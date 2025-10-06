@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>BUILD_TAG=PHASE-3-20240526 | Muscle Routine</title>
+  <title>BUILD_TAG=PHASE-5-20240529 | Muscle Routine</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     html, body { height: 100%; }
@@ -35,7 +35,7 @@
 
   <script>
     const state = {
-      schemaVersion: 1,
+      schemaVersion: 2,
       master: {
         parts: [
           { id: 'chest', label: '胸' },
@@ -60,78 +60,15 @@
         angles: ['-', 'インクライン', 'オーバーヘッド', 'デクライン', 'フラット', 'ミッド'],
         positions: ['-', 'ニーリング', 'ナロー', 'ハーフスタンス', 'ワイド', '片脚']
       },
-      history: [
-        {
-          date: '2024-05-23',
-          items: [
-            {
-              part: 'chest',
-              exercise: 'バーベルベンチプレス',
-              gear: 'バーベル',
-              attachment: '-',
-              angle: 'フラット',
-              position: '-',
-              timed: false,
-              oneHand: false,
-              sets: [
-                { weight: 80, repsU: 8, repsA: 0, seconds: null, warmup: false, drop: false, round: 1, ts: 1716452400000 },
-                { weight: 85, repsU: 6, repsA: 0, seconds: null, warmup: false, drop: false, round: 1, ts: 1716452460000 }
-              ]
-            },
-            {
-              part: 'back',
-              exercise: 'ラットプルダウン',
-              gear: 'マシン',
-              attachment: 'ワイドバー',
-              angle: '-',
-              position: '-',
-              timed: false,
-              oneHand: false,
-              sets: [
-                { weight: 50, repsU: 12, repsA: 0, seconds: null, warmup: false, drop: false, round: 1, ts: 1716453000000 },
-                { weight: 55, repsU: 10, repsA: 0, seconds: null, warmup: false, drop: false, round: 1, ts: 1716453060000 }
-              ]
-            }
-          ]
-        },
-        {
-          date: '2024-05-20',
-          items: [
-            {
-              part: 'leg',
-              exercise: 'スクワット',
-              gear: 'バーベル',
-              attachment: '-',
-              angle: '-',
-              position: 'ワイド',
-              timed: false,
-              oneHand: false,
-              sets: [
-                { weight: 120, repsU: 5, repsA: 0, seconds: null, warmup: false, drop: false, round: 1, ts: 1716193200000 }
-              ]
-            },
-            {
-              part: 'core',
-              exercise: 'プランク',
-              gear: '自重',
-              attachment: '-',
-              angle: '-',
-              position: '-',
-              timed: true,
-              oneHand: false,
-              sets: [
-                { weight: null, repsU: null, repsA: null, seconds: 60, warmup: false, drop: false, round: 1, ts: 1716193800000 }
-              ]
-            }
-          ]
-        }
-      ],
+      history: [],
       day: {
         date: new Date().toISOString().slice(0, 10),
         items: [
           {
-            id: 'item-1',
+            id: createId('item'),
             order: 1,
+            mode: 'single',
+            groupId: null,
             part: 'chest',
             exercise: 'バーベルベンチプレス',
             gear: 'バーベル',
@@ -140,13 +77,13 @@
             position: '-',
             timed: false,
             oneHand: false,
-            superset: false,
             sets: [
-              { id: 'set-1', parentId: null, weight: 60, repsU: 10, repsA: 0, seconds: null, warmup: true, drop: false, round: 1, ts: Date.now() - 3600000 },
-              { id: 'set-2', parentId: null, weight: 80, repsU: 8, repsA: 0, seconds: null, warmup: false, drop: false, round: 1, ts: Date.now() - 3500000 },
-              { id: 'set-3', parentId: 'set-2', weight: 60, repsU: 12, repsA: 0, seconds: null, warmup: false, drop: true, round: 1, ts: Date.now() - 3490000 }
+              createSet({ weight: 60, repsU: 10, repsA: 0, warmup: true, drop: false, round: null, ts: Date.now() - 7200000 }),
+              createSet({ weight: 80, repsU: 8, repsA: 0, warmup: false, drop: false, round: null, ts: Date.now() - 7100000 }),
+              createSet({ weight: 60, repsU: 12, repsA: 0, warmup: false, drop: true, round: null, ts: Date.now() - 7090000 })
             ]
-          }
+          },
+          ...createSampleSuperset()
         ]
       }
     };
@@ -158,10 +95,73 @@
       setEditor: null
     };
 
+    function createId(prefix) {
+      return `${prefix}-${Math.random().toString(36).slice(2, 11)}`;
+    }
+
+    function createSet({ weight = null, repsU = null, repsA = null, seconds = null, warmup = false, drop = false, round = null, ts = Date.now() }) {
+      return { id: createId('set'), weight, repsU, repsA, seconds, warmup, drop, round, ts };
+    }
+
+    function createSampleSuperset() {
+      const groupId = createGroupId();
+      const now = Date.now();
+      const baseTs = now - 3600000;
+      const bench = {
+        id: createId('item'),
+        order: 2,
+        mode: 'superset',
+        groupId,
+        part: 'chest',
+        exercise: 'ダンベルフライ',
+        gear: 'ダンベル',
+        attachment: '-',
+        angle: 'フラット',
+        position: '-',
+        timed: false,
+        oneHand: false,
+        sets: [
+          createSet({ weight: 20, repsU: 12, repsA: 0, warmup: false, drop: false, round: 0, ts: baseTs }),
+          createSet({ weight: 14, repsU: 12, repsA: 0, warmup: false, drop: true, round: 0, ts: baseTs + 1000 })
+        ]
+      };
+      const pull = {
+        id: createId('item'),
+        order: 2.01,
+        mode: 'superset',
+        groupId,
+        part: 'back',
+        exercise: 'ラットプルダウン',
+        gear: 'マシン',
+        attachment: 'ワイドバー',
+        angle: '-',
+        position: '-',
+        timed: false,
+        oneHand: false,
+        sets: [
+          createSet({ weight: 55, repsU: 10, repsA: 0, warmup: false, drop: false, round: 0, ts: baseTs })
+        ]
+      };
+      return [bench, pull];
+    }
+
+    function createGroupId() {
+      return `grp_${Math.random().toString(36).slice(2, 8)}`;
+    }
+
     function createExerciseFormState() {
+      return {
+        superset: false,
+        cards: [createExerciseCardState('A')]
+      };
+    }
+
+    function createExerciseCardState(label) {
       const firstPart = state.master.parts[0]?.id ?? '';
       const firstExercise = (state.master.exercises[firstPart] || [])[0] || '';
       return {
+        key: createId('card'),
+        label,
         part: firstPart,
         exercise: firstExercise,
         gear: '-',
@@ -169,8 +169,7 @@
         angle: '-',
         position: '-',
         timed: false,
-        oneHand: false,
-        superset: false
+        oneHand: false
       };
     }
 
@@ -256,93 +255,63 @@
       });
       container.appendChild(navRow);
 
-      const recentCard = document.createElement('section');
-      recentCard.className = 'section-card bg-white p-6 space-y-4';
-      recentCard.innerHTML = `
+      const statsCard = document.createElement('section');
+      statsCard.className = 'section-card bg-white p-6 space-y-4';
+      const todayStats = computeTodayStats();
+      statsCard.innerHTML = `
         <div class="flex items-center justify-between">
-          <h2 class="text-xl font-semibold">部位別 直近記録</h2>
-          <span class="text-xs text-slate-400">最新の非ウォームアップセット</span>
+          <h2 class="text-xl font-semibold">今日の概要</h2>
+          <span class="text-xs text-slate-400">ウォームアップ除外</span>
+        </div>
+        <div class="grid grid-cols-3 gap-3 text-center">
+          <div class="ios-card bg-indigo-50 text-indigo-700 py-3 min-h-[44px] flex flex-col justify-center">
+            <p class="text-xs">作業セット</p>
+            <p class="text-2xl font-semibold">${todayStats.workSets}</p>
+          </div>
+          <div class="ios-card bg-orange-50 text-orange-700 py-3 min-h-[44px] flex flex-col justify-center">
+            <p class="text-xs">SSラウンド</p>
+            <p class="text-2xl font-semibold">${todayStats.supersetRounds}</p>
+          </div>
+          <div class="ios-card bg-emerald-50 text-emerald-700 py-3 min-h-[44px] flex flex-col justify-center">
+            <p class="text-xs">単独セット</p>
+            <p class="text-2xl font-semibold">${todayStats.soloSets}</p>
+          </div>
         </div>
       `;
-      const list = document.createElement('div');
-      list.className = 'flex flex-col divide-y divide-slate-100';
-      state.master.parts.forEach(part => {
-        const record = getLatestRecordForPart(part.id);
-        const row = document.createElement('div');
-        row.className = 'py-3 flex items-start justify-between gap-3';
-        const left = document.createElement('div');
-        left.className = 'min-w-0';
-        left.innerHTML = `<p class="text-sm font-semibold text-slate-600">${part.label}</p>`;
-        const right = document.createElement('div');
-        right.className = 'text-right text-sm text-slate-500 min-w-0';
-        if (record) {
-          const { date, item, set } = record;
-          const detail = item.timed ? `${set.seconds}秒` : `${set.weight ?? '-'}kg×${set.repsU ?? '-'}${set.repsA ? ` (+${set.repsA}補助)` : ''}`;
-          right.innerHTML = `
-            <p class="truncate">${item.exercise}</p>
-            <p class="text-xs text-slate-400">${date}</p>
-            <p class="text-xs text-slate-500">${detail}</p>
-          `;
-        } else {
-          right.innerHTML = `<p class="text-xs text-slate-400">記録なし</p>`;
-        }
-        row.append(left, right);
-        list.appendChild(row);
-      });
-      recentCard.appendChild(list);
-      container.appendChild(recentCard);
-
-      const freqCard = document.createElement('section');
-      freqCard.className = 'section-card bg-white p-6 space-y-6';
-      freqCard.innerHTML = '<h2 class="text-xl font-semibold">直近の頻度</h2>';
-      [
-        { label: '1週間', days: 7 },
-        { label: '1ヶ月', days: 30 }
-      ].forEach(period => {
-        const count = countWorkouts(period.days);
-        const max = period.days;
-        const ratio = Math.min(1, count / max);
-        const block = document.createElement('div');
-        block.className = 'space-y-2';
-        block.innerHTML = `
-          <div class="flex items-center justify-between text-sm text-slate-500">
-            <span>${period.label}</span>
-            <span>${count}日</span>
-          </div>
-          <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
-            <div class="h-full bg-indigo-500 transition-all" style="width: ${ratio * 100}%"></div>
-          </div>
-        `;
-        freqCard.appendChild(block);
-      });
-      container.appendChild(freqCard);
+      container.appendChild(statsCard);
     }
 
-    function getLatestRecordForPart(partId) {
-      const allDays = [state.day, ...state.history].sort((a, b) => b.date.localeCompare(a.date));
-      for (const day of allDays) {
-        const item = day.items.find(it => it.part === partId && Array.isArray(it.sets));
-        if (!item) continue;
-        const sets = [...item.sets].filter(set => !set.warmup).sort((a, b) => (b.ts ?? 0) - (a.ts ?? 0));
-        if (sets.length > 0) {
-          return { date: day.date, item, set: sets[0] };
-        }
-      }
-      return null;
-    }
-
-    function countWorkouts(days) {
-      const cutoff = new Date();
-      cutoff.setDate(cutoff.getDate() - (days - 1));
-      const allDays = [state.day, ...state.history];
-      const uniqueDates = new Set();
-      allDays.forEach(day => {
-        const dateObj = new Date(day.date);
-        if (!Number.isNaN(dateObj.valueOf()) && dateObj >= cutoff && day.items.length > 0) {
-          uniqueDates.add(day.date);
-        }
+    function computeTodayStats() {
+      const singles = state.day.items
+        .filter(item => item.mode === 'single')
+        .flatMap(item => item.sets)
+        .filter(set => !set.warmup)
+        .length;
+      const roundMap = new Map();
+      state.day.items
+        .filter(item => item.mode === 'superset' && item.groupId)
+        .forEach(item => {
+          if (!roundMap.has(item.groupId)) roundMap.set(item.groupId, new Map());
+          const groupRounds = roundMap.get(item.groupId);
+          item.sets.forEach(set => {
+            if (set.round === null || set.round === undefined) return;
+            if (!groupRounds.has(set.round)) groupRounds.set(set.round, { hasWorking: false });
+            if (!set.warmup) {
+              groupRounds.get(set.round).hasWorking = true;
+            }
+          });
+        });
+      let supersetRounds = 0;
+      roundMap.forEach(group => {
+        group.forEach(entry => {
+          if (entry.hasWorking) supersetRounds += 1;
+        });
       });
-      return uniqueDates.size;
+      return {
+        soloSets: singles,
+        supersetRounds,
+        workSets: singles + supersetRounds
+      };
     }
 
     function renderToday() {
@@ -390,125 +359,239 @@
       const list = document.createElement('div');
       list.className = 'space-y-4';
       const sortedItems = [...state.day.items].sort((a, b) => a.order - b.order);
-      sortedItems.forEach((item, index) => {
-        const card = document.createElement('article');
-        card.className = 'section-card bg-white p-5 space-y-3';
-        const header = document.createElement('div');
-        header.className = 'flex items-start justify-between gap-3';
-        const partLabel = state.master.parts.find(p => p.id === item.part)?.label ?? '';
-        header.innerHTML = `
-          <div class="min-w-0">
-            <p class="text-sm font-semibold text-slate-600 truncate">${index + 1}. ${item.exercise}</p>
-            <p class="text-xs text-slate-400">${partLabel}</p>
-          </div>
-          <div class="text-xs text-slate-400 text-right min-w-0 truncate">
-            ${[item.gear, item.angle, item.position].map(val => val && val !== '-' ? val : '―').join(' / ')}
-          </div>
-        `;
-        card.appendChild(header);
-
-        if (item.attachment && item.attachment !== '-') {
-          const att = document.createElement('p');
-          att.className = 'text-[11px] text-slate-400';
-          att.textContent = `アタッチメント: ${item.attachment}`;
-          card.appendChild(att);
+      const processedGroups = new Set();
+      sortedItems.forEach(item => {
+        if (item.mode === 'superset') {
+          if (!item.groupId || processedGroups.has(item.groupId)) return;
+          const groupItems = sortedItems.filter(candidate => candidate.groupId === item.groupId);
+          processedGroups.add(item.groupId);
+          list.appendChild(buildSupersetCard(groupItems));
+        } else {
+          list.appendChild(buildSingleCard(item));
         }
-
-        const badgeRow = document.createElement('div');
-        badgeRow.className = 'flex flex-col gap-2';
-        const baseSets = item.sets.filter(set => !set.drop);
-        baseSets.forEach(set => {
-          const row = document.createElement('div');
-          row.className = 'flex items-start gap-2';
-          row.appendChild(createSetBadge(set, item));
-          const drops = item.sets.filter(child => child.parentId === set.id && child.drop);
-          if (drops.length > 0) {
-            const dropList = document.createElement('div');
-            dropList.className = 'pl-6 flex flex-wrap gap-2';
-            drops.forEach(drop => dropList.appendChild(createSetBadge(drop, item, true)));
-            row.appendChild(dropList);
-          }
-          badgeRow.appendChild(row);
-        });
-        card.appendChild(badgeRow);
-
-        const controls = document.createElement('div');
-        controls.className = 'flex justify-end gap-3 pt-1';
-        const editBtn = document.createElement('button');
-        editBtn.type = 'button';
-        editBtn.className = 'px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 text-sm font-semibold min-h-[44px]';
-        editBtn.textContent = '編集';
-        editBtn.addEventListener('click', () => {
-          uiState.currentItemId = item.id;
-          prepareSetEditor(item.id);
-          navigate('#/set');
-        });
-        const deleteBtn = document.createElement('button');
-        deleteBtn.type = 'button';
-        deleteBtn.className = 'px-4 py-2 rounded-full bg-rose-100 text-rose-700 text-sm font-semibold min-h-[44px]';
-        deleteBtn.textContent = '削除';
-        deleteBtn.addEventListener('click', () => removeItem(item.id));
-        controls.append(editBtn, deleteBtn);
-        card.appendChild(controls);
-        list.appendChild(card);
       });
       container.appendChild(list);
+    }
 
-      const backButton = document.createElement('button');
-      backButton.type = 'button';
-      backButton.className = 'self-start text-sm text-indigo-500 font-semibold px-4 py-3 min-h-[44px]';
-      backButton.textContent = '← ダッシュボードに戻る';
-      backButton.addEventListener('click', () => navigate('#/dashboard'));
-      container.appendChild(backButton);
+    function buildSingleCard(item) {
+      const card = document.createElement('article');
+      card.className = 'section-card bg-white p-5 space-y-4';
+      const partLabel = state.master.parts.find(p => p.id === item.part)?.label ?? '';
+      const header = document.createElement('div');
+      header.className = 'flex items-start justify-between gap-3';
+      header.innerHTML = `
+        <div class="min-w-0">
+          <p class="text-sm font-semibold text-slate-600 truncate">${item.exercise}</p>
+          <p class="text-xs text-slate-400">${partLabel}</p>
+        </div>
+        <div class="text-xs text-slate-400 text-right min-w-0 truncate">
+          ${[item.gear, item.angle, item.position].map(val => val && val !== '-' ? val : '―').join(' / ')}
+        </div>
+      `;
+      card.appendChild(header);
+      if (item.attachment && item.attachment !== '-') {
+        const att = document.createElement('p');
+        att.className = 'text-[11px] text-slate-400';
+        att.textContent = `アタッチメント: ${item.attachment}`;
+        card.appendChild(att);
+      }
+
+      const badgeArea = document.createElement('div');
+      badgeArea.className = 'flex flex-col gap-2';
+      groupSetsForDisplay(item.sets).forEach(group => {
+        const row = document.createElement('div');
+        row.className = 'flex items-start gap-2';
+        row.appendChild(createSetBadge(group.base, item));
+        if (group.drops.length > 0) {
+          const dropList = document.createElement('div');
+          dropList.className = 'pl-6 flex flex-wrap gap-2';
+          group.drops.forEach(drop => dropList.appendChild(createSetBadge(drop, item, true)));
+          row.appendChild(dropList);
+        }
+        badgeArea.appendChild(row);
+      });
+      card.appendChild(badgeArea);
+
+      const controls = document.createElement('div');
+      controls.className = 'flex justify-end gap-3 pt-1';
+      const editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 text-sm font-semibold min-h-[44px]';
+      editBtn.textContent = '編集';
+      editBtn.addEventListener('click', () => {
+        uiState.currentItemId = item.id;
+        prepareSetEditor(item.id);
+        navigate('#/set');
+      });
+      controls.appendChild(editBtn);
+      card.appendChild(controls);
+      return card;
+    }
+
+    function buildSupersetCard(groupItems) {
+      const sorted = [...groupItems].sort((a, b) => a.order - b.order);
+      const labels = ['A', 'B', 'C'];
+      const title = `(SS) ${sorted.map(item => item.exercise).join(' + ')}`;
+      const card = document.createElement('article');
+      card.className = 'section-card bg-white p-5 space-y-4';
+      const header = document.createElement('div');
+      header.className = 'flex items-start justify-between gap-3';
+      header.innerHTML = `
+        <div class="min-w-0">
+          <p class="text-sm font-semibold text-slate-600 truncate">${title}</p>
+          <p class="text-xs text-slate-400">${sorted.map((item, index) => `${labels[index]}. ${state.master.parts.find(p => p.id === item.part)?.label ?? ''}`).join(' / ')}</p>
+        </div>
+        <div class="text-xs text-slate-400 text-right min-w-0 truncate">
+          ${sorted.map(item => [item.gear, item.angle, item.position].map(val => val && val !== '-' ? val : '―').join(' / ')).join(' ｜ ')}
+        </div>
+      `;
+      card.appendChild(header);
+
+      const rounds = buildSupersetRounds(sorted);
+      if (rounds.length > 0) {
+        const roundList = document.createElement('div');
+        roundList.className = 'flex flex-col gap-2';
+        rounds.forEach(round => {
+          const row = document.createElement('div');
+          row.className = 'flex flex-col gap-1';
+          const badgeRow = document.createElement('div');
+          badgeRow.className = 'flex flex-wrap gap-2 items-start';
+          round.entries.forEach(entry => badgeRow.appendChild(entry));
+          row.appendChild(badgeRow);
+          if (round.drops.length > 0) {
+            const dropRow = document.createElement('div');
+            dropRow.className = 'pl-6 flex flex-wrap gap-2';
+            round.drops.forEach(drop => dropRow.appendChild(drop));
+            row.appendChild(dropRow);
+          }
+          roundList.appendChild(row);
+        });
+        card.appendChild(roundList);
+      }
+
+      const soloArea = document.createElement('div');
+      const soloChips = [];
+      sorted.forEach((item, index) => {
+        const solos = groupSetsForDisplay(item.sets.filter(set => set.round == null));
+        solos.forEach(group => {
+          const row = document.createElement('div');
+          row.className = 'flex items-start gap-2';
+          const chip = createSetBadge(group.base, item);
+          chip.textContent = `${labels[index]}: ${chip.textContent}`;
+          row.appendChild(chip);
+          if (group.drops.length > 0) {
+            const dropList = document.createElement('div');
+            dropList.className = 'pl-6 flex flex-wrap gap-2';
+            group.drops.forEach(drop => dropList.appendChild(createSetBadge(drop, item, true)));
+            row.appendChild(dropList);
+          }
+          soloChips.push(row);
+        });
+      });
+      if (soloChips.length > 0) {
+        const heading = document.createElement('p');
+        heading.className = 'text-xs text-slate-400';
+        heading.textContent = '単独セット';
+        card.appendChild(heading);
+        soloChips.forEach(row => card.appendChild(row));
+      }
+
+      const controls = document.createElement('div');
+      controls.className = 'flex justify-end gap-3 pt-1';
+      const editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 text-sm font-semibold min-h-[44px]';
+      editBtn.textContent = '編集';
+      editBtn.addEventListener('click', () => {
+        uiState.currentItemId = sorted[0].id;
+        prepareSetEditor(sorted[0].id);
+        navigate('#/set');
+      });
+      controls.appendChild(editBtn);
+      card.appendChild(controls);
+      return card;
+    }
+
+    function buildSupersetRounds(groupItems) {
+      const map = new Map();
+      const labels = ['A', 'B', 'C'];
+      groupItems.forEach((item, index) => {
+        let currentBase = null;
+        item.sets
+          .filter(set => set.round !== null && set.round !== undefined)
+          .sort((a, b) => a.ts - b.ts)
+          .forEach(set => {
+            if (!map.has(set.round)) {
+              map.set(set.round, { entries: new Map(), drops: [] });
+            }
+            const slot = map.get(set.round);
+            if (!set.drop) {
+              currentBase = { item, set };
+              slot.entries.set(labels[index], { item, set, drops: [] });
+            } else if (currentBase && slot.entries.has(labels[index])) {
+              slot.entries.get(labels[index]).drops.push({ item, set });
+            } else {
+              slot.drops.push(createSetBadge(set, item, true));
+            }
+          });
+      });
+      const rows = [];
+      [...map.keys()].sort((a, b) => a - b).forEach(round => {
+        const entry = map.get(round);
+        const displayEntries = [];
+        const dropBadges = [...entry.drops];
+        groupItems.forEach((item, index) => {
+          const label = labels[index];
+          const data = entry.entries.get(label);
+          if (data) {
+            const chip = createSetBadge(data.set, data.item);
+            chip.textContent = `${label}: ${chip.textContent}`;
+            displayEntries.push(chip);
+            data.drops.forEach(drop => {
+              dropBadges.push(createSetBadge(drop.set, drop.item, true));
+            });
+          }
+        });
+        if (displayEntries.length > 0) {
+          rows.push({ entries: displayEntries, drops: dropBadges });
+        }
+      });
+      return rows;
+    }
+
+    function groupSetsForDisplay(sets) {
+      const rows = [];
+      let current = null;
+      sets.forEach(set => {
+        if (!set.drop) {
+          current = { base: set, drops: [] };
+          rows.push(current);
+        } else if (current) {
+          current.drops.push(set);
+        } else {
+          rows.push({ base: set, drops: [] });
+        }
+      });
+      return rows;
     }
 
     function createSetBadge(set, item, isDrop = false) {
       const badge = document.createElement('span');
-      const baseStyle = 'inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold min-h-[32px]';
-      if (set.warmup) {
-        badge.className = `${baseStyle} bg-slate-200 text-slate-600`;
-      } else if (isDrop) {
-        badge.className = `${baseStyle} bg-amber-100 text-amber-700`;
-      } else {
-        badge.className = `${baseStyle} bg-orange-500 text-white`;
-      }
-      if (item.timed) {
-        badge.textContent = `${set.seconds ?? 0}秒${isDrop ? ' (Drop)' : ''}`;
-      } else {
-        const reps = set.repsU != null ? `${set.repsU}` : '-';
-        const assist = set.repsA ? ` +補助${set.repsA}` : '';
-        badge.textContent = `${set.weight ?? 0}kg×${reps}${assist}${isDrop ? ' (Drop)' : ''}`;
-      }
-      if (set.round && set.round > 1) {
-        badge.title = `ラウンド ${set.round}`;
-      }
+      const baseClasses = 'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold min-h-[32px] truncate';
+      const color = set.warmup ? 'bg-slate-200 text-slate-600' : 'bg-orange-100 text-orange-700';
+      badge.className = `${baseClasses} ${isDrop ? 'border border-orange-200 bg-orange-50 text-orange-600' : color}`;
+      badge.textContent = formatSetValue(set, item.timed);
       return badge;
     }
 
-    function computeTodayStats() {
-      const allSets = state.day.items.flatMap(item => item.sets.map(set => ({ set, item })));
-      const workSets = allSets.filter(({ set }) => !set.warmup).length;
-      const roundKeys = new Set();
-      allSets.forEach(({ set }) => {
-        if (!set.warmup) {
-          const key = `${set.round || 1}`;
-          roundKeys.add(key);
-        }
-      });
-      const soloSets = allSets.filter(({ set }) => !set.warmup && (set.round || 1) === 1).length;
-      return {
-        workSets,
-        supersetRounds: roundKeys.size,
-        soloSets
-      };
-    }
-
-    function removeItem(itemId) {
-      state.day.items = state.day.items.filter(item => item.id !== itemId);
-      state.day.items.sort((a, b) => a.order - b.order).forEach((item, index) => {
-        item.order = index + 1;
-      });
-      renderToday();
+    function formatSetValue(set, timed) {
+      if (timed) {
+        return `${set.seconds ?? '-'}秒`;
+      }
+      const weight = set.weight != null ? `${set.weight}kg` : '-kg';
+      const reps = set.repsU != null ? `${set.repsU}` : '-';
+      const assist = set.repsA != null && set.repsA > 0 ? ` +${set.repsA}` : '';
+      return `${weight}×${reps}${assist}`;
     }
 
     function renderExercise() {
@@ -518,205 +601,323 @@
       const form = document.createElement('form');
       form.className = 'section-card bg-white p-6 space-y-6';
       form.innerHTML = `
-        <div class="space-y-2">
-          <h2 class="text-xl font-semibold">種目の選択</h2>
-          <p class="text-xs text-slate-400">部位を選ぶと種目リストが更新されます。</p>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <label class="flex flex-col gap-1 text-sm font-semibold text-slate-600">
-            部位
-            <select id="partSelect" class="w-full rounded-2xl border border-slate-200 px-3 py-3 text-sm min-h-[44px]" required></select>
-          </label>
-          <label class="flex flex-col gap-1 text-sm font-semibold text-slate-600">
-            種目
-            <select id="exerciseSelect" class="w-full rounded-2xl border border-slate-200 px-3 py-3 text-sm min-h-[44px]" required></select>
-          </label>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <label class="flex flex-col gap-1 text-sm font-semibold text-slate-600">
-            器具
-            <select id="gearSelect" class="w-full rounded-2xl border border-slate-200 px-3 py-3 text-sm min-h-[44px]"></select>
-          </label>
-          <label class="flex flex-col gap-1 text-sm font-semibold text-slate-600">
-            アタッチメント
-            <select id="attachmentSelect" class="w-full rounded-2xl border border-slate-200 px-3 py-3 text-sm min-h-[44px]"></select>
-          </label>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <label class="flex flex-col gap-1 text-sm font-semibold text-slate-600">
-            角度
-            <select id="angleSelect" class="w-full rounded-2xl border border-slate-200 px-3 py-3 text-sm min-h-[44px]"></select>
-          </label>
-          <label class="flex flex-col gap-1 text-sm font-semibold text-slate-600">
-            ポジション
-            <select id="positionSelect" class="w-full rounded-2xl border border-slate-200 px-3 py-3 text-sm min-h-[44px]"></select>
-          </label>
-        </div>
-        <div class="flex flex-col sm:flex-row gap-4 text-sm text-slate-600">
-          <label class="flex items-center gap-2 bg-slate-100 rounded-2xl px-4 py-3 min-h-[44px]">
-            <input type="checkbox" id="timedToggle" class="w-5 h-5 rounded" ${uiState.exerciseForm.timed ? 'checked' : ''}>
-            秒数で記録
-          </label>
-          <label class="flex items-center gap-2 bg-slate-100 rounded-2xl px-4 py-3 min-h-[44px]">
-            <input type="checkbox" id="oneHandToggle" class="w-5 h-5 rounded" ${uiState.exerciseForm.oneHand ? 'checked' : ''}>
-            ワンハンド
-          </label>
-          <label class="flex items-center gap-2 bg-slate-100 rounded-2xl px-4 py-3 min-h-[44px]">
-            <input type="checkbox" id="supersetToggle" class="w-5 h-5 rounded" ${uiState.exerciseForm.superset ? 'checked' : ''}>
-            スーパーセット
-          </label>
-        </div>
-        <div class="flex justify-between items-center">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-semibold">種目入力</h2>
           <button type="button" id="exerciseBack" class="text-sm text-indigo-500 font-semibold px-3 py-2 min-h-[44px]">← 今日の一覧へ戻る</button>
+        </div>
+        <div class="flex items-center gap-3 bg-slate-100 rounded-2xl px-4 py-3 text-sm text-slate-600">
+          <input type="checkbox" id="supersetToggle" class="w-5 h-5 rounded" ${uiState.exerciseForm.superset ? 'checked' : ''}>
+          <label for="supersetToggle" class="font-semibold">スーパーセットにする</label>
+        </div>
+        <div id="exerciseCards" class="flex flex-col gap-4"></div>
+        <div class="flex justify-between items-center">
           <button type="submit" class="ios-card bg-indigo-500 text-white px-6 py-3 font-semibold min-h-[44px]">決定</button>
         </div>
       `;
       container.appendChild(form);
 
-      populateSelectOptions(form.querySelector('#partSelect'), state.master.parts.map(p => ({ value: p.id, label: p.label })), uiState.exerciseForm.part);
-      updateExerciseOptions(form.querySelector('#exerciseSelect'), uiState.exerciseForm.part, uiState.exerciseForm.exercise);
-      populateSelectOptions(form.querySelector('#gearSelect'), sortForDisplay(state.master.gear).map(value => ({ value, label: value })), uiState.exerciseForm.gear);
-      populateSelectOptions(form.querySelector('#attachmentSelect'), sortForDisplay(state.master.attachments).map(value => ({ value, label: value })), uiState.exerciseForm.attachment);
-      populateSelectOptions(form.querySelector('#angleSelect'), sortForDisplay(state.master.angles).map(value => ({ value, label: value })), uiState.exerciseForm.angle);
-      populateSelectOptions(form.querySelector('#positionSelect'), sortForDisplay(state.master.positions).map(value => ({ value, label: value })), uiState.exerciseForm.position);
+      const cardsContainer = form.querySelector('#exerciseCards');
+      renderExerciseCards(cardsContainer);
 
       form.addEventListener('change', event => {
-        if (event.target.id === 'partSelect') {
-          uiState.exerciseForm.part = event.target.value;
-          updateExerciseOptions(form.querySelector('#exerciseSelect'), uiState.exerciseForm.part);
-        } else if (event.target.id === 'exerciseSelect') {
-          uiState.exerciseForm.exercise = event.target.value;
-        } else if (event.target.id === 'gearSelect') {
-          uiState.exerciseForm.gear = event.target.value;
-        } else if (event.target.id === 'attachmentSelect') {
-          uiState.exerciseForm.attachment = event.target.value;
-        } else if (event.target.id === 'angleSelect') {
-          uiState.exerciseForm.angle = event.target.value;
-        } else if (event.target.id === 'positionSelect') {
-          uiState.exerciseForm.position = event.target.value;
-        } else if (event.target.id === 'timedToggle') {
-          uiState.exerciseForm.timed = event.target.checked;
-        } else if (event.target.id === 'oneHandToggle') {
-          uiState.exerciseForm.oneHand = event.target.checked;
-        } else if (event.target.id === 'supersetToggle') {
+        if (event.target.id === 'supersetToggle') {
           uiState.exerciseForm.superset = event.target.checked;
+          if (uiState.exerciseForm.superset && uiState.exerciseForm.cards.length < 2) {
+            uiState.exerciseForm.cards = [createExerciseCardState('A'), createExerciseCardState('B')];
+          }
+          if (!uiState.exerciseForm.superset) {
+            uiState.exerciseForm.cards = [createExerciseCardState('A')];
+          }
+          renderExercise();
         }
       });
 
       form.addEventListener('submit', event => {
         event.preventDefault();
-        const newItem = createItemFromExerciseForm();
-        state.day.items.push(newItem);
+        const newItems = buildItemsFromExerciseForm();
+        const baseOrder = Math.max(0, ...state.day.items.map(item => item.order)) + 1;
+        newItems.forEach((item, index) => {
+          item.order = item.mode === 'superset' ? baseOrder + index * 0.01 : baseOrder;
+          state.day.items.push(item);
+        });
         state.day.items.sort((a, b) => a.order - b.order);
-        uiState.currentItemId = newItem.id;
-        prepareSetEditor(newItem.id, true);
-        navigate('#/set');
+        const firstId = newItems[0]?.id;
+        if (firstId) {
+          uiState.currentItemId = firstId;
+          prepareSetEditor(firstId, true);
+          navigate('#/set');
+        } else {
+          navigate('#/today');
+        }
       });
 
       form.querySelector('#exerciseBack').addEventListener('click', () => navigate('#/today'));
     }
 
-    function populateSelectOptions(select, options, currentValue) {
+    function renderExerciseCards(container) {
+      container.innerHTML = '';
+      uiState.exerciseForm.cards.forEach((card, index) => {
+        const cardEl = document.createElement('section');
+        cardEl.className = 'bg-slate-50 rounded-2xl p-4 space-y-4 border border-slate-200';
+        const label = uiState.exerciseForm.superset ? ['A', 'B', 'C'][index] : '';
+        const title = uiState.exerciseForm.superset ? `${label} 種目` : '種目設定';
+        cardEl.innerHTML = `
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-slate-600">${title}</h3>
+            ${uiState.exerciseForm.superset && uiState.exerciseForm.cards.length > 2 && index === uiState.exerciseForm.cards.length - 1
+              ? '<button type="button" class="text-xs text-rose-500 font-semibold" data-remove="true">削除</button>'
+              : ''}
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <label class="flex flex-col gap-1 text-sm font-semibold text-slate-600">
+              部位
+              <select class="w-full rounded-2xl border border-slate-200 px-3 py-3 text-sm min-h-[44px]" data-field="part"></select>
+            </label>
+            <label class="flex flex-col gap-1 text-sm font-semibold text-slate-600">
+              種目
+              <select class="w-full rounded-2xl border border-slate-200 px-3 py-3 text-sm min-h-[44px]" data-field="exercise"></select>
+            </label>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <label class="flex flex-col gap-1 text-sm font-semibold text-slate-600">
+              器具
+              <select class="w-full rounded-2xl border border-slate-200 px-3 py-3 text-sm min-h-[44px]" data-field="gear"></select>
+            </label>
+            <label class="flex flex-col gap-1 text-sm font-semibold text-slate-600">
+              アタッチメント
+              <select class="w-full rounded-2xl border border-slate-200 px-3 py-3 text-sm min-h-[44px]" data-field="attachment"></select>
+            </label>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <label class="flex flex-col gap-1 text-sm font-semibold text-slate-600">
+              角度
+              <select class="w-full rounded-2xl border border-slate-200 px-3 py-3 text-sm min-h-[44px]" data-field="angle"></select>
+            </label>
+            <label class="flex flex-col gap-1 text-sm font-semibold text-slate-600">
+              ポジション
+              <select class="w-full rounded-2xl border border-slate-200 px-3 py-3 text-sm min-h-[44px]" data-field="position"></select>
+            </label>
+          </div>
+          <div class="flex flex-wrap gap-3 text-sm text-slate-600">
+            <label class="flex items-center gap-2 bg-white rounded-2xl px-4 py-3 min-h-[44px]">
+              <input type="checkbox" class="w-5 h-5 rounded" data-field="timed" ${card.timed ? 'checked' : ''}>
+              秒数で記録
+            </label>
+            <label class="flex items-center gap-2 bg-white rounded-2xl px-4 py-3 min-h-[44px]">
+              <input type="checkbox" class="w-5 h-5 rounded" data-field="oneHand" ${card.oneHand ? 'checked' : ''}>
+              ワンハンド
+            </label>
+          </div>
+        `;
+        container.appendChild(cardEl);
+
+        const partSelect = cardEl.querySelector('[data-field="part"]');
+        const exerciseSelect = cardEl.querySelector('[data-field="exercise"]');
+        const selects = [
+          { element: partSelect, field: 'part', options: state.master.parts.map(p => ({ value: p.id, label: p.label })) },
+          { element: cardEl.querySelector('[data-field="gear"]'), field: 'gear', options: sortForDisplay(state.master.gear).map(value => ({ value, label: value })) },
+          { element: cardEl.querySelector('[data-field="attachment"]'), field: 'attachment', options: sortForDisplay(state.master.attachments).map(value => ({ value, label: value })) },
+          { element: cardEl.querySelector('[data-field="angle"]'), field: 'angle', options: sortForDisplay(state.master.angles).map(value => ({ value, label: value })) },
+          { element: cardEl.querySelector('[data-field="position"]'), field: 'position', options: sortForDisplay(state.master.positions).map(value => ({ value, label: value })) }
+        ];
+        populateSelect(partSelect, selects[0].options, card.part);
+        updateExerciseOptions(exerciseSelect, card);
+        selects.slice(1).forEach(select => populateSelect(select.element, select.options, card[select.field]));
+
+        cardEl.querySelectorAll('select, input[type="checkbox"]').forEach(field => {
+          field.addEventListener('change', event => {
+            const target = event.target;
+            const fieldName = target.getAttribute('data-field');
+            if (!fieldName) return;
+            if (fieldName === 'part') {
+              card.part = target.value;
+              updateExerciseOptions(exerciseSelect, card);
+            } else if (fieldName === 'exercise') {
+              card.exercise = target.value;
+            } else if (fieldName === 'timed' || fieldName === 'oneHand') {
+              card[fieldName] = target.checked;
+            } else {
+              card[fieldName] = target.value;
+            }
+          });
+        });
+
+        if (uiState.exerciseForm.superset && uiState.exerciseForm.cards.length > 2 && index === uiState.exerciseForm.cards.length - 1) {
+          cardEl.querySelector('[data-remove="true"]').addEventListener('click', () => {
+            uiState.exerciseForm.cards.splice(index, 1);
+            renderExercise();
+          });
+        }
+      });
+
+      if (uiState.exerciseForm.superset && uiState.exerciseForm.cards.length < 3) {
+        const addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.className = 'w-full text-sm text-indigo-500 font-semibold px-4 py-3 bg-white rounded-2xl border border-dashed border-indigo-200 min-h-[44px]';
+        addBtn.textContent = '＋ カード追加';
+        addBtn.addEventListener('click', () => {
+          const label = ['A', 'B', 'C'][uiState.exerciseForm.cards.length] || 'C';
+          uiState.exerciseForm.cards.push(createExerciseCardState(label));
+          renderExercise();
+        });
+        container.appendChild(addBtn);
+      }
+    }
+
+    function populateSelect(select, options, selected) {
       select.innerHTML = '';
       options.forEach(option => {
         const opt = document.createElement('option');
         opt.value = option.value;
         opt.textContent = option.label;
-        if (option.value === currentValue) opt.selected = true;
+        if (option.value === selected) opt.selected = true;
         select.appendChild(opt);
       });
     }
 
-    function updateExerciseOptions(select, partId, selectedValue) {
-      const exercises = sortForDisplay(state.master.exercises[partId] || []);
-      const actualSelected = selectedValue && exercises.includes(selectedValue) ? selectedValue : exercises[0] || '';
-      uiState.exerciseForm.exercise = actualSelected;
-      populateSelectOptions(select, exercises.map(value => ({ value, label: value })), actualSelected);
+    function updateExerciseOptions(select, card) {
+      const exercises = sortForDisplay(state.master.exercises[card.part] || []);
+      const actual = card.exercise && exercises.includes(card.exercise) ? card.exercise : exercises[0] || '';
+      select.innerHTML = '';
+      exercises.forEach(value => {
+        const opt = document.createElement('option');
+        opt.value = value;
+        opt.textContent = value;
+        if (value === actual) opt.selected = true;
+        select.appendChild(opt);
+      });
+      card.exercise = actual;
     }
 
-    function createItemFromExerciseForm() {
-      const id = `item-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-      const order = state.day.items.length + 1;
+    function buildItemsFromExerciseForm() {
+      const idBase = Date.now();
+      if (!uiState.exerciseForm.superset) {
+        const card = uiState.exerciseForm.cards[0];
+        return [buildItemFromCard(card, `${idBase}`)];
+      }
+      const groupId = createGroupId();
+      return uiState.exerciseForm.cards.map((card, index) => buildItemFromCard(card, `${idBase}-${index}`, groupId));
+    }
+
+    function buildItemFromCard(card, keySeed, groupId = null) {
       return {
-        id,
-        order,
-        part: uiState.exerciseForm.part,
-        exercise: uiState.exerciseForm.exercise,
-        gear: uiState.exerciseForm.gear,
-        attachment: uiState.exerciseForm.attachment,
-        angle: uiState.exerciseForm.angle,
-        position: uiState.exerciseForm.position,
-        timed: uiState.exerciseForm.timed,
-        oneHand: uiState.exerciseForm.oneHand,
-        superset: uiState.exerciseForm.superset,
+        id: createId('item'),
+        order: state.day.items.length + 1,
+        mode: groupId ? 'superset' : 'single',
+        groupId,
+        part: card.part,
+        exercise: card.exercise,
+        gear: card.gear,
+        attachment: card.attachment,
+        angle: card.angle,
+        position: card.position,
+        timed: card.timed,
+        oneHand: card.oneHand,
         sets: []
       };
     }
 
     function prepareSetEditor(itemId, isNew = false) {
-      const item = state.day.items.find(it => it.id === itemId);
-      if (!item) return;
-      const grouped = [];
-      const baseSets = item.sets.filter(set => !set.drop);
-      if (baseSets.length === 0) {
-        grouped.push(createBlankSetRow(item));
+      const target = state.day.items.find(item => item.id === itemId);
+      if (!target) return;
+      let items = [];
+      if (target.mode === 'superset' && target.groupId) {
+        items = state.day.items.filter(item => item.groupId === target.groupId).sort((a, b) => a.order - b.order);
       } else {
-        baseSets.forEach(base => {
-          const row = {
-            id: base.id,
-            weight: base.weight ?? '',
-            repsU: base.repsU ?? '',
-            repsA: base.repsA ?? '',
-            seconds: base.seconds ?? '',
-            warmup: !!base.warmup,
-            round: base.round || 1,
-            drops: []
-          };
-          const drops = item.sets.filter(child => child.parentId === base.id && child.drop);
-          drops.forEach(drop => {
-            row.drops.push({
-              id: drop.id,
-              weight: drop.weight ?? '',
-              repsU: drop.repsU ?? '',
-              repsA: drop.repsA ?? '',
-              seconds: drop.seconds ?? '',
-              warmup: !!drop.warmup,
-              round: drop.round || 1
-            });
-          });
-          grouped.push(row);
-        });
+        items = [target];
       }
-      uiState.setEditor = {
-        itemId,
+      const editorItems = items.map((item, index) => ({
+        itemId: item.id,
+        label: ['A', 'B', 'C'][index] || 'A',
         timed: item.timed,
-        isNew,
-        rows: grouped
+        mode: item.mode,
+        rows: buildRowsFromSets(item.sets, item.timed)
+      }));
+      const maxRound = Math.max(-1, ...items.flatMap(item => item.sets.filter(set => set.round != null).map(set => set.round)));
+      uiState.setEditor = {
+        isSuperset: target.mode === 'superset',
+        activeIndex: items.findIndex(item => item.id === itemId) || 0,
+        items: editorItems,
+        cycleBuffers: editorItems.map(item => createBuffer(item.timed)),
+        nextRound: maxRound + 1,
+        isNew
       };
     }
 
-    function createBlankSetRow(item) {
+    function buildRowsFromSets(sets, timed) {
+      const rows = [];
+      let current = null;
+      sets.sort((a, b) => a.ts - b.ts).forEach(set => {
+        if (!set.drop) {
+          current = createRowFromSet(set);
+          rows.push(current);
+        } else if (current) {
+          current.drops.push(createDropFromSet(set));
+        } else {
+          const orphan = createRowFromSet(set);
+          rows.push(orphan);
+        }
+      });
+      if (rows.length === 0) {
+        rows.push(createBlankRow(timed));
+      }
+      return rows;
+    }
+
+    function createRowFromSet(set) {
       return {
-        id: `set-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-        weight: item?.timed ? '' : '',
-        repsU: '',
-        repsA: '',
-        seconds: item?.timed ? '' : '',
-        warmup: false,
-        round: 1,
+        id: set.id || createId('row'),
+        weight: set.weight ?? '',
+        repsU: set.repsU ?? '',
+        repsA: set.repsA ?? '',
+        seconds: set.seconds ?? '',
+        warmup: !!set.warmup,
+        round: set.round ?? null,
         drops: []
       };
     }
 
-    function createBlankDropRow(timed) {
+    function createDropFromSet(set) {
       return {
-        id: `drop-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        id: set.id || createId('drop'),
+        weight: set.weight ?? '',
+        repsU: set.repsU ?? '',
+        repsA: set.repsA ?? '',
+        seconds: set.seconds ?? '',
+        warmup: !!set.warmup,
+        round: set.round ?? null
+      };
+    }
+
+    function createBlankRow(timed, round = null) {
+      return {
+        id: createId('row'),
         weight: timed ? '' : '',
         repsU: '',
         repsA: '',
         seconds: timed ? '' : '',
         warmup: false,
-        round: 1
+        round,
+        drops: []
+      };
+    }
+
+    function createBlankDrop(timed, round = null) {
+      return {
+        id: createId('drop'),
+        weight: timed ? '' : '',
+        repsU: '',
+        repsA: '',
+        seconds: timed ? '' : '',
+        warmup: false,
+        round
+      };
+    }
+
+    function createBuffer(timed) {
+      return {
+        row: createBlankRow(timed),
+        drops: []
       };
     }
 
@@ -731,118 +932,127 @@
         container.appendChild(message);
         return;
       }
-      const item = state.day.items.find(it => it.id === editor.itemId);
-      if (!item) return;
-
       const section = document.createElement('section');
       section.className = 'section-card bg-white p-6 space-y-6';
+
+      if (editor.isSuperset) {
+        const tabs = document.createElement('div');
+        tabs.className = 'flex gap-2';
+        editor.items.forEach((item, index) => {
+          const tab = document.createElement('button');
+          tab.type = 'button';
+          tab.className = `flex-1 rounded-2xl px-4 py-2 text-sm font-semibold min-h-[44px] ${index === editor.activeIndex ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-600'}`;
+          tab.textContent = item.label;
+          tab.addEventListener('click', () => {
+            editor.activeIndex = index;
+            renderSet();
+          });
+          tabs.appendChild(tab);
+        });
+        section.appendChild(tabs);
+      }
+
+      const active = editor.items[editor.activeIndex];
+      const item = state.day.items.find(it => it.id === active.itemId);
+      if (!item) {
+        container.appendChild(section);
+        return;
+      }
+
       const subtitle = [item.gear, item.attachment, item.angle, item.position]
         .map(value => (value && value !== '-') ? value : '―')
         .join(' / ');
-      section.innerHTML = `
+      const header = document.createElement('div');
+      header.innerHTML = `
         <div>
           <h2 class="text-xl font-semibold">${item.exercise}</h2>
           <p class="text-[11px] text-slate-400 mt-1">${subtitle}</p>
         </div>
       `;
+      section.appendChild(header);
 
-      const previous = findPreviousRecord(item);
-      const prevPanel = document.createElement('div');
-      prevPanel.className = 'ios-card bg-slate-50 px-4 py-3 space-y-2 text-sm text-slate-600';
-      if (previous) {
-        const badges = previous.item.sets.filter(s => !s.warmup).map(set => {
-          return `<span class=\"inline-flex items-center rounded-full bg-slate-200 px-3 py-1 text-xs\">${previous.item.timed ? `${set.seconds}秒` : `${set.weight}kg×${set.repsU}`}</span>`;
-        }).join('');
-        prevPanel.innerHTML = `
-          <div class="flex items-center justify-between text-xs text-slate-400">
-            <span>前回 (${previous.date})</span>
-            <span>${previous.item.oneHand ? '片手' : '両手'}</span>
-          </div>
-          <div class="flex flex-wrap gap-2">${badges || '<span class="text-xs text-slate-400">データなし</span>'}</div>
-        `;
-      } else {
-        prevPanel.innerHTML = '<p class="text-xs text-slate-400">同条件での過去記録はありません。</p>';
-      }
-      section.appendChild(prevPanel);
-
-      const form = document.createElement('div');
-      form.className = 'space-y-4';
-      editor.rows.forEach((row, rowIndex) => {
+      const rowsWrapper = document.createElement('div');
+      rowsWrapper.className = 'space-y-4';
+      active.rows.forEach((row, rowIndex) => {
         const rowCard = document.createElement('div');
-        rowCard.className = 'ios-card bg-slate-50 p-4 space-y-3';
+        rowCard.className = 'bg-slate-50 rounded-2xl p-4 space-y-4 border border-slate-200';
+        const title = document.createElement('div');
+        title.className = 'flex items-center justify-between text-xs text-slate-500';
+        title.textContent = row.round != null ? `ラウンド ${row.round}` : '単独セット';
+        rowCard.appendChild(title);
 
-        const inputs = document.createElement('div');
-        inputs.className = editor.timed ? 'grid grid-cols-2 gap-3 text-sm text-slate-600' : 'grid grid-cols-4 gap-3 text-sm text-slate-600';
-        if (editor.timed) {
-          const secondsInput = createNumberInput('秒(秒)', row.seconds, value => { row.seconds = parseNumber(value); });
-          const roundInput = createNumberInput('ラウンド', row.round, value => { row.round = parseInt(value || '1', 10) || 1; }, 1);
-          inputs.append(secondsInput.wrapper, roundInput.wrapper);
+        const grid = document.createElement('div');
+        grid.className = 'grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-slate-600';
+        if (active.timed) {
+          grid.appendChild(createNumberInput('秒数', row.seconds, value => { row.seconds = value; }));
         } else {
-          const weightInput = createNumberInput('重量(kg)', row.weight, value => { row.weight = parseNumber(value); });
-          const repsUInput = createNumberInput('自力回数', row.repsU, value => { row.repsU = parseNumber(value); });
-          const repsAInput = createNumberInput('補助回数', row.repsA, value => { row.repsA = parseNumber(value); });
-          const roundInput = createNumberInput('ラウンド', row.round, value => { row.round = parseInt(value || '1', 10) || 1; }, 1);
-          inputs.append(weightInput.wrapper, repsUInput.wrapper, repsAInput.wrapper, roundInput.wrapper);
+          grid.appendChild(createNumberInput('重量(kg)', row.weight, value => { row.weight = value; }));
+          grid.appendChild(createNumberInput('自力レップ', row.repsU, value => { row.repsU = value; }));
+          grid.appendChild(createNumberInput('補助レップ', row.repsA, value => { row.repsA = value; }, 0));
         }
-        rowCard.appendChild(inputs);
+        rowCard.appendChild(grid);
 
         const toggles = document.createElement('div');
         toggles.className = 'flex flex-wrap gap-3 text-sm text-slate-600';
-        const warmup = document.createElement('label');
-        warmup.className = 'flex items-center gap-2 bg-white rounded-2xl px-3 py-2 min-h-[44px]';
+        const warmupLabel = document.createElement('label');
+        warmupLabel.className = 'flex items-center gap-2 bg-white rounded-2xl px-4 py-2 min-h-[40px]';
         const warmupInput = document.createElement('input');
         warmupInput.type = 'checkbox';
-        warmupInput.className = 'w-5 h-5';
+        warmupInput.className = 'w-5 h-5 rounded';
         warmupInput.checked = row.warmup;
         warmupInput.addEventListener('change', () => { row.warmup = warmupInput.checked; });
-        warmup.append(warmupInput, document.createTextNode('ウォームアップ'));
-        toggles.appendChild(warmup);
+        warmupLabel.append(warmupInput, document.createTextNode('ウォームアップ'));
+        toggles.appendChild(warmupLabel);
         rowCard.appendChild(toggles);
 
         const dropArea = document.createElement('div');
-        dropArea.className = 'pl-4 border-l-2 border-dashed border-slate-200 space-y-2';
+        dropArea.className = 'space-y-3';
         row.drops.forEach((drop, dropIndex) => {
           const dropCard = document.createElement('div');
-          dropCard.className = 'bg-white rounded-2xl px-3 py-3 space-y-3';
-          if (editor.timed) {
-            const secondsInput = createNumberInput('秒(秒)', drop.seconds, value => { drop.seconds = parseNumber(value); });
-            const roundInput = createNumberInput('ラウンド', drop.round, value => { drop.round = parseInt(value || '1', 10) || 1; }, 1);
-            dropCard.append(secondsInput.wrapper, roundInput.wrapper);
+          dropCard.className = 'bg-white rounded-2xl p-4 space-y-3 border border-dashed border-orange-200';
+          const dropTitle = document.createElement('p');
+          dropTitle.className = 'text-xs font-semibold text-orange-600';
+          dropTitle.textContent = 'ドロップセット';
+          dropCard.appendChild(dropTitle);
+          const dropGrid = document.createElement('div');
+          dropGrid.className = 'grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-slate-600';
+          if (active.timed) {
+            dropGrid.appendChild(createNumberInput('秒数', drop.seconds, value => { drop.seconds = value; }));
           } else {
-            const weightInput = createNumberInput('重量(kg)', drop.weight, value => { drop.weight = parseNumber(value); });
-            const repsUInput = createNumberInput('自力回数', drop.repsU, value => { drop.repsU = parseNumber(value); });
-            const repsAInput = createNumberInput('補助回数', drop.repsA, value => { drop.repsA = parseNumber(value); });
-            const roundInput = createNumberInput('ラウンド', drop.round, value => { drop.round = parseInt(value || '1', 10) || 1; }, 1);
-            dropCard.append(weightInput.wrapper, repsUInput.wrapper, repsAInput.wrapper, roundInput.wrapper);
+            dropGrid.appendChild(createNumberInput('重量(kg)', drop.weight, value => { drop.weight = value; }));
+            dropGrid.appendChild(createNumberInput('自力レップ', drop.repsU, value => { drop.repsU = value; }));
+            dropGrid.appendChild(createNumberInput('補助レップ', drop.repsA, value => { drop.repsA = value; }, 0));
           }
+          dropCard.appendChild(dropGrid);
+          const dropToggle = document.createElement('label');
+          dropToggle.className = 'inline-flex items-center gap-2 bg-slate-100 rounded-2xl px-3 py-2 text-xs text-slate-600 min-h-[32px]';
+          const dropWarm = document.createElement('input');
+          dropWarm.type = 'checkbox';
+          dropWarm.className = 'w-4 h-4 rounded';
+          dropWarm.checked = drop.warmup;
+          dropWarm.addEventListener('change', () => { drop.warmup = dropWarm.checked; });
+          dropToggle.append(dropWarm, document.createTextNode('ウォームアップ'));
+          dropCard.appendChild(dropToggle);
           const dropFooter = document.createElement('div');
-          dropFooter.className = 'flex justify-between items-center';
-          const warmupDrop = document.createElement('label');
-          warmupDrop.className = 'flex items-center gap-2 text-xs text-slate-500 min-h-[44px]';
-          const warmupDropInput = document.createElement('input');
-          warmupDropInput.type = 'checkbox';
-          warmupDropInput.className = 'w-4 h-4';
-          warmupDropInput.checked = drop.warmup;
-          warmupDropInput.addEventListener('change', () => { drop.warmup = warmupDropInput.checked; });
-          warmupDrop.append(warmupDropInput, document.createTextNode('ウォームアップ'));
-          const removeDrop = document.createElement('button');
-          removeDrop.type = 'button';
-          removeDrop.className = 'text-xs text-rose-500 font-semibold px-3 py-2 rounded-full min-h-[44px]';
-          removeDrop.textContent = '削除';
-          removeDrop.addEventListener('click', () => {
+          dropFooter.className = 'flex justify-end';
+          const dropRemove = document.createElement('button');
+          dropRemove.type = 'button';
+          dropRemove.className = 'text-xs text-rose-500 font-semibold px-3 py-1 min-h-[32px]';
+          dropRemove.textContent = '削除';
+          dropRemove.addEventListener('click', () => {
             row.drops.splice(dropIndex, 1);
             renderSet();
           });
-          dropFooter.append(warmupDrop, removeDrop);
+          dropFooter.appendChild(dropRemove);
           dropCard.appendChild(dropFooter);
           dropArea.appendChild(dropCard);
         });
         const addDropBtn = document.createElement('button');
         addDropBtn.type = 'button';
-        addDropBtn.className = 'w-full text-sm text-indigo-500 font-semibold px-3 py-2 bg-white rounded-2xl min-h-[44px]';
+        addDropBtn.className = 'w-full text-xs text-indigo-500 font-semibold px-4 py-2 bg-white rounded-2xl min-h-[40px]';
         addDropBtn.textContent = '＋ ドロップセット';
         addDropBtn.addEventListener('click', () => {
-          row.drops.push(createBlankDropRow(editor.timed));
+          row.drops.push(createBlankDrop(active.timed, row.round));
           renderSet();
         });
         dropArea.appendChild(addDropBtn);
@@ -855,30 +1065,32 @@
         removeBtn.className = 'text-sm text-rose-500 font-semibold px-4 py-2 min-h-[44px]';
         removeBtn.textContent = 'このセットを削除';
         removeBtn.addEventListener('click', () => {
-          uiState.setEditor.rows.splice(rowIndex, 1);
-          if (uiState.setEditor.rows.length === 0) {
-            uiState.setEditor.rows.push(createBlankSetRow(item));
+          active.rows.splice(rowIndex, 1);
+          if (active.rows.length === 0) {
+            active.rows.push(createBlankRow(active.timed));
           }
           renderSet();
         });
         rowFooter.appendChild(removeBtn);
         rowCard.appendChild(rowFooter);
 
-        form.appendChild(rowCard);
+        rowsWrapper.appendChild(rowCard);
       });
+      section.appendChild(rowsWrapper);
 
       const addSetBtn = document.createElement('button');
       addSetBtn.type = 'button';
       addSetBtn.className = 'w-full text-sm text-indigo-500 font-semibold px-4 py-3 bg-white rounded-2xl min-h-[44px]';
-      addSetBtn.textContent = '＋ セット追加';
+      addSetBtn.textContent = editor.isSuperset ? '＋ 単独セット追加' : '＋ セット追加';
       addSetBtn.addEventListener('click', () => {
-        const itemForRow = state.day.items.find(it => it.id === editor.itemId);
-        uiState.setEditor.rows.push(createBlankSetRow(itemForRow));
+        active.rows.push(createBlankRow(active.timed));
         renderSet();
       });
-      form.appendChild(addSetBtn);
+      section.appendChild(addSetBtn);
 
-      section.appendChild(form);
+      if (editor.isSuperset) {
+        section.appendChild(renderRoundBuffer(editor));
+      }
 
       const footer = document.createElement('div');
       footer.className = 'flex flex-col sm:flex-row gap-3 justify-between';
@@ -905,6 +1117,99 @@
       container.appendChild(section);
     }
 
+    function renderRoundBuffer(editor) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'space-y-4 bg-indigo-50 rounded-2xl p-4 border border-indigo-200';
+      const title = document.createElement('div');
+      title.className = 'flex items-center justify-between';
+      title.innerHTML = `
+        <div>
+          <p class="text-sm font-semibold text-indigo-700">ラウンド入力</p>
+          <p class="text-xs text-indigo-500">現在のラウンド番号: ${editor.nextRound}</p>
+        </div>
+        <button type="button" class="ios-card bg-indigo-500 text-white px-4 py-2 text-sm font-semibold min-h-[40px]" id="nextRoundBtn">次ラウンドへ</button>
+      `;
+      wrapper.appendChild(title);
+      const activeBuffer = editor.cycleBuffers[editor.activeIndex];
+      const activeItem = editor.items[editor.activeIndex];
+      const grid = document.createElement('div');
+      grid.className = 'grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-indigo-700';
+      if (activeItem.timed) {
+        grid.appendChild(createNumberInput('秒数', activeBuffer.row.seconds, value => { activeBuffer.row.seconds = value; }));
+      } else {
+        grid.appendChild(createNumberInput('重量(kg)', activeBuffer.row.weight, value => { activeBuffer.row.weight = value; }));
+        grid.appendChild(createNumberInput('自力レップ', activeBuffer.row.repsU, value => { activeBuffer.row.repsU = value; }));
+        grid.appendChild(createNumberInput('補助レップ', activeBuffer.row.repsA, value => { activeBuffer.row.repsA = value; }, 0));
+      }
+      wrapper.appendChild(grid);
+      const warmupRow = document.createElement('label');
+      warmupRow.className = 'inline-flex items-center gap-2 bg-white rounded-2xl px-3 py-2 text-xs text-indigo-700 min-h-[32px]';
+      const warmupInput = document.createElement('input');
+      warmupInput.type = 'checkbox';
+      warmupInput.className = 'w-4 h-4 rounded';
+      warmupInput.checked = activeBuffer.row.warmup;
+      warmupInput.addEventListener('change', () => { activeBuffer.row.warmup = warmupInput.checked; });
+      warmupRow.append(warmupInput, document.createTextNode('ウォームアップ'));
+      wrapper.appendChild(warmupRow);
+
+      activeBuffer.drops.forEach((drop, index) => {
+        const dropCard = document.createElement('div');
+        dropCard.className = 'bg-white rounded-2xl p-4 space-y-3 border border-dashed border-indigo-200';
+        const dropTitle = document.createElement('p');
+        dropTitle.className = 'text-xs font-semibold text-indigo-600';
+        dropTitle.textContent = 'ドロップセット';
+        dropCard.appendChild(dropTitle);
+        const dropGrid = document.createElement('div');
+        dropGrid.className = 'grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-indigo-700';
+        if (activeItem.timed) {
+          dropGrid.appendChild(createNumberInput('秒数', drop.seconds, value => { drop.seconds = value; }));
+        } else {
+          dropGrid.appendChild(createNumberInput('重量(kg)', drop.weight, value => { drop.weight = value; }));
+          dropGrid.appendChild(createNumberInput('自力レップ', drop.repsU, value => { drop.repsU = value; }));
+          dropGrid.appendChild(createNumberInput('補助レップ', drop.repsA, value => { drop.repsA = value; }, 0));
+        }
+        dropCard.appendChild(dropGrid);
+        const dropToggle = document.createElement('label');
+        dropToggle.className = 'inline-flex items-center gap-2 bg-slate-100 rounded-2xl px-3 py-2 text-xs text-slate-600 min-h-[32px]';
+        const dropWarm = document.createElement('input');
+        dropWarm.type = 'checkbox';
+        dropWarm.className = 'w-4 h-4 rounded';
+        dropWarm.checked = drop.warmup;
+        dropWarm.addEventListener('change', () => { drop.warmup = dropWarm.checked; });
+        dropToggle.append(dropWarm, document.createTextNode('ウォームアップ'));
+        dropCard.appendChild(dropToggle);
+        const dropFooter = document.createElement('div');
+        dropFooter.className = 'flex justify-end';
+        const dropRemove = document.createElement('button');
+        dropRemove.type = 'button';
+        dropRemove.className = 'text-xs text-rose-500 font-semibold px-3 py-1 min-h-[32px]';
+        dropRemove.textContent = '削除';
+        dropRemove.addEventListener('click', () => {
+          activeBuffer.drops.splice(index, 1);
+          renderSet();
+        });
+        dropFooter.appendChild(dropRemove);
+        dropCard.appendChild(dropFooter);
+        wrapper.appendChild(dropCard);
+      });
+
+      const addDropBtn = document.createElement('button');
+      addDropBtn.type = 'button';
+      addDropBtn.className = 'w-full text-xs text-indigo-500 font-semibold px-4 py-2 bg-white rounded-2xl min-h-[40px]';
+      addDropBtn.textContent = '＋ ドロップセット';
+      addDropBtn.addEventListener('click', () => {
+        activeBuffer.drops.push(createBlankDrop(activeItem.timed));
+        renderSet();
+      });
+      wrapper.appendChild(addDropBtn);
+
+      wrapper.querySelector('#nextRoundBtn').addEventListener('click', () => {
+        advanceRoundCycle();
+      });
+
+      return wrapper;
+    }
+
     function createNumberInput(labelText, value, onInput, min = 0) {
       const wrapper = document.createElement('label');
       wrapper.className = 'flex flex-col gap-1';
@@ -916,97 +1221,112 @@
       input.className = 'rounded-2xl border border-slate-200 px-3 py-2';
       input.addEventListener('input', () => onInput(input.value));
       wrapper.appendChild(input);
-      return { wrapper, input };
+      return wrapper;
     }
 
-    function buildSetFromRow(row, options) {
-      if (options.timed) {
-        const seconds = parseNumber(row.seconds);
-        if (seconds == null) return null;
-        return {
-          id: row.id || `set-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-          parentId: options.parentId,
-          weight: null,
-          repsU: null,
-          repsA: null,
-          seconds,
-          warmup: !!row.warmup,
-          drop: options.isDrop,
-          round: row.round || 1,
-          ts: Date.now()
-        };
+    function bufferHasData(buffer, timed) {
+      if (timed) {
+        return buffer.row.seconds !== '' || buffer.drops.some(drop => drop.seconds !== '');
       }
-      const weight = parseNumber(row.weight);
-      const repsU = parseNumber(row.repsU);
-      const repsA = parseNumber(row.repsA);
-      if (weight == null && repsU == null && repsA == null) return null;
-      return {
-        id: row.id || `set-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-        parentId: options.parentId,
-        weight,
-        repsU,
-        repsA,
-        seconds: null,
-        warmup: !!row.warmup,
-        drop: options.isDrop,
-        round: row.round || 1,
-        ts: Date.now()
-      };
+      const baseFilled = buffer.row.weight !== '' || buffer.row.repsU !== '' || buffer.row.repsA !== '';
+      const dropFilled = buffer.drops.some(drop => drop.weight !== '' || drop.repsU !== '' || drop.repsA !== '');
+      return baseFilled || dropFilled;
+    }
+
+    function advanceRoundCycle() {
+      const editor = uiState.setEditor;
+      if (!editor || !editor.isSuperset) return;
+      const buffer = editor.cycleBuffers[editor.activeIndex];
+      editor.activeIndex = (editor.activeIndex + 1) % editor.items.length;
+      if (editor.activeIndex === 0) {
+        finalizeRoundBuffer();
+      } else {
+        renderSet();
+      }
+    }
+
+    function finalizeRoundBuffer() {
+      const editor = uiState.setEditor;
+      if (!editor) return;
+      const entries = editor.cycleBuffers.map((buffer, index) => {
+        const item = editor.items[index];
+        if (!bufferHasData(buffer, item.timed)) return null;
+        const row = createBlankRow(item.timed, editor.nextRound);
+        row.weight = buffer.row.weight;
+        row.repsU = buffer.row.repsU;
+        row.repsA = buffer.row.repsA;
+        row.seconds = buffer.row.seconds;
+        row.warmup = buffer.row.warmup;
+        row.drops = buffer.drops.map(drop => ({
+          id: createId('drop'),
+          weight: drop.weight,
+          repsU: drop.repsU,
+          repsA: drop.repsA,
+          seconds: drop.seconds,
+          warmup: drop.warmup,
+          round: editor.nextRound
+        }));
+        return row;
+      });
+      const hasAny = entries.some(entry => entry !== null);
+      if (hasAny) {
+        entries.forEach((row, index) => {
+          if (!row) return;
+          editor.items[index].rows.push(row);
+        });
+        editor.nextRound += 1;
+      }
+      editor.cycleBuffers = editor.items.map(item => createBuffer(item.timed));
+      renderSet();
     }
 
     function persistSetEditor() {
       const editor = uiState.setEditor;
       if (!editor) return;
-      const item = state.day.items.find(it => it.id === editor.itemId);
-      if (!item) return;
-      const newSets = [];
-      editor.rows.forEach(row => {
-        const baseSet = buildSetFromRow(row, { timed: editor.timed, isDrop: false, parentId: null });
-        if (baseSet) {
-          row.id = baseSet.id;
-          newSets.push(baseSet);
-          row.drops.forEach(drop => {
-            const dropSet = buildSetFromRow(drop, { timed: editor.timed, isDrop: true, parentId: baseSet.id });
-            if (dropSet) {
-              drop.id = dropSet.id;
-              newSets.push(dropSet);
-            }
-          });
-        }
+      editor.items.forEach(itemState => {
+        const item = state.day.items.find(it => it.id === itemState.itemId);
+        if (!item) return;
+        const newSets = [];
+        itemState.rows.forEach(row => {
+          const built = buildSetsFromRow(row, itemState.timed);
+          built.forEach(set => newSets.push(set));
+        });
+        item.sets = newSets;
       });
-      item.sets = newSets;
       state.day.items.sort((a, b) => a.order - b.order).forEach((entry, index) => {
         entry.order = index + 1;
       });
       renderToday();
     }
 
+    function buildSetsFromRow(row, timed) {
+      const sets = [];
+      const base = convertRowToSet(row, timed, false);
+      if (base) sets.push(base);
+      row.drops.forEach(drop => {
+        const dropSet = convertRowToSet({ ...drop, round: drop.round ?? row.round }, timed, true);
+        if (dropSet) sets.push(dropSet);
+      });
+      return sets;
+    }
+
+    function convertRowToSet(row, timed, isDrop) {
+      if (timed) {
+        const seconds = parseNumber(row.seconds);
+        if (seconds == null) return null;
+        return createSet({ seconds, warmup: !!row.warmup, drop: isDrop, round: row.round ?? null });
+      }
+      const weight = parseNumber(row.weight);
+      const repsU = parseNumber(row.repsU);
+      const repsA = parseNumber(row.repsA);
+      if (weight == null && repsU == null && repsA == null) return null;
+      return createSet({ weight, repsU, repsA, warmup: !!row.warmup, drop: isDrop, round: row.round ?? null });
+    }
+
     function parseNumber(value) {
       if (value === '' || value === null || value === undefined) return null;
       const num = Number(value);
       return Number.isFinite(num) ? num : null;
-    }
-
-    function findPreviousRecord(targetItem) {
-      const matches = candidate => (
-        candidate.exercise === targetItem.exercise &&
-        candidate.gear === targetItem.gear &&
-        candidate.attachment === targetItem.attachment &&
-        candidate.angle === targetItem.angle &&
-        candidate.position === targetItem.position
-      );
-      const todayCandidates = state.day.items.filter(item => item.id !== targetItem.id && matches(item) && item.sets.some(set => !set.warmup));
-      if (todayCandidates.length > 0) {
-        return { date: state.day.date, item: todayCandidates[0] };
-      }
-      const historyDays = [...state.history].sort((a, b) => b.date.localeCompare(a.date));
-      for (const day of historyDays) {
-        const item = day.items.find(matches);
-        if (item && item.sets.some(set => !set.warmup)) {
-          return { date: day.date, item };
-        }
-      }
-      return null;
     }
 
     function initialize() {
