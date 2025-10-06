@@ -1,1 +1,239 @@
+<!DOCTYPE html>
+<html lang="ja" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BUILD_TAG=PHASE-1-20240411 | Muscle Routine</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html, body { height: 100%; }
+    body { overflow-x: hidden; }
+  </style>
+</head>
+<body class="h-full bg-slate-100 text-slate-900">
+  <div id="error-banner" class="hidden fixed top-0 left-0 right-0 z-50 flex items-center gap-2 bg-red-600 text-white px-4 py-3 shadow-lg">
+    <span class="font-semibold">エラー</span>
+    <span id="error-message" class="text-sm"></span>
+    <button type="button" id="error-dismiss" class="ml-auto text-xs font-medium bg-red-500/70 hover:bg-red-500 rounded-full px-3 py-1">閉じる</button>
+  </div>
+  <main class="h-full pt-14 pb-6 px-4 max-w-xl mx-auto flex flex-col gap-6">
+    <header class="mt-2">
+      <h1 class="text-3xl font-semibold tracking-tight text-slate-900">本日のトレーニング</h1>
+      <p class="mt-1 text-sm text-slate-500">集中して今日のセットを仕上げましょう。</p>
+    </header>
 
+    <section data-route="#/today" class="route-view hidden flex-1 flex flex-col gap-6">
+      <section class="rounded-3xl bg-white shadow-sm border border-slate-100 p-4">
+        <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide">統計</h2>
+        <div class="mt-4 grid grid-cols-3 gap-3">
+          <div class="rounded-2xl bg-slate-900 text-white px-4 py-3 flex flex-col">
+            <span class="text-xs uppercase tracking-wide text-white/70">作業セット</span>
+            <span class="mt-1 text-2xl font-semibold">12</span>
+          </div>
+          <div class="rounded-2xl bg-blue-600 text-white px-4 py-3 flex flex-col">
+            <span class="text-xs uppercase tracking-wide text-white/70">SSラウンド</span>
+            <span class="mt-1 text-2xl font-semibold">4</span>
+          </div>
+          <div class="rounded-2xl bg-emerald-500 text-white px-4 py-3 flex flex-col">
+            <span class="text-xs uppercase tracking-wide text-white/70">単独</span>
+            <span class="mt-1 text-2xl font-semibold">3</span>
+          </div>
+        </div>
+      </section>
+
+      <button id="add-exercise" class="rounded-2xl bg-slate-900 text-white px-5 py-3 text-sm font-semibold shadow-sm active:scale-[0.99] transition" data-navigate="#/exercise">
+        ＋種目追加
+      </button>
+
+      <section class="rounded-3xl bg-white shadow-sm border border-slate-100">
+        <div class="px-5 py-4 border-b border-slate-100 flex items-center">
+          <h2 class="text-lg font-semibold text-slate-900">今日の種目</h2>
+          <span class="ml-auto text-xs text-slate-400">3メニュー</span>
+        </div>
+        <ol class="divide-y divide-slate-100">
+          <li class="flex items-center gap-4 px-5 py-4">
+            <span class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-semibold">1</span>
+            <div class="flex-1">
+              <p class="font-semibold text-slate-900">ベンチプレス</p>
+              <p class="text-sm text-slate-500">胸｜バーベル｜フラット</p>
+            </div>
+            <span class="rounded-full bg-orange-100 text-orange-600 px-3 py-1 text-xs font-semibold">80kg × 8</span>
+          </li>
+          <li class="flex items-center gap-4 px-5 py-4">
+            <span class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-semibold">2</span>
+            <div class="flex-1">
+              <p class="font-semibold text-slate-900">ラットプルダウン</p>
+              <p class="text-sm text-slate-500">背中｜ケーブル｜ワイド</p>
+            </div>
+            <span class="rounded-full bg-indigo-100 text-indigo-600 px-3 py-1 text-xs font-semibold">60kg × 10</span>
+          </li>
+          <li class="flex items-center gap-4 px-5 py-4">
+            <span class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-semibold">3</span>
+            <div class="flex-1">
+              <p class="font-semibold text-slate-900">ブルガリアンスクワット</p>
+              <p class="text-sm text-slate-500">脚｜ダンベル｜片脚</p>
+            </div>
+            <span class="rounded-full bg-emerald-100 text-emerald-600 px-3 py-1 text-xs font-semibold">24kg × 12</span>
+          </li>
+        </ol>
+      </section>
+
+      <button class="rounded-2xl bg-white border border-slate-200 text-slate-700 px-5 py-3 text-sm font-semibold shadow-sm">
+        ダッシュボードに戻る
+      </button>
+    </section>
+
+    <section data-route="#/exercise" class="route-view hidden flex-1 flex flex-col gap-6">
+      <div class="rounded-3xl bg-white border border-slate-100 shadow-sm p-5 space-y-6">
+        <div>
+          <label for="bodyPart" class="block text-sm font-semibold text-slate-600">部位</label>
+          <div class="mt-2 rounded-2xl bg-slate-100 px-4 py-3">
+            <select id="bodyPart" class="w-full bg-transparent text-base font-medium text-slate-900 focus:outline-none">
+              <option value="chest">胸</option>
+              <option value="back">背中</option>
+              <option value="shoulders">肩</option>
+              <option value="arms">腕</option>
+              <option value="legs">脚</option>
+              <option value="core">腹</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="exercise" class="block text-sm font-semibold text-slate-600">種目</label>
+          <div class="mt-2 rounded-2xl bg-slate-100 px-4 py-3">
+            <select id="exercise" class="w-full bg-transparent text-base font-medium text-slate-900 focus:outline-none"></select>
+          </div>
+        </div>
+
+        <div>
+          <p class="text-sm font-semibold text-slate-600 mb-3">器具 / アタッチメント / 角度 / ポジション</p>
+          <div id="chipGroup" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="flex items-center gap-3 rounded-2xl bg-white border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700">
+            <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900">
+            秒数で記録
+          </label>
+          <label class="flex items-center gap-3 rounded-2xl bg-white border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700">
+            <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900">
+            ワンハンド種目
+          </label>
+          <label class="flex items-center gap-3 rounded-2xl bg-white border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700">
+            <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900">
+            スーパーセットにする
+          </label>
+        </div>
+
+        <button data-navigate="#/today" class="w-full rounded-2xl bg-slate-900 text-white px-5 py-3 text-sm font-semibold shadow-sm active:scale-[0.99] transition">
+          決定
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const exerciseOptions = {
+      chest: ["ベンチプレス", "インクラインダンベルプレス", "ケーブルクロス"],
+      back: ["ラットプルダウン", "ベントオーバーロウ", "シーテッドロウ"],
+      shoulders: ["ショルダープレス", "サイドレイズ", "フェイスプル"],
+      arms: ["バーベルカール", "トライセプスプレスダウン", "ハンマーカール"],
+      legs: ["スクワット", "レッグプレス", "ブルガリアンスクワット"],
+      core: ["プランク", "レッグレイズ", "ケーブルクランチ"]
+    };
+
+    const chipPresets = [
+      "バーベル", "ダンベル", "ケーブル", "マシン", "自重",
+      "ストレートバー", "ロープ", "Vバー",
+      "フラット", "インクライン", "デクライン",
+      "ワイドスタンス", "ナロースタンス"
+    ];
+
+    const views = document.querySelectorAll('.route-view');
+
+    function populateExerciseOptions(part) {
+      const exerciseSelect = document.getElementById('exercise');
+      exerciseSelect.innerHTML = '';
+      (exerciseOptions[part] || []).forEach(option => {
+        const opt = document.createElement('option');
+        opt.value = option;
+        opt.textContent = option;
+        exerciseSelect.appendChild(opt);
+      });
+    }
+
+    function createChips() {
+      const container = document.getElementById('chipGroup');
+      chipPresets.forEach(label => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = label;
+        button.className = 'chip inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 shadow-sm transition active:scale-95';
+        button.addEventListener('click', () => {
+          button.classList.toggle('bg-slate-900');
+          button.classList.toggle('text-white');
+          button.classList.toggle('border-slate-900');
+        });
+        container.appendChild(button);
+      });
+    }
+
+    function handleNavigation(hash) {
+      const target = hash || '#/today';
+      views.forEach(view => {
+        if (view.dataset.route === target) {
+          view.classList.remove('hidden');
+        } else {
+          view.classList.add('hidden');
+        }
+      });
+    }
+
+    document.addEventListener('click', (event) => {
+      const target = event.target.closest('[data-navigate]');
+      if (target) {
+        const destination = target.getAttribute('data-navigate');
+        window.location.hash = destination;
+      }
+    });
+
+    window.addEventListener('hashchange', () => handleNavigation(window.location.hash));
+
+    document.getElementById('bodyPart').addEventListener('change', (event) => {
+      populateExerciseOptions(event.target.value);
+    });
+
+    document.getElementById('error-dismiss').addEventListener('click', () => {
+      document.getElementById('error-banner').classList.add('hidden');
+    });
+
+    function showError(message) {
+      const banner = document.getElementById('error-banner');
+      const text = document.getElementById('error-message');
+      text.textContent = message;
+      banner.classList.remove('hidden');
+    }
+
+    window.onerror = function(message, source, lineno, colno) {
+      showError(`${message} (${lineno}:${colno})`);
+    };
+
+    window.onunhandledrejection = function(event) {
+      showError(event.reason ? event.reason.toString() : 'Unhandled rejection');
+    };
+
+    window.__forceError = function() {
+      setTimeout(() => {
+        throw new Error('強制エラー発生');
+      }, 0);
+      Promise.reject(new Error('強制エラー発生')); // unhandled rejection
+    };
+
+    // Initial setup
+    populateExerciseOptions(document.getElementById('bodyPart').value);
+    createChips();
+    handleNavigation(window.location.hash);
+  </script>
+</body>
+</html>
