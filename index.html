@@ -1,207 +1,928 @@
 <!DOCTYPE html>
-<html lang="ja" class="h-full">
+<html lang="ja" class="h-full bg-slate-100">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BUILD_TAG=PHASE-1-20240411 | Muscle Routine</title>
+  <title>BUILD_TAG=PHASE-2-20240509 | Muscle Routine</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     html, body { height: 100%; }
     body { overflow-x: hidden; }
+    :focus-visible { outline: 2px solid #6366f1; outline-offset: 2px; }
+    ::-webkit-scrollbar { width: 0; height: 0; }
   </style>
 </head>
-<body class="h-full bg-slate-100 text-slate-900">
+<body class="h-full text-slate-900">
   <div id="error-banner" class="hidden fixed top-0 left-0 right-0 z-50 flex items-center gap-2 bg-red-600 text-white px-4 py-3 shadow-lg">
     <span class="font-semibold">エラー</span>
     <span id="error-message" class="text-sm"></span>
-    <button type="button" id="error-dismiss" class="ml-auto text-xs font-medium bg-red-500/70 hover:bg-red-500 rounded-full px-3 py-1">閉じる</button>
+    <button type="button" id="error-dismiss" class="ml-auto text-xs font-medium bg-white/10 hover:bg-white/20 rounded-full px-3 py-1 focus-visible:ring-2 focus-visible:ring-white/70 focus:outline-none">閉じる</button>
   </div>
-  <main class="h-full pt-14 pb-6 px-4 max-w-xl mx-auto flex flex-col gap-6">
-    <header class="mt-2">
-      <h1 class="text-3xl font-semibold tracking-tight text-slate-900">本日のトレーニング</h1>
-      <p class="mt-1 text-sm text-slate-500">集中して今日のセットを仕上げましょう。</p>
+  <main class="h-full pt-14 pb-8 px-4 max-w-3xl mx-auto flex flex-col gap-6">
+    <header class="mt-2 space-y-1">
+      <h1 class="text-3xl font-semibold tracking-tight">本日のトレーニング</h1>
+      <p class="text-sm text-slate-500">URLと状態が同期されたモバイルファーストのワークアウトトラッカー。</p>
     </header>
 
-    <section data-route="#/today" class="route-view hidden flex-1 flex flex-col gap-6">
-      <section class="rounded-3xl bg-white shadow-sm border border-slate-100 p-4">
-        <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide">統計</h2>
-        <div class="mt-4 grid grid-cols-3 gap-3">
-          <div class="rounded-2xl bg-slate-900 text-white px-4 py-3 flex flex-col">
-            <span class="text-xs uppercase tracking-wide text-white/70">作業セット</span>
-            <span class="mt-1 text-2xl font-semibold">12</span>
-          </div>
-          <div class="rounded-2xl bg-blue-600 text-white px-4 py-3 flex flex-col">
-            <span class="text-xs uppercase tracking-wide text-white/70">SSラウンド</span>
-            <span class="mt-1 text-2xl font-semibold">4</span>
-          </div>
-          <div class="rounded-2xl bg-emerald-500 text-white px-4 py-3 flex flex-col">
-            <span class="text-xs uppercase tracking-wide text-white/70">単独</span>
-            <span class="mt-1 text-2xl font-semibold">3</span>
-          </div>
-        </div>
-      </section>
-
-      <button id="add-exercise" class="rounded-2xl bg-slate-900 text-white px-5 py-3 text-sm font-semibold shadow-sm active:scale-[0.99] transition" data-navigate="#/exercise">
-        ＋種目追加
-      </button>
-
-      <section class="rounded-3xl bg-white shadow-sm border border-slate-100">
-        <div class="px-5 py-4 border-b border-slate-100 flex items-center">
-          <h2 class="text-lg font-semibold text-slate-900">今日の種目</h2>
-          <span class="ml-auto text-xs text-slate-400">3メニュー</span>
-        </div>
-        <ol class="divide-y divide-slate-100">
-          <li class="flex items-center gap-4 px-5 py-4">
-            <span class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-semibold">1</span>
-            <div class="flex-1">
-              <p class="font-semibold text-slate-900">ベンチプレス</p>
-              <p class="text-sm text-slate-500">胸｜バーベル｜フラット</p>
-            </div>
-            <span class="rounded-full bg-orange-100 text-orange-600 px-3 py-1 text-xs font-semibold">80kg × 8</span>
-          </li>
-          <li class="flex items-center gap-4 px-5 py-4">
-            <span class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-semibold">2</span>
-            <div class="flex-1">
-              <p class="font-semibold text-slate-900">ラットプルダウン</p>
-              <p class="text-sm text-slate-500">背中｜ケーブル｜ワイド</p>
-            </div>
-            <span class="rounded-full bg-indigo-100 text-indigo-600 px-3 py-1 text-xs font-semibold">60kg × 10</span>
-          </li>
-          <li class="flex items-center gap-4 px-5 py-4">
-            <span class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-semibold">3</span>
-            <div class="flex-1">
-              <p class="font-semibold text-slate-900">ブルガリアンスクワット</p>
-              <p class="text-sm text-slate-500">脚｜ダンベル｜片脚</p>
-            </div>
-            <span class="rounded-full bg-emerald-100 text-emerald-600 px-3 py-1 text-xs font-semibold">24kg × 12</span>
-          </li>
-        </ol>
-      </section>
-
-      <button class="rounded-2xl bg-white border border-slate-200 text-slate-700 px-5 py-3 text-sm font-semibold shadow-sm">
-        ダッシュボードに戻る
-      </button>
-    </section>
-
-    <section data-route="#/exercise" class="route-view hidden flex-1 flex flex-col gap-6">
-      <div class="rounded-3xl bg-white border border-slate-100 shadow-sm p-5 space-y-6">
-        <div>
-          <label for="bodyPart" class="block text-sm font-semibold text-slate-600">部位</label>
-          <div class="mt-2 rounded-2xl bg-slate-100 px-4 py-3">
-            <select id="bodyPart" class="w-full bg-transparent text-base font-medium text-slate-900 focus:outline-none">
-              <option value="chest">胸</option>
-              <option value="back">背中</option>
-              <option value="shoulders">肩</option>
-              <option value="arms">腕</option>
-              <option value="legs">脚</option>
-              <option value="core">腹</option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label for="exercise" class="block text-sm font-semibold text-slate-600">種目</label>
-          <div class="mt-2 rounded-2xl bg-slate-100 px-4 py-3">
-            <select id="exercise" class="w-full bg-transparent text-base font-medium text-slate-900 focus:outline-none"></select>
-          </div>
-        </div>
-
-        <div>
-          <p class="text-sm font-semibold text-slate-600 mb-3">器具 / アタッチメント / 角度 / ポジション</p>
-          <div id="chipGroup" class="flex flex-wrap gap-2"></div>
-        </div>
-
-        <div class="space-y-2">
-          <label class="flex items-center gap-3 rounded-2xl bg-white border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700">
-            <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900">
-            秒数で記録
-          </label>
-          <label class="flex items-center gap-3 rounded-2xl bg-white border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700">
-            <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900">
-            ワンハンド種目
-          </label>
-          <label class="flex items-center gap-3 rounded-2xl bg-white border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700">
-            <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900">
-            スーパーセットにする
-          </label>
-        </div>
-
-        <button data-navigate="#/today" class="w-full rounded-2xl bg-slate-900 text-white px-5 py-3 text-sm font-semibold shadow-sm active:scale-[0.99] transition">
-          決定
-        </button>
-      </div>
-    </section>
+    <section data-route="#/today" class="route-view hidden flex-1 flex flex-col gap-6"></section>
+    <section data-route="#/exercise" class="route-view hidden flex-1 flex flex-col gap-6"></section>
+    <section data-route="#/set" class="route-view hidden flex-1 flex flex-col gap-6"></section>
   </main>
 
   <script>
-    const exerciseOptions = {
-      chest: ["ベンチプレス", "インクラインダンベルプレス", "ケーブルクロス"],
-      back: ["ラットプルダウン", "ベントオーバーロウ", "シーテッドロウ"],
-      shoulders: ["ショルダープレス", "サイドレイズ", "フェイスプル"],
-      arms: ["バーベルカール", "トライセプスプレスダウン", "ハンマーカール"],
-      legs: ["スクワット", "レッグプレス", "ブルガリアンスクワット"],
-      core: ["プランク", "レッグレイズ", "ケーブルクランチ"]
+    const bodyPartLabels = {
+      chest: '胸',
+      back: '背中',
+      shoulders: '肩',
+      arms: '腕',
+      legs: '脚',
+      core: '腹',
+      full: '全身'
     };
 
-    const chipPresets = [
-      "バーベル", "ダンベル", "ケーブル", "マシン", "自重",
-      "ストレートバー", "ロープ", "Vバー",
-      "フラット", "インクライン", "デクライン",
-      "ワイドスタンス", "ナロースタンス"
-    ];
+    const exerciseOptions = {
+      chest: ['ベンチプレス', 'インクラインダンベルプレス', 'ケーブルクロス'],
+      back: ['ラットプルダウン', 'ベントオーバーロウ', 'シーテッドロウ'],
+      shoulders: ['ショルダープレス', 'サイドレイズ', 'フェイスプル'],
+      arms: ['バーベルカール', 'トライセプスプレスダウン', 'ハンマーカール'],
+      legs: ['スクワット', 'レッグプレス', 'ブルガリアンスクワット'],
+      core: ['プランク', 'ケーブルクランチ', 'ハンギングレッグレイズ']
+    };
 
-    const views = document.querySelectorAll('.route-view');
+    const chipGroups = {
+      equipment: {
+        label: '器具',
+        items: ['バーベル', 'ダンベル', 'ケーブル', 'マシン', '自重']
+      },
+      attachment: {
+        label: 'アタッチメント',
+        items: ['ストレートバー', 'ロープ', 'Vバー', 'Dハンドル']
+      },
+      angle: {
+        label: '角度',
+        items: ['フラット', 'インクライン', 'デクライン', 'オーバーヘッド']
+      },
+      position: {
+        label: 'ポジション',
+        items: ['ワイド', 'ナロー', '片脚', 'ニーリング']
+      }
+    };
 
-    function populateExerciseOptions(part) {
-      const exerciseSelect = document.getElementById('exercise');
-      exerciseSelect.innerHTML = '';
-      (exerciseOptions[part] || []).forEach(option => {
-        const opt = document.createElement('option');
-        opt.value = option;
-        opt.textContent = option;
-        exerciseSelect.appendChild(opt);
-      });
+    const appState = {
+      today: new Date(),
+      exercises: [
+        {
+          id: 'ex-1',
+          order: 1,
+          bodyPart: 'chest',
+          name: 'ベンチプレス',
+          tags: { equipment: 'バーベル', attachment: null, angle: 'フラット', position: null },
+          options: { trackSeconds: false, singleArm: false, isSuperset: false },
+          supersetGroupId: null,
+          sets: [
+            {
+              id: 'set-1',
+              weight: 60,
+              reps: 10,
+              assistedReps: 0,
+              seconds: null,
+              isWarmup: true,
+              isFuturePR: false,
+              supersetGroupId: null,
+              roundIndex: 0,
+              isSingle: true,
+              drops: []
+            },
+            {
+              id: 'set-2',
+              weight: 80,
+              reps: 8,
+              assistedReps: 0,
+              seconds: null,
+              isWarmup: false,
+              isFuturePR: false,
+              supersetGroupId: null,
+              roundIndex: 1,
+              isSingle: true,
+              drops: [
+                {
+                  id: 'set-2a',
+                  weight: 65,
+                  reps: 10,
+                  assistedReps: 0,
+                  seconds: null,
+                  isWarmup: false,
+                  isFuturePR: false,
+                  supersetGroupId: null,
+                  roundIndex: 1,
+                  isSingle: true,
+                  isDrop: true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'ex-2',
+          order: 2,
+          bodyPart: 'back',
+          name: 'ラットプルダウン',
+          tags: { equipment: 'ケーブル', attachment: 'ワイドバー', angle: null, position: 'シーテッド' },
+          options: { trackSeconds: false, singleArm: false, isSuperset: false },
+          supersetGroupId: null,
+          sets: [
+            {
+              id: 'set-3',
+              weight: 50,
+              reps: 12,
+              assistedReps: 0,
+              seconds: null,
+              isWarmup: true,
+              isFuturePR: false,
+              supersetGroupId: null,
+              roundIndex: 0,
+              isSingle: true,
+              drops: []
+            },
+            {
+              id: 'set-4',
+              weight: 60,
+              reps: 10,
+              assistedReps: 1,
+              seconds: null,
+              isWarmup: false,
+              isFuturePR: false,
+              supersetGroupId: null,
+              roundIndex: 1,
+              isSingle: true,
+              drops: []
+            }
+          ]
+        },
+        {
+          id: 'ex-3',
+          order: 3,
+          bodyPart: 'core',
+          name: 'プランク',
+          tags: { equipment: '自重', attachment: null, angle: null, position: 'フロア' },
+          options: { trackSeconds: true, singleArm: false, isSuperset: false },
+          supersetGroupId: null,
+          sets: [
+            {
+              id: 'set-5',
+              weight: 0,
+              reps: null,
+              assistedReps: null,
+              seconds: 60,
+              isWarmup: false,
+              isFuturePR: false,
+              supersetGroupId: null,
+              roundIndex: 0,
+              isSingle: true,
+              drops: []
+            },
+            {
+              id: 'set-6',
+              weight: 0,
+              reps: null,
+              assistedReps: null,
+              seconds: 75,
+              isWarmup: false,
+              isFuturePR: true,
+              supersetGroupId: null,
+              roundIndex: 1,
+              isSingle: true,
+              drops: []
+            }
+          ]
+        }
+      ],
+      nextExerciseId: 4,
+      nextSetId: 7
+    };
+
+    const uiState = {
+      currentRoute: '#/today',
+      currentExerciseId: null,
+      exerciseForm: createDefaultExerciseForm(),
+      setEditor: {
+        exerciseId: null,
+        rows: [],
+        tempRowCounter: 0
+      }
+    };
+
+    function createDefaultExerciseForm() {
+      return {
+        exerciseId: null,
+        bodyPart: 'chest',
+        exerciseName: exerciseOptions['chest'][0],
+        chips: { equipment: null, attachment: null, angle: null, position: null },
+        trackSeconds: false,
+        singleArm: false,
+        isSuperset: false
+      };
     }
 
-    function createChips() {
-      const container = document.getElementById('chipGroup');
-      chipPresets.forEach(label => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.textContent = label;
-        button.className = 'chip inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 shadow-sm transition active:scale-95';
-        button.addEventListener('click', () => {
-          button.classList.toggle('bg-slate-900');
-          button.classList.toggle('text-white');
-          button.classList.toggle('border-slate-900');
+    function formatSmallText(exercise) {
+      const parts = [];
+      const body = bodyPartLabels[exercise.bodyPart] || exercise.bodyPart;
+      if (body) parts.push(body);
+      if (exercise.tags.equipment) parts.push(exercise.tags.equipment);
+      if (exercise.tags.angle) parts.push(exercise.tags.angle);
+      if (exercise.tags.position) parts.push(exercise.tags.position);
+      return parts.join('｜');
+    }
+
+    function gatherAllSets(exercise) {
+      const all = [];
+      exercise.sets.forEach((set) => {
+        all.push({ set, isDrop: false });
+        (set.drops || []).forEach(drop => {
+          all.push({ set: drop, isDrop: true });
         });
-        container.appendChild(button);
       });
+      return all;
+    }
+
+    function formatSetBadge(exercise, set, isDrop = false) {
+      const display = exercise.options.trackSeconds
+        ? `${Number(set.seconds || 0)}秒`
+        : `${Number(set.weight || 0)}kg×${Number(set.reps || 0)}`;
+      const assisted = !exercise.options.trackSeconds && Number(set.assistedReps || 0) > 0
+        ? `(+${Number(set.assistedReps)})`
+        : '';
+      const prefix = isDrop ? 'D/' : '';
+      return `${prefix}${display}${assisted}`;
+    }
+
+    function computeStats() {
+      let workSets = 0;
+      const roundWorkState = new Map();
+      let singleCount = 0;
+      appState.exercises.forEach(exercise => {
+        gatherAllSets(exercise).forEach(({ set }) => {
+          const groupId = set.supersetGroupId;
+          const roundIndex = set.roundIndex ?? 0;
+          const key = groupId ? `${groupId}::${roundIndex}` : null;
+          if (key && !roundWorkState.has(key)) {
+            roundWorkState.set(key, { hasWork: false });
+          }
+          if (!set.isWarmup) {
+            workSets += 1;
+            if (key) {
+              const record = roundWorkState.get(key) || { hasWork: false };
+              record.hasWork = true;
+              roundWorkState.set(key, record);
+            }
+            if (set.isSingle) {
+              singleCount += 1;
+            }
+          }
+        });
+      });
+      let ssRounds = 0;
+      roundWorkState.forEach(value => {
+        if (value.hasWork) ssRounds += 1;
+      });
+      return { workSets, supersetRounds: ssRounds, singleSets: singleCount };
+    }
+
+    function renderTodayView() {
+      const target = document.querySelector('[data-route="#/today"]');
+      const stats = computeStats();
+      const cards = appState.exercises
+        .slice()
+        .sort((a, b) => a.order - b.order)
+        .map((exercise, index) => {
+          const badges = gatherAllSets(exercise)
+            .map(({ set, isDrop }) => {
+              let baseClass = 'px-3 py-1 rounded-full text-xs font-semibold shadow-sm';
+              if (set.isWarmup) {
+                baseClass += ' bg-slate-200 text-slate-700';
+              } else if (set.isFuturePR) {
+                baseClass += ' bg-purple-100 text-purple-600';
+              } else {
+                baseClass += ' bg-orange-100 text-orange-600';
+              }
+              return `<span class="${baseClass}">${formatSetBadge(exercise, set, isDrop)}</span>`;
+            })
+            .join('');
+          return `
+            <li class="flex flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center" data-open-set="${exercise.id}">
+              <div class="flex items-center gap-4">
+                <span class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-semibold shadow-sm">${String(index + 1)}</span>
+                <div>
+                  <p class="font-semibold text-slate-900 text-base">${exercise.name}</p>
+                  <p class="text-sm text-slate-500">${formatSmallText(exercise)}</p>
+                </div>
+              </div>
+              <div class="flex-1 flex flex-wrap gap-2" aria-label="本日のセット">
+                ${badges || '<span class="text-xs text-slate-400">セット未登録</span>'}
+              </div>
+            </li>
+          `;
+        })
+        .join('');
+
+      target.innerHTML = `
+        <section class="rounded-3xl bg-white shadow-sm border border-slate-100 p-5">
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">本日の統計</h2>
+          <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="rounded-2xl bg-slate-900 text-white px-4 py-3 flex flex-col shadow-sm">
+              <span class="text-xs uppercase tracking-wide text-white/70">作業セット</span>
+              <span class="mt-1 text-2xl font-semibold">${stats.workSets}</span>
+            </div>
+            <div class="rounded-2xl bg-indigo-600 text-white px-4 py-3 flex flex-col shadow-sm">
+              <span class="text-xs uppercase tracking-wide text-white/70">SSラウンド</span>
+              <span class="mt-1 text-2xl font-semibold">${stats.supersetRounds}</span>
+            </div>
+            <div class="rounded-2xl bg-emerald-500 text-white px-4 py-3 flex flex-col shadow-sm">
+              <span class="text-xs uppercase tracking-wide text-white/70">単独</span>
+              <span class="mt-1 text-2xl font-semibold">${stats.singleSets}</span>
+            </div>
+          </div>
+        </section>
+
+        <button type="button" class="rounded-2xl bg-slate-900 text-white px-5 py-3 text-sm font-semibold shadow-sm active:scale-[0.99] transition focus-visible:ring-4 focus-visible:ring-slate-900/30" data-action="add-exercise" data-navigate="#/exercise">
+          ＋種目追加
+        </button>
+
+        <section class="rounded-3xl bg-white shadow-sm border border-slate-100 overflow-hidden">
+          <div class="px-5 py-4 border-b border-slate-100 flex items-center">
+            <h2 class="text-lg font-semibold text-slate-900">今日の種目</h2>
+            <span class="ml-auto text-xs text-slate-400">${appState.exercises.length}メニュー</span>
+          </div>
+          <ol class="divide-y divide-slate-100" aria-label="今日の種目一覧">
+            ${cards}
+          </ol>
+        </section>
+
+        <button type="button" class="rounded-2xl bg-white border border-slate-200 text-slate-700 px-5 py-3 text-sm font-semibold shadow-sm focus-visible:ring-4 focus-visible:ring-slate-900/10">
+          ダッシュボードに戻る
+        </button>
+      `;
+    }
+
+    function renderExerciseView() {
+      const target = document.querySelector('[data-route="#/exercise"]');
+      const form = uiState.exerciseForm;
+      const bodyOptions = Object.keys(bodyPartLabels)
+        .map(key => `<option value="${key}">${bodyPartLabels[key]}</option>`)
+        .join('');
+
+      const exerciseSelectOptions = (exerciseOptions[form.bodyPart] || [])
+        .map(name => `<option value="${name}">${name}</option>`)
+        .join('');
+
+      const chipSections = Object.entries(chipGroups)
+        .map(([key, group]) => {
+          const chips = group.items
+            .map(label => {
+              const isActive = form.chips[key] === label;
+              const base = 'chip inline-flex items-center rounded-full border px-4 py-2 text-xs font-semibold transition shadow-sm focus-visible:ring-2 focus-visible:ring-slate-900/50';
+              const activeClasses = isActive ? ' bg-slate-900 border-slate-900 text-white' : ' bg-white border-slate-200 text-slate-600';
+              return `<button type="button" class="${base}${activeClasses}" data-chip="${key}" data-chip-value="${label}">${label}</button>`;
+            })
+            .join('');
+          return `
+            <section>
+              <h3 class="text-sm font-semibold text-slate-600 mb-3">${group.label}</h3>
+              <div class="flex flex-wrap gap-2">
+                ${chips}
+              </div>
+            </section>
+          `;
+        })
+        .join('');
+
+      target.innerHTML = `
+        <div class="rounded-3xl bg-white border border-slate-100 shadow-sm p-5 space-y-6">
+          <div>
+            <label for="bodyPart" class="block text-sm font-semibold text-slate-600">部位</label>
+            <div class="mt-2 rounded-2xl bg-slate-100 px-4 py-3 shadow-inner">
+              <select id="bodyPart" class="w-full bg-transparent text-base font-medium text-slate-900 focus:outline-none">
+                ${bodyOptions}
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label for="exerciseName" class="block text-sm font-semibold text-slate-600">種目</label>
+            <div class="mt-2 rounded-2xl bg-slate-100 px-4 py-3 shadow-inner">
+              <select id="exerciseName" class="w-full bg-transparent text-base font-medium text-slate-900 focus:outline-none">
+                ${exerciseSelectOptions}
+              </select>
+            </div>
+          </div>
+
+          ${chipSections}
+
+          <div class="space-y-2">
+            <label class="flex items-center gap-3 rounded-2xl bg-white border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 shadow-sm">
+              <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900" data-option="trackSeconds" ${form.trackSeconds ? 'checked' : ''}>
+              秒数で記録
+            </label>
+            <label class="flex items-center gap-3 rounded-2xl bg-white border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 shadow-sm">
+              <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900" data-option="singleArm" ${form.singleArm ? 'checked' : ''}>
+              ワンハンド種目
+            </label>
+            <label class="flex items-center gap-3 rounded-2xl bg-white border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 shadow-sm">
+              <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900" data-option="isSuperset" ${form.isSuperset ? 'checked' : ''}>
+              スーパーセットにする
+            </label>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button type="button" class="rounded-2xl bg-slate-900 text-white px-5 py-3 text-sm font-semibold shadow-sm focus-visible:ring-4 focus-visible:ring-slate-900/30" data-action="confirm-exercise">
+              決定
+            </button>
+            <button type="button" class="rounded-2xl bg-white border border-slate-200 text-slate-700 px-5 py-3 text-sm font-semibold shadow-sm focus-visible:ring-4 focus-visible:ring-slate-900/10" data-navigate="#/today">
+              キャンセル
+            </button>
+          </div>
+        </div>
+      `;
+
+      const bodyPartSelect = target.querySelector('#bodyPart');
+      bodyPartSelect.value = form.bodyPart;
+      const exerciseSelect = target.querySelector('#exerciseName');
+      exerciseSelect.value = form.exerciseName;
+    }
+
+    function createBlankRow() {
+      return {
+        id: `tmp-${++uiState.setEditor.tempRowCounter}`,
+        weight: '',
+        reps: '',
+        assistedReps: '',
+        seconds: '',
+        isWarmup: false,
+        isFuturePR: false,
+        drops: []
+      };
+    }
+
+    function createBlankDropRow() {
+      return {
+        id: `tmp-${++uiState.setEditor.tempRowCounter}`,
+        weight: '',
+        reps: '',
+        assistedReps: '',
+        seconds: '',
+        isWarmup: false,
+        isFuturePR: false,
+        isDrop: true
+      };
+    }
+
+    function prepareSetEditor(exerciseId) {
+      const exercise = appState.exercises.find(ex => ex.id === exerciseId);
+      if (!exercise) return;
+      uiState.setEditor.exerciseId = exerciseId;
+      uiState.setEditor.tempRowCounter = 0;
+      if (exercise.sets.length === 0) {
+        uiState.setEditor.rows = [createBlankRow()];
+      } else {
+        uiState.setEditor.rows = exercise.sets.map(set => ({
+          id: set.id,
+          weight: set.weight ?? '',
+          reps: set.reps ?? '',
+          assistedReps: set.assistedReps ?? '',
+          seconds: set.seconds ?? '',
+          isWarmup: Boolean(set.isWarmup),
+          isFuturePR: Boolean(set.isFuturePR),
+          drops: (set.drops || []).map(drop => ({
+            id: drop.id,
+            weight: drop.weight ?? '',
+            reps: drop.reps ?? '',
+            assistedReps: drop.assistedReps ?? '',
+            seconds: drop.seconds ?? '',
+            isWarmup: Boolean(drop.isWarmup),
+            isFuturePR: Boolean(drop.isFuturePR),
+            isDrop: true
+          }))
+        }));
+      }
+    }
+
+    function captureSetEditorValues() {
+      const container = document.querySelector('[data-route="#/set"]');
+      if (!container || !uiState.setEditor.exerciseId) return;
+      const rows = [];
+      container.querySelectorAll('[data-set-row]').forEach(rowEl => {
+        const row = {
+          id: rowEl.dataset.rowId,
+          weight: rowEl.querySelector('[data-field="weight"]').value,
+          reps: rowEl.querySelector('[data-field="reps"]') ? rowEl.querySelector('[data-field="reps"]').value : '',
+          assistedReps: rowEl.querySelector('[data-field="assisted"]') ? rowEl.querySelector('[data-field="assisted"]').value : '',
+          seconds: rowEl.querySelector('[data-field="seconds"]') ? rowEl.querySelector('[data-field="seconds"]').value : '',
+          isWarmup: rowEl.querySelector('[data-field="warmup"]').checked,
+          isFuturePR: rowEl.querySelector('[data-field="future"]').checked,
+          drops: []
+        };
+        rowEl.querySelectorAll('[data-drop-row]').forEach(dropEl => {
+          row.drops.push({
+            id: dropEl.dataset.rowId,
+            weight: dropEl.querySelector('[data-field="weight"]').value,
+            reps: dropEl.querySelector('[data-field="reps"]') ? dropEl.querySelector('[data-field="reps"]').value : '',
+            assistedReps: dropEl.querySelector('[data-field="assisted"]') ? dropEl.querySelector('[data-field="assisted"]').value : '',
+            seconds: dropEl.querySelector('[data-field="seconds"]') ? dropEl.querySelector('[data-field="seconds"]').value : '',
+            isWarmup: dropEl.querySelector('[data-field="warmup"]').checked,
+            isFuturePR: dropEl.querySelector('[data-field="future"]').checked,
+            isDrop: true
+          });
+        });
+        rows.push(row);
+      });
+      uiState.setEditor.rows = rows;
+    }
+
+    function renderSetInputs(row, trackSeconds, isDrop) {
+      const weightField = `
+        <label class="flex flex-col text-xs font-semibold text-slate-500">
+          重量(kg)
+          <input type="number" step="0.5" inputmode="decimal" data-field="weight" value="${row.weight ?? ''}" class="mt-1 rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-900 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-900/20">
+        </label>`;
+      const repsField = `
+        <label class="flex flex-col text-xs font-semibold text-slate-500">
+          自力レップ
+          <input type="number" inputmode="numeric" data-field="reps" value="${row.reps ?? ''}" class="mt-1 rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-900 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-900/20">
+        </label>`;
+      const assistedField = `
+        <label class="flex flex-col text-xs font-semibold text-slate-500">
+          補助レップ
+          <input type="number" inputmode="numeric" data-field="assisted" value="${row.assistedReps ?? ''}" class="mt-1 rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-900 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-900/20">
+        </label>`;
+      const secondsField = `
+        <label class="flex flex-col text-xs font-semibold text-slate-500">
+          秒(秒)
+          <input type="number" inputmode="numeric" data-field="seconds" value="${row.seconds ?? ''}" class="mt-1 rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-900 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-900/20">
+        </label>`;
+      const fields = [weightField];
+      if (trackSeconds) {
+        fields.push(secondsField);
+      } else {
+        fields.push(repsField, assistedField);
+      }
+      const columnClass = trackSeconds ? 'sm:grid-cols-2' : 'sm:grid-cols-3';
+      return `<div class="grid grid-cols-1 ${columnClass} gap-3">${fields.join('')}</div>`;
+    }
+
+    function renderSetRows(exercise) {
+      const trackSeconds = exercise.options.trackSeconds;
+      return uiState.setEditor.rows
+        .map((row, index) => {
+          const dropSection = (row.drops || [])
+            .map((drop, dropIndex) => {
+              return `
+                <div class="mt-4 pl-4 border-l-2 border-dashed border-slate-200" data-drop-row data-row-id="${drop.id}">
+                  <div class="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-2">
+                    <span class="px-2 py-1 rounded-full bg-slate-100">DROP ${dropIndex + 1}</span>
+                    <span>セット${index + 1}の派生</span>
+                  </div>
+                  ${renderSetInputs(drop, trackSeconds, true)}
+                  <div class="mt-3 flex flex-wrap gap-2">
+                    <label class="flex items-center gap-2 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-full px-3 py-2 shadow-sm">
+                      <input type="checkbox" data-field="warmup" ${drop.isWarmup ? 'checked' : ''} class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900">
+                      WUP
+                    </label>
+                    <label class="flex items-center gap-2 text-xs font-medium text-slate-600 bg-white border border-purple-200 rounded-full px-3 py-2 shadow-sm">
+                      <input type="checkbox" data-field="future" ${drop.isFuturePR ? 'checked' : ''} class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-600">
+                      将来PR
+                    </label>
+                    <button type="button" class="ml-auto text-xs font-semibold text-rose-600 hover:text-rose-700 px-3 py-2 rounded-full bg-rose-100 focus-visible:ring-4 focus-visible:ring-rose-200" data-action="remove-drop" data-row-id="${drop.id}" data-parent-id="${row.id}">
+                      ドロップ削除
+                    </button>
+                  </div>
+                </div>
+              `;
+            })
+            .join('');
+
+          return `
+            <article class="rounded-3xl bg-white border border-slate-100 shadow-sm p-5 space-y-4" data-set-row data-row-id="${row.id}">
+              <header class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-semibold text-slate-500">セット${index + 1}</p>
+                  <p class="text-xs text-slate-400">${exercise.name}</p>
+                </div>
+                <button type="button" class="text-xs font-semibold text-rose-600 hover:text-rose-700 px-3 py-2 rounded-full bg-rose-100 focus-visible:ring-4 focus-visible:ring-rose-200" data-action="remove-set" data-row-id="${row.id}">
+                  セット削除
+                </button>
+              </header>
+              ${renderSetInputs(row, trackSeconds, false)}
+              <div class="flex flex-wrap gap-2">
+                <label class="flex items-center gap-2 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-full px-3 py-2 shadow-sm">
+                  <input type="checkbox" data-field="warmup" ${row.isWarmup ? 'checked' : ''} class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900">
+                  WUP
+                </label>
+                <label class="flex items-center gap-2 text-xs font-medium text-slate-600 bg-white border border-purple-200 rounded-full px-3 py-2 shadow-sm">
+                  <input type="checkbox" data-field="future" ${row.isFuturePR ? 'checked' : ''} class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-600">
+                  将来PR
+                </label>
+                <button type="button" class="ml-auto text-xs font-semibold text-slate-700 px-3 py-2 rounded-full bg-slate-100 hover:bg-slate-200 focus-visible:ring-4 focus-visible:ring-slate-300" data-action="add-drop" data-row-id="${row.id}">
+                  ＋ドロップセット
+                </button>
+              </div>
+              ${dropSection}
+            </article>
+          `;
+        })
+        .join('');
+    }
+
+    function renderSetView() {
+      const target = document.querySelector('[data-route="#/set"]');
+      const exercise = appState.exercises.find(ex => ex.id === uiState.currentExerciseId) || appState.exercises[0];
+      if (!exercise) {
+        target.innerHTML = '<p class="text-sm text-slate-500">種目が選択されていません。</p>';
+        return;
+      }
+      if (uiState.setEditor.exerciseId !== exercise.id) {
+        prepareSetEditor(exercise.id);
+      }
+      const tagText = [exercise.tags.equipment, exercise.tags.attachment, exercise.tags.angle, exercise.tags.position]
+        .filter(Boolean)
+        .join(' / ');
+      const prevRecords = [
+        { weight: 78, reps: 8, assisted: 0, seconds: null, date: '2024-04-30' },
+        { weight: 80, reps: 7, assisted: 1, seconds: null, date: '2024-04-23' },
+        { weight: 75, reps: 9, assisted: 0, seconds: null, date: '2024-04-16' }
+      ];
+      const prevList = prevRecords
+        .map(record => {
+          const value = exercise.options.trackSeconds
+            ? `${record.seconds ?? 0}秒`
+            : `${record.weight}kg×${record.reps}${record.assisted ? `(+${record.assisted})` : ''}`;
+          return `<li class="flex items-center justify-between text-sm"><span>${record.date}</span><span class="font-semibold">${value}</span></li>`;
+        })
+        .join('');
+
+      target.innerHTML = `
+        <section class="rounded-3xl bg-white border border-slate-100 shadow-sm p-5 space-y-6">
+          <header class="space-y-1">
+            <h2 class="text-xl font-semibold text-slate-900">${exercise.name}</h2>
+            <p class="text-xs uppercase tracking-wide text-slate-400">${tagText || '条件なし'}</p>
+          </header>
+
+          <section class="rounded-2xl bg-slate-50 border border-slate-100 p-4 space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold text-slate-600">前回記録</span>
+              <span class="text-[10px] uppercase tracking-wide text-slate-400">同条件ダミーデータ</span>
+            </div>
+            <ol class="space-y-2 text-slate-600 text-xs">
+              ${prevList}
+            </ol>
+          </section>
+
+          <section class="space-y-4" aria-label="セット入力">
+            ${renderSetRows(exercise)}
+          </section>
+
+          <div class="flex flex-wrap gap-3">
+            <button type="button" class="rounded-2xl bg-slate-900 text-white px-5 py-3 text-sm font-semibold shadow-sm focus-visible:ring-4 focus-visible:ring-slate-900/30" data-action="add-set">
+              ＋セット追加
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button type="button" class="rounded-2xl bg-slate-900 text-white px-5 py-3 text-sm font-semibold shadow-sm focus-visible:ring-4 focus-visible:ring-slate-900/30" data-action="save-and-return">
+              保存して戻る
+            </button>
+            <button type="button" class="rounded-2xl bg-white border border-slate-200 text-slate-700 px-5 py-3 text-sm font-semibold shadow-sm focus-visible:ring-4 focus-visible:ring-slate-900/10" data-action="save-and-next">
+              次の種目へ
+            </button>
+          </div>
+        </section>
+      `;
+    }
+
+    function persistSetEditor() {
+      const exercise = appState.exercises.find(ex => ex.id === uiState.setEditor.exerciseId);
+      if (!exercise) return;
+      captureSetEditorValues();
+      const rows = uiState.setEditor.rows.map((row, index) => {
+        const setId = row.id.startsWith('tmp-') ? `set-${appState.nextSetId++}` : row.id;
+        return {
+          id: setId,
+          weight: row.weight === '' ? null : Number(row.weight),
+          reps: row.reps === '' ? null : Number(row.reps),
+          assistedReps: row.assistedReps === '' ? 0 : Number(row.assistedReps),
+          seconds: row.seconds === '' ? null : Number(row.seconds),
+          isWarmup: Boolean(row.isWarmup),
+          isFuturePR: Boolean(row.isFuturePR),
+          supersetGroupId: exercise.options.isSuperset ? exercise.id : null,
+          roundIndex: index,
+          isSingle: !exercise.options.isSuperset,
+          drops: (row.drops || []).map((drop, dropIndex) => {
+            const dropId = drop.id.startsWith('tmp-') ? `set-${appState.nextSetId++}` : drop.id;
+            return {
+              id: dropId,
+              weight: drop.weight === '' ? null : Number(drop.weight),
+              reps: drop.reps === '' ? null : Number(drop.reps),
+              assistedReps: drop.assistedReps === '' ? 0 : Number(drop.assistedReps),
+              seconds: drop.seconds === '' ? null : Number(drop.seconds),
+              isWarmup: Boolean(drop.isWarmup),
+              isFuturePR: Boolean(drop.isFuturePR),
+              supersetGroupId: exercise.options.isSuperset ? exercise.id : null,
+              roundIndex: `${index}-${dropIndex}`,
+              isSingle: !exercise.options.isSuperset,
+              isDrop: true
+            };
+          })
+        };
+      });
+      exercise.sets = rows;
     }
 
     function handleNavigation(hash) {
-      const target = hash || '#/today';
-      views.forEach(view => {
-        if (view.dataset.route === target) {
+      const targetHash = hash || '#/today';
+      uiState.currentRoute = targetHash;
+      document.querySelectorAll('.route-view').forEach(view => {
+        if (view.dataset.route === targetHash) {
           view.classList.remove('hidden');
         } else {
           view.classList.add('hidden');
         }
       });
+      if (targetHash === '#/today') {
+        renderTodayView();
+      } else if (targetHash === '#/exercise') {
+        renderExerciseView();
+      } else if (targetHash === '#/set') {
+        renderSetView();
+      }
+    }
+
+    function resetExerciseForm() {
+      uiState.exerciseForm = createDefaultExerciseForm();
+    }
+
+    function openSetEditor(exerciseId) {
+      uiState.currentExerciseId = exerciseId;
+      prepareSetEditor(exerciseId);
+      navigate('#/set');
+    }
+
+    function navigate(hash) {
+      if (window.location.hash === hash) {
+        handleNavigation(hash);
+      } else {
+        window.location.hash = hash;
+      }
     }
 
     document.addEventListener('click', (event) => {
-      const target = event.target.closest('[data-navigate]');
-      if (target) {
-        const destination = target.getAttribute('data-navigate');
-        window.location.hash = destination;
+      const navigateTrigger = event.target.closest('[data-navigate]');
+      if (navigateTrigger) {
+        const destination = navigateTrigger.getAttribute('data-navigate');
+        if (destination === '#/exercise' && navigateTrigger.dataset.action === 'add-exercise') {
+          resetExerciseForm();
+        }
+        navigate(destination);
+        return;
+      }
+
+      const openSet = event.target.closest('[data-open-set]');
+      if (openSet) {
+        const exerciseId = openSet.getAttribute('data-open-set');
+        openSetEditor(exerciseId);
+        return;
+      }
+
+      const action = event.target.closest('[data-action]');
+      if (!action) return;
+      const actionType = action.getAttribute('data-action');
+
+      if (actionType === 'confirm-exercise') {
+        const form = uiState.exerciseForm;
+        let exercise = null;
+        if (form.exerciseId) {
+          exercise = appState.exercises.find(ex => ex.id === form.exerciseId);
+        }
+        if (!exercise) {
+          const newExerciseId = `ex-${appState.nextExerciseId++}`;
+          exercise = {
+            id: newExerciseId,
+            order: appState.exercises.length + 1,
+            bodyPart: form.bodyPart,
+            name: form.exerciseName,
+            tags: { ...form.chips },
+            options: {
+              trackSeconds: form.trackSeconds,
+              singleArm: form.singleArm,
+              isSuperset: form.isSuperset
+            },
+            supersetGroupId: form.isSuperset ? newExerciseId : null,
+            sets: []
+          };
+          appState.exercises.push(exercise);
+        } else {
+          exercise.bodyPart = form.bodyPart;
+          exercise.name = form.exerciseName;
+          exercise.tags = { ...form.chips };
+          exercise.options = {
+            trackSeconds: form.trackSeconds,
+            singleArm: form.singleArm,
+            isSuperset: form.isSuperset
+          };
+          exercise.supersetGroupId = form.isSuperset ? exercise.id : null;
+        }
+        uiState.exerciseForm.exerciseId = exercise.id;
+        uiState.currentExerciseId = exercise.id;
+        prepareSetEditor(exercise.id);
+        navigate('#/set');
+        return;
+      }
+
+      if (actionType === 'add-set') {
+        captureSetEditorValues();
+        uiState.setEditor.rows.push(createBlankRow());
+        renderSetView();
+        return;
+      }
+
+      if (actionType === 'remove-set') {
+        captureSetEditorValues();
+        const rowId = action.getAttribute('data-row-id');
+        uiState.setEditor.rows = uiState.setEditor.rows.filter(row => row.id !== rowId);
+        if (uiState.setEditor.rows.length === 0) {
+          uiState.setEditor.rows.push(createBlankRow());
+        }
+        renderSetView();
+        return;
+      }
+
+      if (actionType === 'add-drop') {
+        captureSetEditorValues();
+        const parentId = action.getAttribute('data-row-id');
+        const parent = uiState.setEditor.rows.find(row => row.id === parentId);
+        if (parent) {
+          parent.drops = parent.drops || [];
+          parent.drops.push(createBlankDropRow());
+        }
+        renderSetView();
+        return;
+      }
+
+      if (actionType === 'remove-drop') {
+        captureSetEditorValues();
+        const dropId = action.getAttribute('data-row-id');
+        const parentId = action.getAttribute('data-parent-id');
+        const parent = uiState.setEditor.rows.find(row => row.id === parentId);
+        if (parent && parent.drops) {
+          parent.drops = parent.drops.filter(drop => drop.id !== dropId);
+        }
+        renderSetView();
+        return;
+      }
+
+      if (actionType === 'save-and-return' || actionType === 'save-and-next') {
+        persistSetEditor();
+        renderTodayView();
+        if (actionType === 'save-and-return') {
+          navigate('#/today');
+        } else {
+          resetExerciseForm();
+          navigate('#/exercise');
+        }
+        return;
       }
     });
 
-    window.addEventListener('hashchange', () => handleNavigation(window.location.hash));
+    document.addEventListener('change', (event) => {
+      const select = event.target.closest('#bodyPart');
+      if (select) {
+        uiState.exerciseForm.bodyPart = select.value;
+        uiState.exerciseForm.exerciseName = (exerciseOptions[select.value] || [])[0] || '';
+        renderExerciseView();
+        return;
+      }
+      if (event.target.id === 'exerciseName') {
+        uiState.exerciseForm.exerciseName = event.target.value;
+        return;
+      }
+      if (event.target.matches('[data-option]')) {
+        const key = event.target.getAttribute('data-option');
+        uiState.exerciseForm[key] = event.target.checked;
+        return;
+      }
+    });
 
-    document.getElementById('bodyPart').addEventListener('change', (event) => {
-      populateExerciseOptions(event.target.value);
+    document.addEventListener('click', (event) => {
+      const chip = event.target.closest('[data-chip]');
+      if (chip) {
+        const category = chip.getAttribute('data-chip');
+        const value = chip.getAttribute('data-chip-value');
+        const current = uiState.exerciseForm.chips[category];
+        uiState.exerciseForm.chips[category] = current === value ? null : value;
+        renderExerciseView();
+      }
+    }, true);
+
+    window.addEventListener('hashchange', () => {
+      handleNavigation(window.location.hash);
     });
 
     document.getElementById('error-dismiss').addEventListener('click', () => {
@@ -227,13 +948,15 @@
       setTimeout(() => {
         throw new Error('強制エラー発生');
       }, 0);
-      Promise.reject(new Error('強制エラー発生')); // unhandled rejection
+      Promise.reject(new Error('強制エラー発生'));
     };
 
-    // Initial setup
-    populateExerciseOptions(document.getElementById('bodyPart').value);
-    createChips();
-    handleNavigation(window.location.hash);
+    function initialize() {
+      renderTodayView();
+      handleNavigation(window.location.hash || '#/today');
+    }
+
+    initialize();
   </script>
 </body>
 </html>
