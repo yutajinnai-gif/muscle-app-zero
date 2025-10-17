@@ -57,25 +57,25 @@
     .sumi-text-light { color: var(--color-sumi-light); }
   </style>
 </head>
-<body class="h-full sumi-text">
+<body class="h-full sumi-text transition-colors duration-300">
   <div id="error-banner" class="hidden fixed top-0 left-0 right-0 z-50 flex items-center gap-2 bg-red-600 text-white px-4 py-3 shadow-lg">
     <span class="font-semibold">エラー</span>
     <span id="error-message" class="text-sm min-w-0 truncate"></span>
     <button type="button" id="error-dismiss" class="ml-auto text-xs font-semibold bg-white/15 hover:bg-white/25 rounded-full px-3 py-1 focus-visible:ring-2 focus-visible:ring-white/70 focus:outline-none min-h-[36px]">閉じる</button>
   </div>
 
-  <main class="h-full max-w-3xl mx-auto px-4 pb-16 pt-20 flex flex-col gap-8">
+  <main class="h-full max-w-3xl mx-auto px-4 pb-16 pt-20 flex flex-col gap-8 bg-transparent">
     <header class="space-y-2">
       <h1 class="text-3xl font-light tracking-wide sumi-text" style="letter-spacing: 0.05em;">筋トレ記録</h1>
       <p class="text-sm sumi-text-light font-light">自分の変化を美しく記録するツール</p>
     </header>
 
-    <section data-route="#/dashboard" class="route-view hidden flex flex-col gap-6"></section>
-    <section data-route="#/today" class="route-view hidden flex flex-col gap-6"></section>
-    <section data-route="#/exercise" class="route-view hidden flex flex-col gap-6"></section>
-    <section data-route="#/set" class="route-view hidden flex flex-col gap-6"></section>
-    <section data-route="#/history" class="route-view hidden flex flex-col gap-6"></section>
-    <section data-route="#/settings" class="route-view hidden flex flex-col gap-6"></section>
+    <section data-route="#/dashboard" class="route-view hidden flex flex-col gap-6 bg-neutral-50"></section>
+    <section data-route="#/today" class="route-view hidden flex flex-col gap-6 bg-violet-50"></section>
+    <section data-route="#/exercise" class="route-view hidden flex flex-col gap-6 bg-orange-50"></section>
+    <section data-route="#/set" class="route-view hidden flex flex-col gap-6 bg-orange-50"></section>
+    <section data-route="#/history" class="route-view hidden flex flex-col gap-6 bg-amber-50"></section>
+    <section data-route="#/settings" class="route-view hidden flex flex-col gap-6 bg-sky-50"></section>
   </main>
 
   <script>
@@ -300,6 +300,23 @@
       const valid = ['#/dashboard', '#/today', '#/exercise', '#/set', '#/history', '#/settings'];
       const next = valid.includes(hash) ? hash : '#/dashboard';
       uiState.route = next;
+      
+      // bodyの背景色をルートに応じて変更
+      const bgColors = {
+        '#/dashboard': 'bg-neutral-50',
+        '#/today': 'bg-violet-50',
+        '#/exercise': 'bg-orange-50',
+        '#/set': 'bg-orange-50',
+        '#/history': 'bg-amber-50',
+        '#/settings': 'bg-sky-50'
+      };
+      
+      const body = document.body;
+      // 既存の背景色クラスを削除
+      Object.values(bgColors).forEach(cls => body.classList.remove(cls));
+      // 新しい背景色クラスを追加
+      body.classList.add(bgColors[next]);
+      
       document.querySelectorAll('.route-view').forEach(section => {
         section.classList.toggle('hidden', section.getAttribute('data-route') !== next);
       });
@@ -322,27 +339,52 @@
       container.innerHTML = '';
 
       // ナビゲーションボタン
-      const navRow = document.createElement('div');
-      navRow.className = 'grid grid-cols-1 sm:grid-cols-3 gap-3';
-      const buttons = [
-        { label: '今日のトレーニング', handler: () => navigate('#/today'), icon: '📝' },
-        { label: '履歴', handler: () => navigate('#/history'), icon: '📖' },
-        { label: '設定', handler: () => navigate('#/settings'), icon: '⚙️' }
-      ];
-      buttons.forEach(btn => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'ios-card bg-white w-full px-6 py-4 text-base font-light transition active:scale-[0.99] min-h-[44px] sumi-text hover:gold-accent border border-neutral-100';
-        button.innerHTML = `
-          <div class="flex flex-col items-center gap-2">
-            <span class="text-2xl">${btn.icon}</span>
-            <span>${btn.label}</span>
-          </div>
-        `;
-        button.addEventListener('click', btn.handler);
-        navRow.appendChild(button);
-      });
-      container.appendChild(navRow);
+      const navContainer = document.createElement('div');
+      navContainer.className = 'space-y-3';
+      
+      // 今日のトレーニングボタン（全幅）
+      const todayButton = document.createElement('button');
+      todayButton.type = 'button';
+      todayButton.className = 'ios-card bg-white w-full px-6 py-4 text-base font-light transition active:scale-[0.99] min-h-[44px] sumi-text hover:gold-accent border border-neutral-100';
+      todayButton.innerHTML = `
+        <div class="flex flex-col items-center gap-2">
+          <span class="text-2xl">📝</span>
+          <span>今日のトレーニング</span>
+        </div>
+      `;
+      todayButton.addEventListener('click', () => navigate('#/today'));
+      navContainer.appendChild(todayButton);
+      
+      // 履歴と設定ボタン（半分ずつ）
+      const bottomRow = document.createElement('div');
+      bottomRow.className = 'grid grid-cols-2 gap-3';
+      
+      const historyButton = document.createElement('button');
+      historyButton.type = 'button';
+      historyButton.className = 'ios-card bg-white w-full px-6 py-4 text-base font-light transition active:scale-[0.99] min-h-[44px] sumi-text hover:gold-accent border border-neutral-100';
+      historyButton.innerHTML = `
+        <div class="flex flex-col items-center gap-2">
+          <span class="text-2xl">📖</span>
+          <span>履歴</span>
+        </div>
+      `;
+      historyButton.addEventListener('click', () => navigate('#/history'));
+      bottomRow.appendChild(historyButton);
+      
+      const settingsButton = document.createElement('button');
+      settingsButton.type = 'button';
+      settingsButton.className = 'ios-card bg-white w-full px-6 py-4 text-base font-light transition active:scale-[0.99] min-h-[44px] sumi-text hover:gold-accent border border-neutral-100';
+      settingsButton.innerHTML = `
+        <div class="flex flex-col items-center gap-2">
+          <span class="text-2xl">⚙️</span>
+          <span>設定</span>
+        </div>
+      `;
+      settingsButton.addEventListener('click', () => navigate('#/settings'));
+      bottomRow.appendChild(settingsButton);
+      
+      navContainer.appendChild(bottomRow);
+      container.appendChild(navContainer);
 
       // 統計情報カード
       const stats = computeDashboardStats();
@@ -1326,12 +1368,34 @@
           .map(value => (value && value !== '-') ? value : '―')
           .join(' / ');
         const header = document.createElement('div');
-        header.innerHTML = `
-          <div>
-            <h2 class="text-lg font-light sumi-text" style="letter-spacing: 0.03em;">${item.exercise}</h2>
-            <p class="text-[10px] sumi-text-light font-light mt-0.5">${subtitle}</p>
-          </div>
+        header.className = 'flex items-start justify-between gap-3 mb-2';
+        const headerLeft = document.createElement('div');
+        headerLeft.innerHTML = `
+          <h2 class="text-lg font-light sumi-text" style="letter-spacing: 0.03em;">${item.exercise}</h2>
+          <p class="text-[10px] sumi-text-light font-light mt-0.5">${subtitle}</p>
         `;
+        header.appendChild(headerLeft);
+        
+        const editExerciseBtn = document.createElement('button');
+        editExerciseBtn.type = 'button';
+        editExerciseBtn.className = 'px-3 py-1.5 rounded-full text-xs font-light min-h-[36px] border transition';
+        editExerciseBtn.style.cssText = 'background-color: rgba(245, 237, 214, 0.2); color: var(--color-gold); border-color: rgba(212, 175, 55, 0.3); letter-spacing: 0.05em;';
+        editExerciseBtn.textContent = '種目を編集';
+        editExerciseBtn.addEventListener('click', () => {
+          // 現在の種目情報をformStateに設定
+          uiState.formState = {
+            part: item.part,
+            exercise: item.exercise,
+            gear: item.gear,
+            attachment: item.attachment,
+            angle: item.angle,
+            position: item.position,
+            timed: item.timed,
+            oneHand: item.oneHand
+          };
+          navigate('#/exercise');
+        });
+        header.appendChild(editExerciseBtn);
         section.appendChild(header);
 
         const rowsWrapper = document.createElement('div');
@@ -2041,15 +2105,30 @@
         `;
         header.appendChild(headerLeft);
         
+        const buttonGroup = document.createElement('div');
+        buttonGroup.className = 'flex gap-2';
+        
         const editBtn = document.createElement('button');
         editBtn.type = 'button';
-        editBtn.className = 'px-4 py-2 rounded-full text-sm font-light min-h-[44px] border transition';
+        editBtn.className = 'px-3 py-1.5 rounded-full text-xs font-light min-h-[36px] border transition';
         editBtn.style.cssText = 'background-color: rgba(245, 237, 214, 0.2); color: var(--color-gold); border-color: rgba(212, 175, 55, 0.3); letter-spacing: 0.05em;';
         editBtn.textContent = '編集';
         editBtn.addEventListener('click', () => {
           loadHistoryForEdit(workoutIndex);
         });
-        header.appendChild(editBtn);
+        buttonGroup.appendChild(editBtn);
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'px-3 py-1.5 rounded-full text-xs font-light min-h-[36px] border transition';
+        deleteBtn.style.cssText = 'background-color: rgba(254, 226, 226, 0.5); color: #dc2626; border-color: rgba(220, 38, 38, 0.3); letter-spacing: 0.05em;';
+        deleteBtn.textContent = '削除';
+        deleteBtn.addEventListener('click', () => {
+          deleteWorkout(workoutIndex);
+        });
+        buttonGroup.appendChild(deleteBtn);
+        
+        header.appendChild(buttonGroup);
         card.appendChild(header);
         
         const itemsList = document.createElement('div');
@@ -2179,6 +2258,24 @@
       }
     }
 
+    function deleteWorkout(workoutIndex) {
+      const workout = state.history[workoutIndex];
+      const date = new Date(workout.date);
+      const dateStr = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+      
+      const confirmed = confirm(`${dateStr}のトレーニング履歴を削除しますか？\nこの操作は元に戻せません。`);
+      if (!confirmed) return;
+      
+      // 履歴から削除
+      state.history.splice(workoutIndex, 1);
+      saveHistory();
+      
+      // 画面を再描画
+      render();
+      
+      alert('履歴を削除しました。');
+    }
+    
     function loadHistoryForEdit(historyIndex) {
       // 履歴データをstate.dayに読み込む
       const workout = state.history[historyIndex];
