@@ -75,6 +75,7 @@
     <section data-route="#/exercise" class="route-view hidden flex flex-col gap-6"></section>
     <section data-route="#/set" class="route-view hidden flex flex-col gap-6"></section>
     <section data-route="#/history" class="route-view hidden flex flex-col gap-6"></section>
+    <section data-route="#/settings" class="route-view hidden flex flex-col gap-6"></section>
   </main>
 
   <script>
@@ -296,7 +297,7 @@
     }
 
     function handleNavigation(hash) {
-      const valid = ['#/dashboard', '#/today', '#/exercise', '#/set', '#/history'];
+      const valid = ['#/dashboard', '#/today', '#/exercise', '#/set', '#/history', '#/settings'];
       const next = valid.includes(hash) ? hash : '#/dashboard';
       uiState.route = next;
       document.querySelectorAll('.route-view').forEach(section => {
@@ -313,6 +314,7 @@
       if (uiState.route === '#/exercise') renderExercise();
       if (uiState.route === '#/set') renderSet();
       if (uiState.route === '#/history') renderHistory();
+      if (uiState.route === '#/settings') renderSettings();
     }
 
     function renderDashboard() {
@@ -325,7 +327,7 @@
       const buttons = [
         { label: '今日のトレーニング', handler: () => navigate('#/today'), icon: '📝' },
         { label: '履歴', handler: () => navigate('#/history'), icon: '📖' },
-        { label: '設定', handler: () => alert('設定は後日実装予定です。'), icon: '⚙️' }
+        { label: '設定', handler: () => navigate('#/settings'), icon: '⚙️' }
       ];
       buttons.forEach(btn => {
         const button = document.createElement('button');
@@ -1838,6 +1840,7 @@
       wrapper.appendChild(label);
       const input = document.createElement('input');
       input.type = 'number';
+      input.inputMode = 'numeric';
       input.min = String(min);
       input.value = value ?? '';
       input.className = 'rounded-lg border px-2 py-1.5 text-sm sumi-text font-light transition focus:outline-none focus:ring-1 w-full';
@@ -1865,6 +1868,7 @@
       wrapper.appendChild(label);
       const input = document.createElement('input');
       input.type = 'number';
+      input.inputMode = 'numeric';
       input.min = String(min);
       input.value = value ?? '';
       input.className = 'rounded-lg border px-3 py-2 text-sm sumi-text font-light transition focus:outline-none focus:ring-1';
@@ -2238,6 +2242,175 @@
         
         alert('トレーニングを完了しました！\n引き続き編集できます。');
         render(); // 画面を再描画
+      }
+    }
+
+    function renderSettings() {
+      const container = document.querySelector('[data-route="#/settings"]');
+      container.innerHTML = '';
+      
+      // ヘッダー
+      const header = document.createElement('div');
+      header.className = 'flex items-center justify-between mb-3';
+      const title = document.createElement('h1');
+      title.className = 'text-lg font-light sumi-text';
+      title.style.letterSpacing = '0.05em';
+      title.textContent = '設定';
+      header.appendChild(title);
+      const homeButton = document.createElement('button');
+      homeButton.type = 'button';
+      homeButton.className = 'flex items-center gap-1 text-sm font-light sumi-text-light hover:sumi-text transition min-h-[44px] px-3';
+      homeButton.innerHTML = '← ホーム';
+      homeButton.addEventListener('click', () => navigate('#/dashboard'));
+      header.appendChild(homeButton);
+      container.appendChild(header);
+      
+      // データ管理セクション
+      const dataSection = document.createElement('section');
+      dataSection.className = 'section-card bg-white p-4 space-y-4';
+      
+      const dataSectionTitle = document.createElement('h2');
+      dataSectionTitle.className = 'text-base font-light sumi-text';
+      dataSectionTitle.style.letterSpacing = '0.05em';
+      dataSectionTitle.textContent = 'データ管理';
+      dataSection.appendChild(dataSectionTitle);
+      
+      // エクスポートボタン
+      const exportBtn = document.createElement('button');
+      exportBtn.type = 'button';
+      exportBtn.className = 'w-full ios-card bg-white px-4 py-3 text-sm font-light transition min-h-[44px] border';
+      exportBtn.style.cssText = 'border-color: rgba(212, 175, 55, 0.3); color: var(--color-gold); letter-spacing: 0.05em;';
+      exportBtn.textContent = '📥 データをエクスポート';
+      exportBtn.addEventListener('click', exportData);
+      dataSection.appendChild(exportBtn);
+      
+      // インポートボタン
+      const importBtn = document.createElement('button');
+      importBtn.type = 'button';
+      importBtn.className = 'w-full ios-card bg-white px-4 py-3 text-sm font-light transition min-h-[44px] border';
+      importBtn.style.cssText = 'border-color: rgba(212, 175, 55, 0.3); color: var(--color-gold); letter-spacing: 0.05em;';
+      importBtn.textContent = '📤 データをインポート';
+      importBtn.addEventListener('click', () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'application/json';
+        input.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (file) importData(file);
+        });
+        input.click();
+      });
+      dataSection.appendChild(importBtn);
+      
+      // データクリアボタン
+      const clearBtn = document.createElement('button');
+      clearBtn.type = 'button';
+      clearBtn.className = 'w-full ios-card bg-white px-4 py-3 text-sm font-light transition min-h-[44px] border';
+      clearBtn.style.cssText = 'border-color: rgba(220, 38, 38, 0.3); color: #dc2626; letter-spacing: 0.05em;';
+      clearBtn.textContent = '🗑️ すべてのデータを削除';
+      clearBtn.addEventListener('click', clearAllData);
+      dataSection.appendChild(clearBtn);
+      
+      container.appendChild(dataSection);
+      
+      // アプリ情報セクション
+      const infoSection = document.createElement('section');
+      infoSection.className = 'section-card bg-white p-4 space-y-3';
+      
+      const infoSectionTitle = document.createElement('h2');
+      infoSectionTitle.className = 'text-base font-light sumi-text';
+      infoSectionTitle.style.letterSpacing = '0.05em';
+      infoSectionTitle.textContent = 'アプリ情報';
+      infoSection.appendChild(infoSectionTitle);
+      
+      const versionInfo = document.createElement('div');
+      versionInfo.className = 'text-sm font-light sumi-text-light space-y-1';
+      versionInfo.innerHTML = `
+        <p>バージョン: 1.0.0</p>
+        <p>ビルドタグ: PHASE-5-20240529</p>
+        <p class="text-xs mt-2">開発: Manus AI</p>
+      `;
+      infoSection.appendChild(versionInfo);
+      
+      container.appendChild(infoSection);
+    }
+    
+    function exportData() {
+      try {
+        const exportObj = {
+          version: '1.0.0',
+          exportDate: new Date().toISOString(),
+          data: {
+            history: state.history,
+            day: state.day
+          }
+        };
+        
+        const jsonStr = JSON.stringify(exportObj, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const dateStr = new Date().toISOString().slice(0, 10);
+        a.download = `muscle-routine-backup-${dateStr}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        alert('データをエクスポートしました！');
+      } catch (e) {
+        alert('エクスポートに失敗しました: ' + e.message);
+      }
+    }
+    
+    function importData(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const importObj = JSON.parse(e.target.result);
+          
+          if (!importObj.data || !importObj.data.history) {
+            throw new Error('無効なデータ形式です');
+          }
+          
+          const confirmed = confirm('データをインポートしますか？\n現在のデータは上書きされます。');
+          if (!confirmed) return;
+          
+          state.history = importObj.data.history || [];
+          if (importObj.data.day) {
+            state.day = importObj.data.day;
+          }
+          
+          saveHistory();
+          render();
+          
+          alert(`データをインポートしました！\n履歴: ${state.history.length}件`);
+        } catch (e) {
+          alert('インポートに失敗しました: ' + e.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+    
+    function clearAllData() {
+      const confirmed = confirm('本当にすべてのデータを削除しますか？\nこの操作は元に戻せません。');
+      if (!confirmed) return;
+      
+      const doubleConfirmed = confirm('最終確認: 本当に削除しますか？');
+      if (!doubleConfirmed) return;
+      
+      try {
+        localStorage.clear();
+        state.history = [];
+        state.day = {
+          date: new Date().toISOString().slice(0, 10),
+          memo: '',
+          items: []
+        };
+        render();
+        alert('すべてのデータを削除しました。');
+        navigate('#/dashboard');
+      } catch (e) {
+        alert('削除に失敗しました: ' + e.message);
       }
     }
 
