@@ -319,7 +319,7 @@
 
       // ナビゲーションボタン
       const navRow = document.createElement('div');
-      navRow.className = 'grid grid-cols-1 sm:grid-cols-3 gap-4';
+      navRow.className = 'grid grid-cols-1 sm:grid-cols-3 gap-3';
       const buttons = [
         { label: '今日のトレーニング', handler: () => navigate('#/today'), icon: '📝' },
         { label: '履歴', handler: () => navigate('#/history'), icon: '📖' },
@@ -328,7 +328,7 @@
       buttons.forEach(btn => {
         const button = document.createElement('button');
         button.type = 'button';
-        button.className = 'ios-card bg-white w-full px-6 py-5 text-base font-light transition active:scale-[0.99] min-h-[44px] sumi-text hover:gold-accent border border-neutral-100';
+        button.className = 'ios-card bg-white w-full px-6 py-4 text-base font-light transition active:scale-[0.99] min-h-[44px] sumi-text hover:gold-accent border border-neutral-100';
         button.innerHTML = `
           <div class="flex flex-col items-center gap-2">
             <span class="text-2xl">${btn.icon}</span>
@@ -343,10 +343,10 @@
       // 統計情報カード
       const stats = computeDashboardStats();
       const statsCard = document.createElement('section');
-      statsCard.className = 'section-card bg-white p-6 space-y-5';
+      statsCard.className = 'section-card bg-white p-4 space-y-3';
       statsCard.innerHTML = `
-        <h2 class="text-xl font-light sumi-text" style="letter-spacing: 0.05em;">統計情報</h2>
-        <div class="grid grid-cols-3 gap-4 text-center">
+        <h2 class="text-base font-light sumi-text" style="letter-spacing: 0.05em;">統計情報</h2>
+        <div class="grid grid-cols-3 gap-3 text-center">
           <div class="section-card gold-accent py-4 px-3 min-h-[44px] flex flex-col justify-center">
             <p class="text-xs sumi-text-light font-light mb-1">今週</p>
             <p class="text-3xl font-light sumi-text">${stats.thisWeek}</p>
@@ -368,12 +368,12 @@
       // 最近のトレーニング概要
       if (state.history.length > 0) {
         const recentSection = document.createElement('section');
-        recentSection.className = 'section-card bg-white p-6 space-y-4';
+        recentSection.className = 'section-card bg-white p-4 space-y-3';
         
         const header = document.createElement('div');
         header.className = 'flex items-center justify-between';
         header.innerHTML = `
-          <h2 class="text-xl font-light sumi-text" style="letter-spacing: 0.05em;">最近のトレーニング</h2>
+          <h2 class="text-base font-light sumi-text" style="letter-spacing: 0.05em;">最近のトレーニング</h2>
           <button type="button" class="text-sm sumi-text-light hover:sumi-text transition font-light" id="view-all-history">すべて見る →</button>
         `;
         recentSection.appendChild(header);
@@ -395,7 +395,7 @@
       } else {
         // 履歴がない場合のメッセージ
         const emptyCard = document.createElement('section');
-        emptyCard.className = 'section-card bg-white p-8 text-center';
+        emptyCard.className = 'section-card bg-white p-6 text-center';
         emptyCard.innerHTML = `
           <p class="text-base sumi-text-light font-light mb-4">まだトレーニング履歴がありません</p>
           <button type="button" class="ios-card gold-accent px-6 py-3 text-base font-light sumi-text transition active:scale-[0.99] min-h-[44px]" id="start-first-workout">最初のトレーニングを始める</button>
@@ -501,23 +501,30 @@
       const container = document.querySelector('[data-route="#/today"]');
       container.innerHTML = '';
 
-      // ホームボタン
+      // ヘッダー（タイトルとホームボタン）
+      const header = document.createElement('div');
+      header.className = 'flex items-center justify-between mb-3';
+      const title = document.createElement('h1');
+      title.className = 'text-lg font-light sumi-text';
+      title.textContent = '今日のトレーニング';
+      header.appendChild(title);
       const homeButton = document.createElement('button');
       homeButton.type = 'button';
-      homeButton.className = 'flex items-center gap-2 text-sm font-light sumi-text-light hover:sumi-text transition mb-4';
+      homeButton.className = 'flex items-center gap-1 text-sm font-light sumi-text-light hover:sumi-text transition min-h-[44px] px-3';
       homeButton.innerHTML = '← ホーム';
       homeButton.addEventListener('click', () => navigate('#/dashboard'));
-      container.appendChild(homeButton);
+      header.appendChild(homeButton);
+      container.appendChild(header);
 
       const statsSection = document.createElement('section');
-      statsSection.className = 'section-card bg-white p-6 space-y-3';
+      statsSection.className = 'section-card bg-white p-4 space-y-2';
       const summary = computeTodayStats();
       statsSection.innerHTML = `
-        <div class="flex items-center justify-between">
-          <h2 class="text-xl font-light sumi-text" style="letter-spacing: 0.03em;">今日の概要</h2>
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-base font-light sumi-text" style="letter-spacing: 0.03em;">今日の概要</h2>
           <span class="text-xs font-light sumi-text-light">ウォームアップ除外</span>
         </div>
-        <div class="grid grid-cols-3 gap-3 text-center">
+        <div class="grid grid-cols-3 gap-2 text-center">
           <div class="ios-card py-3 min-h-[44px] flex flex-col justify-center border" style="background-color: rgba(245, 237, 214, 0.15); border-color: rgba(212, 175, 55, 0.2); color: var(--color-gold);">
             <p class="text-xs font-light">作業セット</p>
             <p class="text-2xl font-light">${summary.workSets}</p>
@@ -535,11 +542,11 @@
       container.appendChild(statsSection);
 
       const actionRow = document.createElement('div');
-      actionRow.className = 'flex justify-between items-center gap-4';
+      actionRow.className = 'flex items-center gap-3';
       const addButton = document.createElement('button');
       addButton.type = 'button';
-      addButton.className = 'ios-card px-6 py-3 font-light text-base min-h-[44px] border transition flex-1';
-      addButton.style.cssText = 'background-color: var(--color-gold); color: white; border-color: var(--color-gold-dark); letter-spacing: 0.05em;';
+      addButton.className = 'ios-card px-6 py-3 font-light text-base min-h-[44px] border transition';
+      addButton.style.cssText = 'background-color: var(--color-gold); color: white; border-color: var(--color-gold-dark); letter-spacing: 0.05em; flex: 2;';
       addButton.textContent = '＋ 種目追加';
       addButton.addEventListener('click', () => {
         uiState.exerciseForm = createExerciseFormState();
@@ -550,7 +557,7 @@
       const completeButton = document.createElement('button');
       completeButton.type = 'button';
       completeButton.className = 'ios-card px-6 py-3 font-light text-base min-h-[44px] border transition';
-      completeButton.style.cssText = 'background-color: rgba(245, 237, 214, 0.2); color: var(--color-gold); border-color: rgba(212, 175, 55, 0.3); letter-spacing: 0.05em;';
+      completeButton.style.cssText = 'background-color: rgba(245, 237, 214, 0.2); color: var(--color-gold); border-color: rgba(212, 175, 55, 0.3); letter-spacing: 0.05em; flex: 1;';
       completeButton.textContent = '完了';
       completeButton.addEventListener('click', () => {
         if (confirm('今日のトレーニングを完了しますか？')) {
@@ -561,7 +568,7 @@
       container.appendChild(actionRow);
 
       const list = document.createElement('div');
-      list.className = 'space-y-4';
+      list.className = 'space-y-3';
       const sortedItems = [...state.day.items].sort((a, b) => a.order - b.order);
       const processedGroups = new Set();
       sortedItems.forEach(item => {
@@ -579,7 +586,7 @@
 
     function buildSingleCard(item) {
       const card = document.createElement('article');
-      card.className = 'section-card bg-white p-5 space-y-3';
+      card.className = 'section-card bg-white p-4 space-y-2';
       const partLabel = state.master.parts.find(p => p.id === item.part)?.label ?? '';
       
       // ヘッダー：種目名と部位
@@ -620,7 +627,7 @@
       card.appendChild(badgeArea);
 
       const controls = document.createElement('div');
-      controls.className = 'flex justify-end gap-3 pt-1';
+      controls.className = 'flex justify-end';
       const editBtn = document.createElement('button');
       editBtn.type = 'button';
       editBtn.className = 'px-4 py-2 rounded-full text-sm font-light min-h-[44px] border transition';
@@ -641,7 +648,7 @@
       const labels = ['A', 'B', 'C'];
       const title = `(SS) ${sorted.map(item => item.exercise).join(' + ')}`;
       const card = document.createElement('article');
-      card.className = 'section-card bg-white p-5 space-y-3';
+      card.className = 'section-card bg-white p-4 space-y-2';
       
       // ヘッダー：種目名と部位
       const header = document.createElement('div');
@@ -1927,15 +1934,24 @@
       const container = document.querySelector('[data-route="#/history"]');
       container.innerHTML = '';
       
-      const title = document.createElement('h2');
-      title.className = 'text-2xl font-light sumi-text';
+      const header = document.createElement('div');
+      header.className = 'flex items-center justify-between mb-3';
+      const title = document.createElement('h1');
+      title.className = 'text-lg font-light sumi-text';
       title.style.letterSpacing = '0.05em';
       title.textContent = 'トレーニング履歴';
-      container.appendChild(title);
+      header.appendChild(title);
+      const homeButton = document.createElement('button');
+      homeButton.type = 'button';
+      homeButton.className = 'flex items-center gap-1 text-sm font-light sumi-text-light hover:sumi-text transition min-h-[44px] px-3';
+      homeButton.innerHTML = '← ホーム';
+      homeButton.addEventListener('click', () => navigate('#/dashboard'));
+      header.appendChild(homeButton);
+      container.appendChild(header);
       
       if (state.history.length === 0) {
         const empty = document.createElement('div');
-        empty.className = 'section-card bg-white p-8 text-center';
+        empty.className = 'section-card bg-white p-6 text-center';
         empty.innerHTML = `
           <p class="text-sm sumi-text-light font-light">まだ履歴がありません</p>
           <p class="text-xs sumi-text-light font-light mt-2">トレーニングを完了すると履歴が記録されます</p>
@@ -1945,11 +1961,11 @@
       }
       
       const list = document.createElement('div');
-      list.className = 'space-y-4';
+      list.className = 'space-y-3';
       
       state.history.forEach(workout => {
         const card = document.createElement('article');
-        card.className = 'section-card bg-white p-5 space-y-4';
+        card.className = 'section-card bg-white p-4 space-y-3';
         
         const header = document.createElement('div');
         header.className = 'flex items-start justify-between gap-3';
