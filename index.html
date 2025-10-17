@@ -74,6 +74,7 @@
     <section data-route="#/today" class="route-view hidden flex flex-col gap-6"></section>
     <section data-route="#/exercise" class="route-view hidden flex flex-col gap-6"></section>
     <section data-route="#/set" class="route-view hidden flex flex-col gap-6"></section>
+    <section data-route="#/history" class="route-view hidden flex flex-col gap-6"></section>
   </main>
 
   <script>
@@ -293,7 +294,7 @@
     }
 
     function handleNavigation(hash) {
-      const valid = ['#/dashboard', '#/today', '#/exercise', '#/set'];
+      const valid = ['#/dashboard', '#/today', '#/exercise', '#/set', '#/history'];
       const next = valid.includes(hash) ? hash : '#/dashboard';
       uiState.route = next;
       document.querySelectorAll('.route-view').forEach(section => {
@@ -309,6 +310,7 @@
       if (uiState.route === '#/today') renderToday();
       if (uiState.route === '#/exercise') renderExercise();
       if (uiState.route === '#/set') renderSet();
+      if (uiState.route === '#/history') renderHistory();
     }
 
     function renderDashboard() {
@@ -424,7 +426,7 @@
       actionRow.className = 'flex justify-between items-center gap-4';
       const addButton = document.createElement('button');
       addButton.type = 'button';
-      addButton.className = 'ios-card px-6 py-3 font-light text-base min-h-[44px] border transition';
+      addButton.className = 'ios-card px-6 py-3 font-light text-base min-h-[44px] border transition flex-1';
       addButton.style.cssText = 'background-color: var(--color-gold); color: white; border-color: var(--color-gold-dark); letter-spacing: 0.05em;';
       addButton.textContent = '＋ 種目追加';
       addButton.addEventListener('click', () => {
@@ -432,6 +434,18 @@
         navigate('#/exercise');
       });
       actionRow.appendChild(addButton);
+      
+      const completeButton = document.createElement('button');
+      completeButton.type = 'button';
+      completeButton.className = 'ios-card px-6 py-3 font-light text-base min-h-[44px] border transition';
+      completeButton.style.cssText = 'background-color: rgba(245, 237, 214, 0.2); color: var(--color-gold); border-color: rgba(212, 175, 55, 0.3); letter-spacing: 0.05em;';
+      completeButton.textContent = '完了';
+      completeButton.addEventListener('click', () => {
+        if (confirm('今日のトレーニングを完了しますか？')) {
+          completeWorkout();
+        }
+      });
+      actionRow.appendChild(completeButton);
       container.appendChild(actionRow);
 
       const list = document.createElement('div');
@@ -1785,7 +1799,177 @@
       return Number.isFinite(num) ? num : null;
     }
 
+    function renderHistory() {
+      const container = document.querySelector('[data-route="#/history"]');
+      container.innerHTML = '';
+      
+      const title = document.createElement('h2');
+      title.className = 'text-2xl font-light sumi-text';
+      title.style.letterSpacing = '0.05em';
+      title.textContent = 'トレーニング履歴';
+      container.appendChild(title);
+      
+      if (state.history.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'section-card bg-white p-8 text-center';
+        empty.innerHTML = `
+          <p class="text-sm sumi-text-light font-light">まだ履歴がありません</p>
+          <p class="text-xs sumi-text-light font-light mt-2">トレーニングを完了すると履歴が記録されます</p>
+        `;
+        container.appendChild(empty);
+        return;
+      }
+      
+      const list = document.createElement('div');
+      list.className = 'space-y-4';
+      
+      state.history.forEach(workout => {
+        const card = document.createElement('article');
+        card.className = 'section-card bg-white p-5 space-y-4';
+        
+        const header = document.createElement('div');
+        header.className = 'flex items-start justify-between gap-3';
+        const date = new Date(workout.date);
+        const dateStr = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+        header.innerHTML = `
+          <div class="min-w-0">
+            <p class="text-base font-light sumi-text" style="letter-spacing: 0.02em;">${dateStr}</p>
+            <p class="text-xs font-light sumi-text-light">${workout.items.length}種目</p>
+          </div>
+        `;
+        card.appendChild(header);
+        
+        const itemsList = document.createElement('div');
+        itemsList.className = 'space-y-2';
+        
+        const sortedItems = [...workout.items].sort((a, b) => a.order - b.order);
+        const processedGroups = new Set();
+        
+        sortedItems.forEach(item => {
+          if (item.mode === 'superset') {
+            if (!item.groupId || processedGroups.has(item.groupId)) return;
+            const groupItems = sortedItems.filter(candidate => candidate.groupId === item.groupId);
+            processedGroups.add(item.groupId);
+            itemsList.appendChild(buildHistorySuperset(groupItems));
+          } else {
+            itemsList.appendChild(buildHistorySingle(item));
+          }
+        });
+        
+        card.appendChild(itemsList);
+        list.appendChild(card);
+      });
+      
+      container.appendChild(list);
+    }
+    
+    function buildHistorySingle(item) {
+      const div = document.createElement('div');
+      div.className = 'p-3 rounded-lg border border-neutral-200/40';
+      
+      const partLabel = state.master.parts.find(p => p.id === item.part)?.label ?? '';
+      const header = document.createElement('div');
+      header.className = 'flex items-start justify-between gap-2 mb-2';
+      header.innerHTML = `
+        <div class="min-w-0">
+          <p class="text-sm font-light sumi-text" style="letter-spacing: 0.02em;">${item.exercise}</p>
+          <p class="text-xs font-light sumi-text-light">${partLabel}</p>
+        </div>
+        <div class="text-xs font-light sumi-text-light text-right min-w-0 truncate">
+          ${[item.gear, item.angle, item.position].map(val => val && val !== '-' ? val : '―').join(' / ')}
+        </div>
+      `;
+      div.appendChild(header);
+      
+      const workSets = item.sets.filter(s => !s.warmup);
+      const setsText = workSets.map(s => {
+        if (s.seconds != null) return `${s.seconds}秒`;
+        const parts = [];
+        if (s.weight != null) parts.push(`${s.weight}kg`);
+        if (s.repsU != null) parts.push(`×${s.repsU}`);
+        return parts.join('');
+      }).join(', ');
+      
+      const setsDiv = document.createElement('div');
+      setsDiv.className = 'text-xs font-light sumi-text-light';
+      setsDiv.textContent = setsText || 'セットなし';
+      div.appendChild(setsDiv);
+      
+      return div;
+    }
+    
+    function buildHistorySuperset(groupItems) {
+      const sorted = [...groupItems].sort((a, b) => a.order - b.order);
+      const labels = ['A', 'B', 'C'];
+      const title = `(SS) ${sorted.map(item => item.exercise).join(' + ')}`;
+      
+      const div = document.createElement('div');
+      div.className = 'p-3 rounded-lg border border-neutral-200/40';
+      
+      const header = document.createElement('div');
+      header.className = 'flex items-start justify-between gap-2 mb-2';
+      header.innerHTML = `
+        <div class="min-w-0">
+          <p class="text-sm font-light sumi-text" style="letter-spacing: 0.02em;">${title}</p>
+          <p class="text-xs font-light sumi-text-light">${sorted.map((item, index) => `${labels[index]}. ${state.master.parts.find(p => p.id === item.part)?.label ?? ''}`).join(' / ')}</p>
+        </div>
+      `;
+      div.appendChild(header);
+      
+      const rounds = buildSupersetRounds(sorted);
+      const roundsText = `${rounds.length}ラウンド`;
+      const roundsDiv = document.createElement('div');
+      roundsDiv.className = 'text-xs font-light sumi-text-light';
+      roundsDiv.textContent = roundsText;
+      div.appendChild(roundsDiv);
+      
+      return div;
+    }
+
+    // LocalStorage functions
+    function saveHistory() {
+      try {
+        localStorage.setItem('muscleRoutineHistory', JSON.stringify(state.history));
+        localStorage.setItem('muscleRoutineHistoryVersion', '1');
+      } catch (e) {
+        console.error('Failed to save history:', e);
+      }
+    }
+
+    function loadHistory() {
+      try {
+        const saved = localStorage.getItem('muscleRoutineHistory');
+        if (saved) {
+          state.history = JSON.parse(saved);
+        }
+      } catch (e) {
+        console.error('Failed to load history:', e);
+        state.history = [];
+      }
+    }
+
+    function completeWorkout() {
+      // 今日のトレーニングをhistoryに追加
+      const workout = {
+        date: state.day.date,
+        items: JSON.parse(JSON.stringify(state.day.items)), // deep copy
+        completedAt: new Date().toISOString()
+      };
+      state.history.unshift(workout); // 最新を先頭に
+      saveHistory();
+      
+      // 新しい日のデータを初期化
+      state.day = {
+        date: new Date().toISOString().slice(0, 10),
+        items: []
+      };
+      
+      alert('トレーニングを完了しました！');
+      navigate('#/history');
+    }
+
     function initialize() {
+      loadHistory();
       handleNavigation(window.location.hash || '#/dashboard');
     }
 
