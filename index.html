@@ -501,6 +501,14 @@
       const container = document.querySelector('[data-route="#/today"]');
       container.innerHTML = '';
 
+      // ホームボタン
+      const homeButton = document.createElement('button');
+      homeButton.type = 'button';
+      homeButton.className = 'flex items-center gap-2 text-sm font-light sumi-text-light hover:sumi-text transition mb-4';
+      homeButton.innerHTML = '← ホーム';
+      homeButton.addEventListener('click', () => navigate('#/dashboard'));
+      container.appendChild(homeButton);
+
       const statsSection = document.createElement('section');
       statsSection.className = 'section-card bg-white p-6 space-y-3';
       const summary = computeTodayStats();
@@ -571,20 +579,23 @@
 
     function buildSingleCard(item) {
       const card = document.createElement('article');
-      card.className = 'section-card bg-white p-5 space-y-4';
+      card.className = 'section-card bg-white p-5 space-y-3';
       const partLabel = state.master.parts.find(p => p.id === item.part)?.label ?? '';
+      
+      // ヘッダー：種目名と部位
       const header = document.createElement('div');
-      header.className = 'flex items-start justify-between gap-3';
+      header.className = 'space-y-1';
       header.innerHTML = `
-        <div class="min-w-0">
-          <p class="text-sm font-light sumi-text truncate" style="letter-spacing: 0.02em;">${item.exercise}</p>
-          <p class="text-xs font-light sumi-text-light">${partLabel}</p>
-        </div>
-        <div class="text-xs font-light sumi-text-light text-right min-w-0 truncate">
-          ${[item.gear, item.angle, item.position].map(val => val && val !== '-' ? val : '―').join(' / ')}
-        </div>
+        <p class="text-base font-light sumi-text" style="letter-spacing: 0.02em;">${item.exercise}</p>
+        <p class="text-xs font-light sumi-text-light">${partLabel}</p>
       `;
       card.appendChild(header);
+      
+      // 器具・角度・ポジション
+      const details = document.createElement('div');
+      details.className = 'text-xs font-light sumi-text-light';
+      details.textContent = [item.gear, item.angle, item.position].map(val => val && val !== '-' ? val : '―').join(' / ');
+      card.appendChild(details);
       if (item.attachment && item.attachment !== '-') {
         const att = document.createElement('p');
         att.className = 'text-[11px] font-light sumi-text-light';
@@ -630,19 +641,22 @@
       const labels = ['A', 'B', 'C'];
       const title = `(SS) ${sorted.map(item => item.exercise).join(' + ')}`;
       const card = document.createElement('article');
-      card.className = 'section-card bg-white p-5 space-y-4';
+      card.className = 'section-card bg-white p-5 space-y-3';
+      
+      // ヘッダー：種目名と部位
       const header = document.createElement('div');
-      header.className = 'flex items-start justify-between gap-3';
+      header.className = 'space-y-1';
       header.innerHTML = `
-        <div class="min-w-0">
-          <p class="text-sm font-light sumi-text truncate" style="letter-spacing: 0.02em;">${title}</p>
-          <p class="text-xs font-light sumi-text-light">${sorted.map((item, index) => `${labels[index]}. ${state.master.parts.find(p => p.id === item.part)?.label ?? ''}`).join(' / ')}</p>
-        </div>
-        <div class="text-xs font-light sumi-text-light text-right min-w-0 truncate">
-          ${sorted.map(item => [item.gear, item.angle, item.position].map(val => val && val !== '-' ? val : '―').join(' / ')).join(' ｜ ')}
-        </div>
+        <p class="text-base font-light sumi-text" style="letter-spacing: 0.02em;">${title}</p>
+        <p class="text-xs font-light sumi-text-light">${sorted.map((item, index) => `${labels[index]}. ${state.master.parts.find(p => p.id === item.part)?.label ?? ''}`).join(' / ')}</p>
       `;
       card.appendChild(header);
+      
+      // 器具・角度・ポジション
+      const details = document.createElement('div');
+      details.className = 'text-xs font-light sumi-text-light';
+      details.textContent = sorted.map(item => [item.gear, item.angle, item.position].map(val => val && val !== '-' ? val : '―').join(' / ')).join(' ｜ ');
+      card.appendChild(details);
 
       const rounds = buildSupersetRounds(sorted);
       if (rounds.length > 0) {
@@ -686,11 +700,17 @@
         });
       });
       if (soloChips.length > 0) {
+        const soloArea = document.createElement('div');
+        soloArea.className = 'space-y-2 pt-2 border-t border-neutral-100';
         const heading = document.createElement('p');
-        heading.className = 'text-xs text-slate-400';
+        heading.className = 'text-xs font-light sumi-text-light';
         heading.textContent = '単独セット';
-        card.appendChild(heading);
-        soloChips.forEach(row => card.appendChild(row));
+        soloArea.appendChild(heading);
+        const soloList = document.createElement('div');
+        soloList.className = 'space-y-2';
+        soloChips.forEach(row => soloList.appendChild(row));
+        soloArea.appendChild(soloList);
+        card.appendChild(soloArea);
       }
 
       const controls = document.createElement('div');
@@ -2068,8 +2088,8 @@
         items: []
       };
       
-      alert('トレーニングを完了しました！');
-      navigate('#/history');
+      alert('トレーニングを完了しました！\n引き続き編集できます。');
+      render(); // 画面を再描画
     }
 
     function initialize() {
