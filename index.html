@@ -1,20 +1,63 @@
 <!DOCTYPE html>
-<html lang="ja" class="h-full bg-slate-100">
+<html lang="ja" class="h-full bg-neutral-50">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>BUILD_TAG=PHASE-5-20240529 | Muscle Routine</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    /* カラーパレット: 白・墨・淡い金 */
+    :root {
+      --color-sumi-dark: #1A1A1A;
+      --color-sumi-mid: #404040;
+      --color-sumi-light: #737373;
+      --color-gold: #D4AF37;
+      --color-gold-light: #E8D4A0;
+      --color-gold-pale: #F5EDD6;
+      --color-white: #FFFFFF;
+      --color-off-white: #FAFAFA;
+    }
+    
     html, body { height: 100%; }
-    body { overflow-x: hidden; }
-    :focus-visible { outline: 2px solid #6366f1; outline-offset: 2px; }
+    body { 
+      overflow-x: hidden;
+      letter-spacing: 0.01em;
+      line-height: 1.6;
+    }
+    
+    :focus-visible { 
+      outline: 2px solid var(--color-gold); 
+      outline-offset: 2px; 
+    }
+    
     ::-webkit-scrollbar { width: 0; height: 0; }
-    .ios-card { border-radius: 24px; box-shadow: 0 12px 24px -16px rgba(15, 23, 42, 0.6); }
-    .section-card { border-radius: 20px; box-shadow: 0 8px 20px -14px rgba(15, 23, 42, 0.8); }
+    
+    .ios-card { 
+      border-radius: 20px; 
+      box-shadow: 0 4px 16px -4px rgba(26, 26, 26, 0.08);
+      transition: all 0.2s ease;
+    }
+    
+    .ios-card:hover {
+      box-shadow: 0 6px 20px -4px rgba(26, 26, 26, 0.12);
+    }
+    
+    .section-card { 
+      border-radius: 16px; 
+      box-shadow: 0 2px 12px -2px rgba(26, 26, 26, 0.06);
+      border: 1px solid rgba(115, 115, 115, 0.08);
+    }
+    
+    .gold-accent {
+      background: linear-gradient(135deg, var(--color-gold-pale) 0%, var(--color-white) 100%);
+    }
+    
+    .sumi-text { color: var(--color-sumi-dark); }
+    .sumi-text-mid { color: var(--color-sumi-mid); }
+    .sumi-text-light { color: var(--color-sumi-light); }
   </style>
 </head>
-<body class="h-full text-slate-900">
+<body class="h-full sumi-text">
   <div id="error-banner" class="hidden fixed top-0 left-0 right-0 z-50 flex items-center gap-2 bg-red-600 text-white px-4 py-3 shadow-lg">
     <span class="font-semibold">エラー</span>
     <span id="error-message" class="text-sm min-w-0 truncate"></span>
@@ -22,9 +65,9 @@
   </div>
 
   <main class="h-full max-w-3xl mx-auto px-4 pb-16 pt-20 flex flex-col gap-8">
-    <header class="space-y-1">
-      <h1 class="text-3xl font-semibold tracking-tight">Muscle Routine</h1>
-      <p class="text-sm text-slate-500">URLと状態を同期するモバイルファーストのワークアウトプランナー。</p>
+    <header class="space-y-2">
+      <h1 class="text-3xl font-light tracking-wide sumi-text" style="letter-spacing: 0.05em;">筋トレ記録</h1>
+      <p class="text-sm sumi-text-light font-light">自分の変化を美しく記録するツール</p>
     </header>
 
     <section data-route="#/dashboard" class="route-view hidden flex flex-col gap-6"></section>
@@ -635,30 +678,30 @@
       form.className = 'section-card bg-white p-6 space-y-6';
       form.innerHTML = `
         <div class="flex items-center justify-between">
-          <h2 class="text-xl font-semibold">種目入力</h2>
-          <button type="button" id="exerciseBack" class="text-sm text-indigo-500 font-semibold px-3 py-2 min-h-[44px]">← 今日の一覧へ戻る</button>
+          <h2 class="text-xl font-light sumi-text" style="letter-spacing: 0.05em;">種目入力</h2>
+          <button type="button" id="exerciseBack" class="text-sm font-light px-3 py-2 min-h-[44px] transition" style="color: var(--color-gold);">← 戻る</button>
         </div>
-        <div class="flex items-center justify-between gap-3 bg-slate-100 rounded-2xl px-4 py-3 text-sm">
-          <div class="flex items-center gap-3 text-slate-600">
-            <input type="checkbox" id="supersetToggle" class="w-5 h-5 rounded" ${uiState.exerciseForm.superset ? 'checked' : ''}>
-            <label for="supersetToggle" class="font-semibold">スーパーセットにする</label>
+        <div class="flex items-center justify-between gap-3 rounded-2xl px-4 py-3 text-sm gold-accent border" style="border-color: rgba(212, 175, 55, 0.15);">
+          <div class="flex items-center gap-3 sumi-text-mid">
+            <input type="checkbox" id="supersetToggle" class="w-5 h-5 rounded" style="color: var(--color-gold);" ${uiState.exerciseForm.superset ? 'checked' : ''}>
+            <label for="supersetToggle" class="font-light">スーパーセットにする</label>
           </div>
-          <button type="button" id="resetForm" class="text-xs text-slate-500 hover:text-slate-700 font-medium px-2 py-1 transition">リセット</button>
+          <button type="button" id="resetForm" class="text-xs sumi-text-light hover:sumi-text font-light px-2 py-1 transition">リセット</button>
         </div>
-        <div id="exercisePreview" class="hidden bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-3 text-sm">
+        <div id="exercisePreview" class="hidden rounded-xl px-4 py-3 text-sm border" style="background-color: rgba(245, 237, 214, 0.3); border-color: rgba(212, 175, 55, 0.2);">
           <div class="flex items-start gap-2">
-            <svg class="w-5 h-5 text-indigo-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 mt-0.5 flex-shrink-0" style="color: var(--color-gold);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
             <div class="flex-1">
-              <div class="font-semibold text-indigo-900 mb-1">入力中の種目</div>
-              <div id="exercisePreviewText" class="text-indigo-700"></div>
+              <div class="font-light sumi-text mb-1" style="letter-spacing: 0.02em;">入力中の種目</div>
+              <div id="exercisePreviewText" class="sumi-text-mid font-light"></div>
             </div>
           </div>
         </div>
         <div id="exerciseCards" class="flex flex-col gap-4"></div>
         <div class="flex justify-between items-center">
-          <button type="submit" class="ios-card bg-indigo-500 text-white px-6 py-3 font-semibold min-h-[44px]">決定</button>
+          <button type="submit" class="ios-card text-white px-6 py-3 font-light min-h-[44px] transition" style="background-color: var(--color-gold); letter-spacing: 0.05em;">決定</button>
         </div>
       `;
       container.appendChild(form);
@@ -744,90 +787,90 @@
       container.innerHTML = '';
       uiState.exerciseForm.cards.forEach((card, index) => {
         const cardEl = document.createElement('section');
-        cardEl.className = 'bg-slate-50 rounded-2xl p-4 space-y-3 border border-slate-200';
+        cardEl.className = 'bg-white rounded-2xl p-4 space-y-3 border border-neutral-200/40 shadow-sm';
         const label = uiState.exerciseForm.superset ? ['A', 'B', 'C'][index] : '';
         const title = uiState.exerciseForm.superset ? `${label} 種目` : '種目設定';
         cardEl.innerHTML = `
           <div class="flex items-center justify-between mb-1">
-            <h3 class="text-base font-semibold text-slate-800">${title}</h3>
+            <h3 class="text-base font-light sumi-text" style="letter-spacing: 0.02em;">${title}</h3>
             ${uiState.exerciseForm.superset && uiState.exerciseForm.cards.length > 2 && index === uiState.exerciseForm.cards.length - 1
-              ? '<button type="button" class="text-xs text-rose-500 font-semibold hover:text-rose-600 transition" data-remove="true">削除</button>'
+              ? '<button type="button" class="text-xs sumi-text-light hover:sumi-text font-light transition" data-remove="true">削除</button>'
               : ''}
           </div>
           
           <!-- 基本情報 -->
-          <div class="space-y-2 pb-2 border-b border-slate-200/60">
+          <div class="space-y-2 pb-2 border-b border-neutral-200/30">
             <div class="flex items-center gap-1.5">
-              <div class="w-0.5 h-3 bg-indigo-500 rounded-full"></div>
-              <h4 class="text-xs font-medium text-slate-500">基本情報</h4>
+              <div class="w-0.5 h-3 rounded-full" style="background-color: var(--color-gold);"></div>
+              <h4 class="text-xs font-light sumi-text-mid" style="letter-spacing: 0.05em;">基本情報</h4>
             </div>
             <div class="grid grid-cols-2 gap-2">
               <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-slate-600 flex items-center gap-0.5">
-                  部位<span class="text-rose-500">*</span>
+                <span class="text-xs font-light sumi-text-mid flex items-center gap-0.5">
+                  部位<span style="color: var(--color-gold);">*</span>
                 </span>
-                <select class="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm min-h-[40px] focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition" data-field="part"></select>
+                <select class="w-full rounded-lg border border-neutral-200 px-2 py-1.5 text-sm min-h-[40px] sumi-text bg-white transition" style="border-color: rgba(115, 115, 115, 0.2);" data-field="part"></select>
               </label>
               <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-slate-600 flex items-center gap-0.5">
-                  種目<span class="text-rose-500">*</span>
+                <span class="text-xs font-light sumi-text-mid flex items-center gap-0.5">
+                  種目<span style="color: var(--color-gold);">*</span>
                 </span>
-                <select class="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm min-h-[40px] focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition" data-field="exercise"></select>
+                <select class="w-full rounded-lg border border-neutral-200 px-2 py-1.5 text-sm min-h-[40px] sumi-text bg-white transition" style="border-color: rgba(115, 115, 115, 0.2);" data-field="exercise"></select>
               </label>
             </div>
           </div>
           
           <!-- 器具設定 -->
-          <div class="space-y-2 py-2 border-b border-slate-200/60">
+          <div class="space-y-2 py-2 border-b border-neutral-200/30">
             <div class="flex items-center gap-1.5">
-              <div class="w-0.5 h-3 bg-amber-500 rounded-full"></div>
-              <h4 class="text-xs font-medium text-slate-500">器具</h4>
+              <div class="w-0.5 h-3 rounded-full" style="background-color: var(--color-gold-light);"></div>
+              <h4 class="text-xs font-light sumi-text-mid" style="letter-spacing: 0.05em;">器具</h4>
             </div>
             <div class="grid grid-cols-2 gap-2">
               <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-slate-600">
-                  器具 <span class="text-slate-400 text-[10px]">(任意)</span>
+                <span class="text-xs font-light sumi-text-mid">
+                  器具 <span class="sumi-text-light text-[10px]">(任意)</span>
                 </span>
-                <select class="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm min-h-[40px] focus:border-amber-400 focus:ring-1 focus:ring-amber-100 transition" data-field="gear"></select>
+                <select class="w-full rounded-lg border border-neutral-200 px-2 py-1.5 text-sm min-h-[40px] sumi-text bg-white transition" style="border-color: rgba(115, 115, 115, 0.2);" data-field="gear"></select>
               </label>
               <label class="flex flex-col gap-1" data-attachment-field>
-                <span class="text-xs font-medium text-slate-600">
-                  アタッチメント <span class="text-slate-400 text-[10px]">(任意)</span>
+                <span class="text-xs font-light sumi-text-mid">
+                  アタッチメント <span class="sumi-text-light text-[10px]">(任意)</span>
                 </span>
-                <select class="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm min-h-[40px] focus:border-amber-400 focus:ring-1 focus:ring-amber-100 transition" data-field="attachment"></select>
+                <select class="w-full rounded-lg border border-neutral-200 px-2 py-1.5 text-sm min-h-[40px] sumi-text bg-white transition" style="border-color: rgba(115, 115, 115, 0.2);" data-field="attachment"></select>
               </label>
             </div>
-            <div class="text-[10px] text-slate-400 pl-0.5" data-attachment-hint>ケーブル/マシン時に設定</div>
+            <div class="text-[10px] sumi-text-light pl-0.5 font-light" data-attachment-hint>ケーブル/マシン時に設定</div>
           </div>
           
           <!-- 詳細設定 -->
           <div class="space-y-2 pt-2">
             <div class="flex items-center gap-1.5">
-              <div class="w-0.5 h-3 bg-emerald-500 rounded-full"></div>
-              <h4 class="text-xs font-medium text-slate-500">詳細</h4>
+              <div class="w-0.5 h-3 rounded-full" style="background-color: var(--color-gold-pale);"></div>
+              <h4 class="text-xs font-light sumi-text-mid" style="letter-spacing: 0.05em;">詳細</h4>
             </div>
             <div class="grid grid-cols-2 gap-2">
               <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-slate-600">
-                  角度 <span class="text-slate-400 text-[10px]">(任意)</span>
+                <span class="text-xs font-light sumi-text-mid">
+                  角度 <span class="sumi-text-light text-[10px]">(任意)</span>
                 </span>
-                <select class="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm min-h-[40px] focus:border-emerald-400 focus:ring-1 focus:ring-emerald-100 transition" data-field="angle"></select>
+                <select class="w-full rounded-lg border border-neutral-200 px-2 py-1.5 text-sm min-h-[40px] sumi-text bg-white transition" style="border-color: rgba(115, 115, 115, 0.2);" data-field="angle"></select>
               </label>
               <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-slate-600">
-                  ポジション <span class="text-slate-400 text-[10px]">(任意)</span>
+                <span class="text-xs font-light sumi-text-mid">
+                  ポジション <span class="sumi-text-light text-[10px]">(任意)</span>
                 </span>
-                <select class="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm min-h-[40px] focus:border-emerald-400 focus:ring-1 focus:ring-emerald-100 transition" data-field="position"></select>
+                <select class="w-full rounded-lg border border-neutral-200 px-2 py-1.5 text-sm min-h-[40px] sumi-text bg-white transition" style="border-color: rgba(115, 115, 115, 0.2);" data-field="position"></select>
               </label>
             </div>
             <div class="flex flex-wrap gap-2 text-xs pt-1">
-              <label class="flex items-center gap-1.5 bg-white rounded-lg px-3 py-1.5 border border-slate-200 hover:border-slate-300 cursor-pointer transition">
-                <input type="checkbox" class="w-3.5 h-3.5 rounded text-indigo-500 focus:ring-1 focus:ring-indigo-200" data-field="timed" ${card.timed ? 'checked' : ''}>
-                <span class="font-medium text-slate-700">秒数記録</span>
+              <label class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 border cursor-pointer transition" style="border-color: rgba(115, 115, 115, 0.15); background-color: rgba(245, 237, 214, 0.1);">
+                <input type="checkbox" class="w-3.5 h-3.5 rounded focus:ring-1" style="color: var(--color-gold);" data-field="timed" ${card.timed ? 'checked' : ''}>
+                <span class="font-light sumi-text">秒数記録</span>
               </label>
-              <label class="flex items-center gap-1.5 bg-white rounded-lg px-3 py-1.5 border border-slate-200 hover:border-slate-300 cursor-pointer transition">
-                <input type="checkbox" class="w-3.5 h-3.5 rounded text-indigo-500 focus:ring-1 focus:ring-indigo-200" data-field="oneHand" ${card.oneHand ? 'checked' : ''}>
-                <span class="font-medium text-slate-700">ワンハンド</span>
+              <label class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 border cursor-pointer transition" style="border-color: rgba(115, 115, 115, 0.15); background-color: rgba(245, 237, 214, 0.1);">
+                <input type="checkbox" class="w-3.5 h-3.5 rounded focus:ring-1" style="color: var(--color-gold);" data-field="oneHand" ${card.oneHand ? 'checked' : ''}>
+                <span class="font-light sumi-text">ワンハンド</span>
               </label>
             </div>
           </div>
