@@ -400,21 +400,21 @@
       const summary = computeTodayStats();
       statsSection.innerHTML = `
         <div class="flex items-center justify-between">
-          <h2 class="text-xl font-semibold">今日の概要</h2>
-          <span class="text-xs text-slate-400">ウォームアップ除外</span>
+          <h2 class="text-xl font-light sumi-text" style="letter-spacing: 0.03em;">今日の概要</h2>
+          <span class="text-xs font-light sumi-text-light">ウォームアップ除外</span>
         </div>
         <div class="grid grid-cols-3 gap-3 text-center">
-          <div class="ios-card bg-indigo-50 text-indigo-700 py-3 min-h-[44px] flex flex-col justify-center">
-            <p class="text-xs">作業セット</p>
-            <p class="text-2xl font-semibold">${summary.workSets}</p>
+          <div class="ios-card py-3 min-h-[44px] flex flex-col justify-center border" style="background-color: rgba(245, 237, 214, 0.15); border-color: rgba(212, 175, 55, 0.2); color: var(--color-gold);">
+            <p class="text-xs font-light">作業セット</p>
+            <p class="text-2xl font-light">${summary.workSets}</p>
           </div>
-          <div class="ios-card bg-orange-50 text-orange-700 py-3 min-h-[44px] flex flex-col justify-center">
-            <p class="text-xs">SSラウンド</p>
-            <p class="text-2xl font-semibold">${summary.supersetRounds}</p>
+          <div class="ios-card py-3 min-h-[44px] flex flex-col justify-center border" style="background-color: rgba(245, 237, 214, 0.15); border-color: rgba(212, 175, 55, 0.2); color: var(--color-gold);">
+            <p class="text-xs font-light">SSラウンド</p>
+            <p class="text-2xl font-light">${summary.supersetRounds}</p>
           </div>
-          <div class="ios-card bg-emerald-50 text-emerald-700 py-3 min-h-[44px] flex flex-col justify-center">
-            <p class="text-xs">単独セット</p>
-            <p class="text-2xl font-semibold">${summary.soloSets}</p>
+          <div class="ios-card py-3 min-h-[44px] flex flex-col justify-center border" style="background-color: rgba(245, 237, 214, 0.15); border-color: rgba(212, 175, 55, 0.2); color: var(--color-gold);">
+            <p class="text-xs font-light">単独セット</p>
+            <p class="text-2xl font-light">${summary.soloSets}</p>
           </div>
         </div>
       `;
@@ -424,7 +424,8 @@
       actionRow.className = 'flex justify-between items-center gap-4';
       const addButton = document.createElement('button');
       addButton.type = 'button';
-      addButton.className = 'ios-card bg-indigo-500 text-white px-6 py-3 font-semibold text-base min-h-[44px]';
+      addButton.className = 'ios-card px-6 py-3 font-light text-base min-h-[44px] border transition';
+      addButton.style.cssText = 'background-color: var(--color-gold); color: white; border-color: var(--color-gold-dark); letter-spacing: 0.05em;';
       addButton.textContent = '＋ 種目追加';
       addButton.addEventListener('click', () => {
         uiState.exerciseForm = createExerciseFormState();
@@ -458,17 +459,17 @@
       header.className = 'flex items-start justify-between gap-3';
       header.innerHTML = `
         <div class="min-w-0">
-          <p class="text-sm font-semibold text-slate-600 truncate">${item.exercise}</p>
-          <p class="text-xs text-slate-400">${partLabel}</p>
+          <p class="text-sm font-light sumi-text truncate" style="letter-spacing: 0.02em;">${item.exercise}</p>
+          <p class="text-xs font-light sumi-text-light">${partLabel}</p>
         </div>
-        <div class="text-xs text-slate-400 text-right min-w-0 truncate">
+        <div class="text-xs font-light sumi-text-light text-right min-w-0 truncate">
           ${[item.gear, item.angle, item.position].map(val => val && val !== '-' ? val : '―').join(' / ')}
         </div>
       `;
       card.appendChild(header);
       if (item.attachment && item.attachment !== '-') {
         const att = document.createElement('p');
-        att.className = 'text-[11px] text-slate-400';
+        att.className = 'text-[11px] font-light sumi-text-light';
         att.textContent = `アタッチメント: ${item.attachment}`;
         card.appendChild(att);
       }
@@ -493,7 +494,8 @@
       controls.className = 'flex justify-end gap-3 pt-1';
       const editBtn = document.createElement('button');
       editBtn.type = 'button';
-      editBtn.className = 'px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 text-sm font-semibold min-h-[44px]';
+      editBtn.className = 'px-4 py-2 rounded-full text-sm font-light min-h-[44px] border transition';
+      editBtn.style.cssText = 'background-color: rgba(245, 237, 214, 0.2); color: var(--color-gold); border-color: rgba(212, 175, 55, 0.3); letter-spacing: 0.05em;';
       editBtn.textContent = '編集';
       editBtn.addEventListener('click', () => {
         uiState.currentItemId = item.id;
@@ -515,10 +517,10 @@
       header.className = 'flex items-start justify-between gap-3';
       header.innerHTML = `
         <div class="min-w-0">
-          <p class="text-sm font-semibold text-slate-600 truncate">${title}</p>
-          <p class="text-xs text-slate-400">${sorted.map((item, index) => `${labels[index]}. ${state.master.parts.find(p => p.id === item.part)?.label ?? ''}`).join(' / ')}</p>
+          <p class="text-sm font-light sumi-text truncate" style="letter-spacing: 0.02em;">${title}</p>
+          <p class="text-xs font-light sumi-text-light">${sorted.map((item, index) => `${labels[index]}. ${state.master.parts.find(p => p.id === item.part)?.label ?? ''}`).join(' / ')}</p>
         </div>
-        <div class="text-xs text-slate-400 text-right min-w-0 truncate">
+        <div class="text-xs font-light sumi-text-light text-right min-w-0 truncate">
           ${sorted.map(item => [item.gear, item.angle, item.position].map(val => val && val !== '-' ? val : '―').join(' / ')).join(' ｜ ')}
         </div>
       `;
@@ -577,7 +579,8 @@
       controls.className = 'flex justify-end gap-3 pt-1';
       const editBtn = document.createElement('button');
       editBtn.type = 'button';
-      editBtn.className = 'px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 text-sm font-semibold min-h-[44px]';
+      editBtn.className = 'px-4 py-2 rounded-full text-sm font-light min-h-[44px] border transition';
+      editBtn.style.cssText = 'background-color: rgba(245, 237, 214, 0.2); color: var(--color-gold); border-color: rgba(212, 175, 55, 0.3); letter-spacing: 0.05em;';
       editBtn.textContent = '編集';
       editBtn.addEventListener('click', () => {
         uiState.currentItemId = sorted[0].id;
