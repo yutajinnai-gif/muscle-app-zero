@@ -136,7 +136,8 @@
       route: null,
       exerciseForm: createExerciseFormState(),
       currentItemId: null,
-      setEditor: null
+      setEditor: null,
+      editingHistoryIndex: null
     };
 
     function createId(prefix) {
@@ -506,7 +507,8 @@
       header.className = 'flex items-center justify-between mb-3';
       const title = document.createElement('h1');
       title.className = 'text-lg font-light sumi-text';
-      title.textContent = '今日のトレーニング';
+      const isEditing = uiState.editingHistoryIndex !== null;
+      title.textContent = isEditing ? '履歴を編集' : '今日のトレーニング';
       header.appendChild(title);
       const homeButton = document.createElement('button');
       homeButton.type = 'button';
@@ -558,9 +560,10 @@
       completeButton.type = 'button';
       completeButton.className = 'ios-card px-6 py-3 font-light text-base min-h-[44px] border transition';
       completeButton.style.cssText = 'background-color: rgba(245, 237, 214, 0.2); color: var(--color-gold); border-color: rgba(212, 175, 55, 0.3); letter-spacing: 0.05em; flex: 1;';
-      completeButton.textContent = '完了';
+      completeButton.textContent = isEditing ? '保存' : '完了';
       completeButton.addEventListener('click', () => {
-        if (confirm('今日のトレーニングを完了しますか？')) {
+        const message = isEditing ? '変更を保存しますか？' : '今日のトレーニングを完了しますか？';
+        if (confirm(message)) {
           completeWorkout();
         }
       });
@@ -1963,7 +1966,7 @@
       const list = document.createElement('div');
       list.className = 'space-y-3';
       
-      state.history.forEach(workout => {
+      state.history.forEach((workout, workoutIndex) => {
         const card = document.createElement('article');
         card.className = 'section-card bg-white p-4 space-y-3';
         
@@ -1971,12 +1974,23 @@
         header.className = 'flex items-start justify-between gap-3';
         const date = new Date(workout.date);
         const dateStr = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
-        header.innerHTML = `
-          <div class="min-w-0">
-            <p class="text-base font-light sumi-text" style="letter-spacing: 0.02em;">${dateStr}</p>
-            <p class="text-xs font-light sumi-text-light">${workout.items.length}種目</p>
-          </div>
+        const headerLeft = document.createElement('div');
+        headerLeft.className = 'min-w-0';
+        headerLeft.innerHTML = `
+          <p class="text-base font-light sumi-text" style="letter-spacing: 0.02em;">${dateStr}</p>
+          <p class="text-xs font-light sumi-text-light">${workout.items.length}種目</p>
         `;
+        header.appendChild(headerLeft);
+        
+        const editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.className = 'px-4 py-2 rounded-full text-sm font-light min-h-[44px] border transition';
+        editBtn.style.cssText = 'background-color: rgba(245, 237, 214, 0.2); color: var(--color-gold); border-color: rgba(212, 175, 55, 0.3); letter-spacing: 0.05em;';
+        editBtn.textContent = '編集';
+        editBtn.addEventListener('click', () => {
+          loadHistoryForEdit(workoutIndex);
+        });
+        header.appendChild(editBtn);
         card.appendChild(header);
         
         const itemsList = document.createElement('div');
@@ -2088,24 +2102,65 @@
       }
     }
 
-    function completeWorkout() {
-      // 今日のトレーニングをhistoryに追加
-      const workout = {
-        date: state.day.date,
-        items: JSON.parse(JSON.stringify(state.day.items)), // deep copy
-        completedAt: new Date().toISOString()
-      };
-      state.history.unshift(workout); // 最新を先頭に
-      saveHistory();
-      
-      // 新しい日のデータを初期化
+    function loadHistoryForEdit(historyIndex) {
+      // 履歴データをstate.dayに読み込む
+      const workout = state.history[historyIndex];
       state.day = {
-        date: new Date().toISOString().slice(0, 10),
-        items: []
+        date: workout.date,
+        items: JSON.parse(JSON.stringify(workout.items)) // deep copy
       };
       
-      alert('トレーニングを完了しました！\n引き続き編集できます。');
-      render(); // 画面を再描画
+      // 編集モードを設定
+      uiState.editingHistoryIndex = historyIndex;
+      
+      // 今日のトレーニング画面に遷移
+      navigate('#/today');
+    }
+
+    function completeWorkout() {
+      const isEditing = uiState.editingHistoryIndex !== null;
+      
+      if (isEditing) {
+        // 編集モード：履歴を更新
+        const workout = {
+          date: state.day.date,
+          items: JSON.parse(JSON.stringify(state.day.items)), // deep copy
+          completedAt: state.history[uiState.editingHistoryIndex].completedAt,
+          updatedAt: new Date().toISOString()
+        };
+        state.history[uiState.editingHistoryIndex] = workout;
+        saveHistory();
+        
+        // 編集モードを解除
+        uiState.editingHistoryIndex = null;
+        
+        // 新しい日のデータを初期化
+        state.day = {
+          date: new Date().toISOString().slice(0, 10),
+          items: []
+        };
+        
+        alert('履歴を更新しました！');
+        navigate('#/history'); // 履歴画面に戻る
+      } else {
+        // 通常モード：今日のトレーニングをhistoryに追加
+        const workout = {
+          date: state.day.date,
+          items: JSON.parse(JSON.stringify(state.day.items)), // deep copy
+          completedAt: new Date().toISOString()
+        };
+        state.history.unshift(workout); // 最新を先頭に
+        saveHistory();
+        
+        // 新しい日のデータを初期化
+        state.day = {
+          date: new Date().toISOString().slice(0, 10),
+          items: []
+        };
+        
+        alert('トレーニングを完了しました！\n引き続き編集できます。');
+        render(); // 画面を再描画
+      }
     }
 
     function initialize() {
