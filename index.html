@@ -1131,7 +1131,10 @@
         editor.items.forEach((item, index) => {
           const tab = document.createElement('button');
           tab.type = 'button';
-          tab.className = `flex-1 rounded-2xl px-4 py-2 text-sm font-semibold min-h-[44px] ${index === editor.activeIndex ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-600'}`;
+          tab.className = `flex-1 rounded-2xl px-4 py-2 text-sm font-light min-h-[40px] transition ${index === editor.activeIndex ? 'text-white' : 'bg-white sumi-text-mid border border-neutral-200/40'}`;
+          if (index === editor.activeIndex) {
+            tab.style.backgroundColor = 'var(--color-gold)';
+          }
           tab.textContent = item.label;
           tab.addEventListener('click', () => {
             editor.activeIndex = index;
@@ -1155,24 +1158,24 @@
       const header = document.createElement('div');
       header.innerHTML = `
         <div>
-          <h2 class="text-xl font-semibold">${item.exercise}</h2>
-          <p class="text-[11px] text-slate-400 mt-1">${subtitle}</p>
+          <h2 class="text-xl font-light sumi-text" style="letter-spacing: 0.03em;">${item.exercise}</h2>
+          <p class="text-[11px] sumi-text-light font-light mt-1">${subtitle}</p>
         </div>
       `;
       section.appendChild(header);
 
       const rowsWrapper = document.createElement('div');
-      rowsWrapper.className = 'space-y-4';
+      rowsWrapper.className = 'space-y-3';
       active.rows.forEach((row, rowIndex) => {
         const rowCard = document.createElement('div');
-        rowCard.className = 'bg-slate-50 rounded-2xl p-4 space-y-4 border border-slate-200';
+        rowCard.className = 'bg-white rounded-2xl p-3 space-y-3 border border-neutral-200/40 shadow-sm';
         const title = document.createElement('div');
-        title.className = 'flex items-center justify-between text-xs text-slate-500';
+        title.className = 'flex items-center justify-between text-xs sumi-text-mid font-light';
         title.textContent = row.round != null ? `ラウンド ${row.round}` : '単独セット';
         rowCard.appendChild(title);
 
         const grid = document.createElement('div');
-        grid.className = 'grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-slate-600';
+        grid.className = 'grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm sumi-text';
         if (active.timed) {
           grid.appendChild(createNumberInput('秒数', row.seconds, value => { row.seconds = value; }));
         } else {
@@ -1183,12 +1186,15 @@
         rowCard.appendChild(grid);
 
         const toggles = document.createElement('div');
-        toggles.className = 'flex flex-wrap gap-3 text-sm text-slate-600';
+        toggles.className = 'flex flex-wrap gap-2 text-sm sumi-text';
         const warmupLabel = document.createElement('label');
-        warmupLabel.className = 'flex items-center gap-2 bg-white rounded-2xl px-4 py-2 min-h-[40px]';
+        warmupLabel.className = 'flex items-center gap-2 rounded-lg px-3 py-1.5 border cursor-pointer transition';
+        warmupLabel.style.borderColor = 'rgba(115, 115, 115, 0.15)';
+        warmupLabel.style.backgroundColor = 'rgba(245, 237, 214, 0.1)';
         const warmupInput = document.createElement('input');
         warmupInput.type = 'checkbox';
-        warmupInput.className = 'w-5 h-5 rounded';
+        warmupInput.className = 'w-4 h-4 rounded';
+        warmupInput.style.color = 'var(--color-gold)';
         warmupInput.checked = row.warmup;
         warmupInput.addEventListener('change', () => { row.warmup = warmupInput.checked; });
         warmupLabel.append(warmupInput, document.createTextNode('ウォームアップ'));
@@ -1196,16 +1202,19 @@
         rowCard.appendChild(toggles);
 
         const dropArea = document.createElement('div');
-        dropArea.className = 'space-y-3';
+        dropArea.className = 'space-y-2.5';
         row.drops.forEach((drop, dropIndex) => {
           const dropCard = document.createElement('div');
-          dropCard.className = 'bg-white rounded-2xl p-4 space-y-3 border border-dashed border-orange-200';
+          dropCard.className = 'rounded-xl p-3 space-y-2.5 border border-dashed';
+          dropCard.style.borderColor = 'rgba(212, 175, 55, 0.3)';
+          dropCard.style.backgroundColor = 'rgba(245, 237, 214, 0.15)';
           const dropTitle = document.createElement('p');
-          dropTitle.className = 'text-xs font-semibold text-orange-600';
+          dropTitle.className = 'text-xs font-light';
+          dropTitle.style.color = 'var(--color-gold)';
           dropTitle.textContent = 'ドロップセット';
           dropCard.appendChild(dropTitle);
           const dropGrid = document.createElement('div');
-          dropGrid.className = 'grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-slate-600';
+          dropGrid.className = 'grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm sumi-text';
           if (active.timed) {
             dropGrid.appendChild(createNumberInput('秒数', drop.seconds, value => { drop.seconds = value; }));
           } else {
@@ -1215,10 +1224,13 @@
           }
           dropCard.appendChild(dropGrid);
           const dropToggle = document.createElement('label');
-          dropToggle.className = 'inline-flex items-center gap-2 bg-slate-100 rounded-2xl px-3 py-2 text-xs text-slate-600 min-h-[32px]';
+          dropToggle.className = 'inline-flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs sumi-text-mid border cursor-pointer transition';
+          dropToggle.style.borderColor = 'rgba(115, 115, 115, 0.15)';
+          dropToggle.style.backgroundColor = 'rgba(255, 255, 255, 0.6)';
           const dropWarm = document.createElement('input');
           dropWarm.type = 'checkbox';
-          dropWarm.className = 'w-4 h-4 rounded';
+          dropWarm.className = 'w-3.5 h-3.5 rounded';
+          dropWarm.style.color = 'var(--color-gold)';
           dropWarm.checked = drop.warmup;
           dropWarm.addEventListener('change', () => { drop.warmup = dropWarm.checked; });
           dropToggle.append(dropWarm, document.createTextNode('ウォームアップ'));
@@ -1227,7 +1239,8 @@
           dropFooter.className = 'flex justify-end';
           const dropRemove = document.createElement('button');
           dropRemove.type = 'button';
-          dropRemove.className = 'text-xs text-rose-500 font-semibold px-3 py-1 min-h-[32px]';
+          dropRemove.className = 'text-xs font-light px-3 py-1 min-h-[32px] transition';
+          dropRemove.style.color = 'var(--color-sumi-light)';
           dropRemove.textContent = '削除';
           dropRemove.addEventListener('click', () => {
             row.drops.splice(dropIndex, 1);
@@ -1239,7 +1252,9 @@
         });
         const addDropBtn = document.createElement('button');
         addDropBtn.type = 'button';
-        addDropBtn.className = 'w-full text-xs text-indigo-500 font-semibold px-4 py-2 bg-white rounded-2xl min-h-[40px]';
+        addDropBtn.className = 'w-full text-xs font-light px-4 py-2 bg-white rounded-xl min-h-[36px] border transition';
+        addDropBtn.style.borderColor = 'rgba(212, 175, 55, 0.2)';
+        addDropBtn.style.color = 'var(--color-gold)';
         addDropBtn.textContent = '＋ ドロップセット';
         addDropBtn.addEventListener('click', () => {
           row.drops.push(createBlankDrop(active.timed, row.round));
@@ -1252,7 +1267,8 @@
         rowFooter.className = 'flex justify-end';
         const removeBtn = document.createElement('button');
         removeBtn.type = 'button';
-        removeBtn.className = 'text-sm text-rose-500 font-semibold px-4 py-2 min-h-[44px]';
+        removeBtn.className = 'text-sm font-light px-4 py-2 min-h-[40px] transition';
+        removeBtn.style.color = 'var(--color-sumi-light)';
         removeBtn.textContent = 'このセットを削除';
         removeBtn.addEventListener('click', () => {
           active.rows.splice(rowIndex, 1);
@@ -1270,7 +1286,9 @@
 
       const addSetBtn = document.createElement('button');
       addSetBtn.type = 'button';
-      addSetBtn.className = 'w-full text-sm text-indigo-500 font-semibold px-4 py-3 bg-white rounded-2xl min-h-[44px]';
+      addSetBtn.className = 'w-full text-sm font-light px-4 py-3 bg-white rounded-xl min-h-[44px] border transition';
+      addSetBtn.style.borderColor = 'rgba(212, 175, 55, 0.25)';
+      addSetBtn.style.color = 'var(--color-gold)';
       addSetBtn.textContent = editor.isSuperset ? '＋ 単独セット追加' : '＋ セット追加';
       addSetBtn.addEventListener('click', () => {
         active.rows.push(createBlankRow(active.timed));
@@ -1286,7 +1304,9 @@
       footer.className = 'flex flex-col sm:flex-row gap-3 justify-between';
       const saveBack = document.createElement('button');
       saveBack.type = 'button';
-      saveBack.className = 'ios-card bg-indigo-500 text-white px-6 py-3 font-semibold min-h-[44px]';
+      saveBack.className = 'ios-card text-white px-6 py-3 font-light min-h-[44px] transition';
+      saveBack.style.backgroundColor = 'var(--color-gold)';
+      saveBack.style.letterSpacing = '0.05em';
       saveBack.textContent = '保存して戻る';
       saveBack.addEventListener('click', () => {
         persistSetEditor();
@@ -1294,7 +1314,9 @@
       });
       const saveNext = document.createElement('button');
       saveNext.type = 'button';
-      saveNext.className = 'ios-card bg-white text-indigo-600 px-6 py-3 font-semibold min-h-[44px]';
+      saveNext.className = 'ios-card bg-white px-6 py-3 font-light min-h-[44px] border transition';
+      saveNext.style.borderColor = 'rgba(212, 175, 55, 0.3)';
+      saveNext.style.color = 'var(--color-gold)';
       saveNext.textContent = '次の種目へ';
       saveNext.addEventListener('click', () => {
         persistSetEditor();
@@ -1402,13 +1424,26 @@
 
     function createNumberInput(labelText, value, onInput, min = 0) {
       const wrapper = document.createElement('label');
-      wrapper.className = 'flex flex-col gap-1';
-      wrapper.innerHTML = `<span>${labelText}</span>`;
+      wrapper.className = 'flex flex-col gap-1.5';
+      const label = document.createElement('span');
+      label.className = 'text-xs sumi-text-mid font-light';
+      label.textContent = labelText;
+      wrapper.appendChild(label);
       const input = document.createElement('input');
       input.type = 'number';
       input.min = String(min);
       input.value = value ?? '';
-      input.className = 'rounded-2xl border border-slate-200 px-3 py-2';
+      input.className = 'rounded-lg border px-3 py-2 text-sm sumi-text font-light transition focus:outline-none focus:ring-1';
+      input.style.borderColor = 'rgba(115, 115, 115, 0.2)';
+      input.style.backgroundColor = 'rgba(250, 250, 250, 0.5)';
+      input.addEventListener('focus', () => {
+        input.style.borderColor = 'var(--color-gold)';
+        input.style.backgroundColor = 'rgba(245, 237, 214, 0.1)';
+      });
+      input.addEventListener('blur', () => {
+        input.style.borderColor = 'rgba(115, 115, 115, 0.2)';
+        input.style.backgroundColor = 'rgba(250, 250, 250, 0.5)';
+      });
       input.addEventListener('input', () => onInput(input.value));
       wrapper.appendChild(input);
       return wrapper;
