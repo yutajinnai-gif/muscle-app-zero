@@ -662,51 +662,94 @@
         const label = uiState.exerciseForm.superset ? ['A', 'B', 'C'][index] : '';
         const title = uiState.exerciseForm.superset ? `${label} 種目` : '種目設定';
         cardEl.innerHTML = `
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-slate-600">${title}</h3>
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-base font-semibold text-slate-800">${title}</h3>
             ${uiState.exerciseForm.superset && uiState.exerciseForm.cards.length > 2 && index === uiState.exerciseForm.cards.length - 1
-              ? '<button type="button" class="text-xs text-rose-500 font-semibold" data-remove="true">削除</button>'
+              ? '<button type="button" class="text-xs text-rose-500 font-semibold hover:text-rose-600 transition" data-remove="true">削除</button>'
               : ''}
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <label class="flex flex-col gap-1 text-sm font-semibold text-slate-600">
-              部位
-              <select class="w-full rounded-2xl border border-slate-200 px-3 py-3 text-sm min-h-[44px]" data-field="part"></select>
-            </label>
-            <label class="flex flex-col gap-1 text-sm font-semibold text-slate-600">
-              種目
-              <select class="w-full rounded-2xl border border-slate-200 px-3 py-3 text-sm min-h-[44px]" data-field="exercise"></select>
-            </label>
+          
+          <!-- 基本情報セクション -->
+          <div class="space-y-3 pb-4 border-b border-slate-200">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-1 h-4 bg-indigo-500 rounded-full"></div>
+              <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wide">基本情報</h4>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <label class="flex flex-col gap-1.5">
+                <span class="text-sm font-semibold text-slate-700 flex items-center gap-1">
+                  部位
+                  <span class="text-xs text-rose-500">*</span>
+                </span>
+                <select class="w-full rounded-xl border-2 border-slate-200 px-3 py-2.5 text-sm min-h-[44px] focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition" data-field="part"></select>
+              </label>
+              <label class="flex flex-col gap-1.5">
+                <span class="text-sm font-semibold text-slate-700 flex items-center gap-1">
+                  種目
+                  <span class="text-xs text-rose-500">*</span>
+                </span>
+                <select class="w-full rounded-xl border-2 border-slate-200 px-3 py-2.5 text-sm min-h-[44px] focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition" data-field="exercise"></select>
+              </label>
+            </div>
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <label class="flex flex-col gap-1 text-sm font-semibold text-slate-600">
-              器具
-              <select class="w-full rounded-2xl border border-slate-200 px-3 py-3 text-sm min-h-[44px]" data-field="gear"></select>
-            </label>
-            <label class="flex flex-col gap-1 text-sm font-semibold text-slate-600">
-              アタッチメント
-              <select class="w-full rounded-2xl border border-slate-200 px-3 py-3 text-sm min-h-[44px]" data-field="attachment"></select>
-            </label>
+          
+          <!-- 器具設定セクション -->
+          <div class="space-y-3 py-4 border-b border-slate-200">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-1 h-4 bg-amber-500 rounded-full"></div>
+              <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wide">器具設定</h4>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <label class="flex flex-col gap-1.5">
+                <span class="text-sm font-semibold text-slate-700 flex items-center gap-1">
+                  器具
+                  <span class="text-xs text-slate-400">(任意)</span>
+                </span>
+                <select class="w-full rounded-xl border-2 border-slate-200 px-3 py-2.5 text-sm min-h-[44px] focus:border-amber-400 focus:ring-2 focus:ring-amber-100 transition" data-field="gear"></select>
+              </label>
+              <label class="flex flex-col gap-1.5" data-attachment-field>
+                <span class="text-sm font-semibold text-slate-700 flex items-center gap-1">
+                  アタッチメント
+                  <span class="text-xs text-slate-400">(任意)</span>
+                </span>
+                <select class="w-full rounded-xl border-2 border-slate-200 px-3 py-2.5 text-sm min-h-[44px] focus:border-amber-400 focus:ring-2 focus:ring-amber-100 transition" data-field="attachment"></select>
+                <span class="text-xs text-slate-400 mt-0.5" data-attachment-hint>ケーブル/マシン使用時に設定</span>
+              </label>
+            </div>
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <label class="flex flex-col gap-1 text-sm font-semibold text-slate-600">
-              角度
-              <select class="w-full rounded-2xl border border-slate-200 px-3 py-3 text-sm min-h-[44px]" data-field="angle"></select>
-            </label>
-            <label class="flex flex-col gap-1 text-sm font-semibold text-slate-600">
-              ポジション
-              <select class="w-full rounded-2xl border border-slate-200 px-3 py-3 text-sm min-h-[44px]" data-field="position"></select>
-            </label>
-          </div>
-          <div class="flex flex-wrap gap-3 text-sm text-slate-600">
-            <label class="flex items-center gap-2 bg-white rounded-2xl px-4 py-3 min-h-[44px]">
-              <input type="checkbox" class="w-5 h-5 rounded" data-field="timed" ${card.timed ? 'checked' : ''}>
-              秒数で記録
-            </label>
-            <label class="flex items-center gap-2 bg-white rounded-2xl px-4 py-3 min-h-[44px]">
-              <input type="checkbox" class="w-5 h-5 rounded" data-field="oneHand" ${card.oneHand ? 'checked' : ''}>
-              ワンハンド
-            </label>
+          
+          <!-- 詳細設定セクション -->
+          <div class="space-y-3 pt-4">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-1 h-4 bg-emerald-500 rounded-full"></div>
+              <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wide">詳細設定</h4>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <label class="flex flex-col gap-1.5">
+                <span class="text-sm font-semibold text-slate-700 flex items-center gap-1">
+                  角度
+                  <span class="text-xs text-slate-400">(任意)</span>
+                </span>
+                <select class="w-full rounded-xl border-2 border-slate-200 px-3 py-2.5 text-sm min-h-[44px] focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition" data-field="angle"></select>
+              </label>
+              <label class="flex flex-col gap-1.5">
+                <span class="text-sm font-semibold text-slate-700 flex items-center gap-1">
+                  ポジション
+                  <span class="text-xs text-slate-400">(任意)</span>
+                </span>
+                <select class="w-full rounded-xl border-2 border-slate-200 px-3 py-2.5 text-sm min-h-[44px] focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition" data-field="position"></select>
+              </label>
+            </div>
+            <div class="flex flex-wrap gap-3 text-sm text-slate-700 pt-2">
+              <label class="flex items-center gap-2 bg-white rounded-xl px-4 py-2.5 border border-slate-200 hover:border-slate-300 cursor-pointer transition min-h-[44px]">
+                <input type="checkbox" class="w-4 h-4 rounded text-indigo-500 focus:ring-2 focus:ring-indigo-200" data-field="timed" ${card.timed ? 'checked' : ''}>
+                <span class="font-medium">秒数で記録</span>
+              </label>
+              <label class="flex items-center gap-2 bg-white rounded-xl px-4 py-2.5 border border-slate-200 hover:border-slate-300 cursor-pointer transition min-h-[44px]">
+                <input type="checkbox" class="w-4 h-4 rounded text-indigo-500 focus:ring-2 focus:ring-indigo-200" data-field="oneHand" ${card.oneHand ? 'checked' : ''}>
+                <span class="font-medium">ワンハンド</span>
+              </label>
+            </div>
           </div>
         `;
         container.appendChild(cardEl);
@@ -724,6 +767,27 @@
         updateExerciseOptions(exerciseSelect, card);
         selects.slice(1).forEach(select => populateSelect(select.element, select.options, card[select.field]));
 
+        // アタッチメントフィールドの文脈依存表示
+        const gearSelect = cardEl.querySelector('[data-field="gear"]');
+        const attachmentField = cardEl.querySelector('[data-attachment-field]');
+        const attachmentHint = cardEl.querySelector('[data-attachment-hint]');
+        
+        function updateAttachmentHighlight() {
+          const gear = gearSelect.value;
+          const needsAttachment = gear === 'ケーブル' || gear === 'マシン';
+          if (needsAttachment) {
+            attachmentField.classList.add('ring-2', 'ring-amber-200', 'bg-amber-50/30');
+            attachmentHint.classList.remove('text-slate-400');
+            attachmentHint.classList.add('text-amber-600', 'font-medium');
+          } else {
+            attachmentField.classList.remove('ring-2', 'ring-amber-200', 'bg-amber-50/30');
+            attachmentHint.classList.remove('text-amber-600', 'font-medium');
+            attachmentHint.classList.add('text-slate-400');
+          }
+        }
+        
+        updateAttachmentHighlight();
+
         cardEl.querySelectorAll('select, input[type="checkbox"]').forEach(field => {
           field.addEventListener('change', event => {
             const target = event.target;
@@ -734,6 +798,9 @@
               updateExerciseOptions(exerciseSelect, card);
             } else if (fieldName === 'exercise') {
               card.exercise = target.value;
+            } else if (fieldName === 'gear') {
+              card.gear = target.value;
+              updateAttachmentHighlight();
             } else if (fieldName === 'timed' || fieldName === 'oneHand') {
               card[fieldName] = target.checked;
             } else {
