@@ -107,6 +107,7 @@
       history: [],
       day: {
         date: new Date().toISOString().slice(0, 10),
+        memo: '',
         items: [
           {
             id: createId('item'),
@@ -542,6 +543,24 @@
         </div>
       `;
       container.appendChild(statsSection);
+
+      // メモ入力欄
+      const memoSection = document.createElement('div');
+      memoSection.className = 'section-card bg-white p-4 space-y-2';
+      const memoLabel = document.createElement('label');
+      memoLabel.className = 'text-xs font-light sumi-text-light';
+      memoLabel.textContent = 'トレーニングメモ';
+      const memoTextarea = document.createElement('textarea');
+      memoTextarea.className = 'w-full p-3 text-sm sumi-text font-light border rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/30 transition';
+      memoTextarea.style.cssText = 'border-color: rgba(115, 115, 115, 0.2); background-color: rgba(245, 237, 214, 0.05); min-height: 80px; resize: vertical;';
+      memoTextarea.placeholder = '今日のトレーニングのメモを記録...';
+      memoTextarea.value = state.day.memo || '';
+      memoTextarea.addEventListener('input', (e) => {
+        state.day.memo = e.target.value;
+      });
+      memoSection.appendChild(memoLabel);
+      memoSection.appendChild(memoTextarea);
+      container.appendChild(memoSection);
 
       const actionRow = document.createElement('div');
       actionRow.className = 'flex items-center gap-3';
@@ -1414,16 +1433,14 @@
       const toggles = document.createElement('div');
       toggles.className = 'flex flex-wrap gap-1.5 text-sm sumi-text';
       const warmupLabel = document.createElement('label');
-      warmupLabel.className = 'flex items-center gap-1.5 rounded-lg px-2.5 py-1 border cursor-pointer transition text-xs';
-      warmupLabel.style.borderColor = 'rgba(115, 115, 115, 0.15)';
-      warmupLabel.style.backgroundColor = 'rgba(245, 237, 214, 0.1)';
+      warmupLabel.className = 'inline-flex items-center gap-1 text-xs sumi-text-light cursor-pointer';
       const warmupInput = document.createElement('input');
       warmupInput.type = 'checkbox';
-      warmupInput.className = 'w-3.5 h-3.5 rounded';
-      warmupInput.style.color = 'var(--color-gold)';
+      warmupInput.className = 'w-3 h-3 rounded';
+      warmupInput.style.accentColor = 'var(--color-gold)';
       warmupInput.checked = row.warmup;
       warmupInput.addEventListener('change', () => { row.warmup = warmupInput.checked; });
-      warmupLabel.append(warmupInput, document.createTextNode('ウォームアップ'));
+      warmupLabel.append(warmupInput, document.createTextNode('W'));
       toggles.appendChild(warmupLabel);
       rowCard.appendChild(toggles);
 
@@ -1451,16 +1468,14 @@
         }
         dropCard.appendChild(dropGrid);
         const dropToggle = document.createElement('label');
-        dropToggle.className = 'inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-[10px] sumi-text-mid border cursor-pointer transition';
-        dropToggle.style.borderColor = 'rgba(115, 115, 115, 0.15)';
-        dropToggle.style.backgroundColor = 'rgba(255, 255, 255, 0.6)';
+        dropToggle.className = 'inline-flex items-center gap-1 text-[10px] sumi-text-light cursor-pointer';
         const dropWarm = document.createElement('input');
         dropWarm.type = 'checkbox';
         dropWarm.className = 'w-3 h-3 rounded';
-        dropWarm.style.color = 'var(--color-gold)';
+        dropWarm.style.accentColor = 'var(--color-gold)';
         dropWarm.checked = drop.warmup;
         dropWarm.addEventListener('change', () => { drop.warmup = dropWarm.checked; });
-        dropToggle.append(dropWarm, document.createTextNode('ウォームアップ'));
+        dropToggle.append(dropWarm, document.createTextNode('W'));
         dropCard.appendChild(dropToggle);
         const dropFooter = document.createElement('div');
         dropFooter.className = 'flex justify-end';
@@ -1542,16 +1557,14 @@
         const toggles = document.createElement('div');
         toggles.className = 'flex flex-wrap gap-1.5 text-sm sumi-text';
         const warmupLabel = document.createElement('label');
-        warmupLabel.className = 'flex items-center gap-1.5 rounded-lg px-2.5 py-1 border cursor-pointer transition text-xs';
-        warmupLabel.style.borderColor = 'rgba(115, 115, 115, 0.15)';
-        warmupLabel.style.backgroundColor = 'rgba(245, 237, 214, 0.1)';
+        warmupLabel.className = 'inline-flex items-center gap-1 text-xs sumi-text-light cursor-pointer';
         const warmupInput = document.createElement('input');
         warmupInput.type = 'checkbox';
-        warmupInput.className = 'w-3.5 h-3.5 rounded';
-        warmupInput.style.color = 'var(--color-gold)';
+        warmupInput.className = 'w-3 h-3 rounded';
+        warmupInput.style.accentColor = 'var(--color-gold)';
         warmupInput.checked = row.warmup;
         warmupInput.addEventListener('change', () => { row.warmup = warmupInput.checked; });
-        warmupLabel.append(warmupInput, document.createTextNode('ウォームアップ'));
+        warmupLabel.append(warmupInput, document.createTextNode('W'));
         toggles.appendChild(warmupLabel);
         rowCard.appendChild(toggles);
 
@@ -1578,16 +1591,14 @@
           }
           dropCard.appendChild(dropGrid);
           const dropToggle = document.createElement('label');
-          dropToggle.className = 'inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-[10px] sumi-text-mid border cursor-pointer transition';
-          dropToggle.style.borderColor = 'rgba(115, 115, 115, 0.15)';
-          dropToggle.style.backgroundColor = 'rgba(255, 255, 255, 0.6)';
+          dropToggle.className = 'inline-flex items-center gap-1 text-[10px] sumi-text-light cursor-pointer';
           const dropWarm = document.createElement('input');
           dropWarm.type = 'checkbox';
           dropWarm.className = 'w-3 h-3 rounded';
-          dropWarm.style.color = 'var(--color-gold)';
+          dropWarm.style.accentColor = 'var(--color-gold)';
           dropWarm.checked = drop.warmup;
           dropWarm.addEventListener('change', () => { drop.warmup = dropWarm.checked; });
-          dropToggle.append(dropWarm, document.createTextNode('ウォームアップ'));
+          dropToggle.append(dropWarm, document.createTextNode('W'));
           dropCard.appendChild(dropToggle);
           const dropFooter = document.createElement('div');
           dropFooter.className = 'flex justify-end';
@@ -1707,13 +1718,14 @@
       }
       wrapper.appendChild(grid);
       const warmupRow = document.createElement('label');
-      warmupRow.className = 'inline-flex items-center gap-2 bg-white rounded-2xl px-3 py-2 text-xs text-indigo-700 min-h-[32px]';
+      warmupRow.className = 'inline-flex items-center gap-1 text-xs sumi-text-light min-h-[32px]';
       const warmupInput = document.createElement('input');
       warmupInput.type = 'checkbox';
-      warmupInput.className = 'w-4 h-4 rounded';
+      warmupInput.className = 'w-3 h-3 rounded';
+      warmupInput.style.accentColor = 'var(--color-gold)';
       warmupInput.checked = activeBuffer.row.warmup;
       warmupInput.addEventListener('change', () => { activeBuffer.row.warmup = warmupInput.checked; });
-      warmupRow.append(warmupInput, document.createTextNode('ウォームアップ'));
+      warmupRow.append(warmupInput, document.createTextNode('W'));
       wrapper.appendChild(warmupRow);
 
       activeBuffer.drops.forEach((drop, index) => {
@@ -1734,13 +1746,14 @@
         }
         dropCard.appendChild(dropGrid);
         const dropToggle = document.createElement('label');
-        dropToggle.className = 'inline-flex items-center gap-2 bg-slate-100 rounded-2xl px-3 py-2 text-xs text-slate-600 min-h-[32px]';
+        dropToggle.className = 'inline-flex items-center gap-1 text-xs sumi-text-light min-h-[32px]';
         const dropWarm = document.createElement('input');
         dropWarm.type = 'checkbox';
-        dropWarm.className = 'w-4 h-4 rounded';
+        dropWarm.className = 'w-3 h-3 rounded';
+        dropWarm.style.accentColor = 'var(--color-gold)';
         dropWarm.checked = drop.warmup;
         dropWarm.addEventListener('change', () => { drop.warmup = dropWarm.checked; });
-        dropToggle.append(dropWarm, document.createTextNode('ウォームアップ'));
+        dropToggle.append(dropWarm, document.createTextNode('W'));
         dropCard.appendChild(dropToggle);
         const dropFooter = document.createElement('div');
         dropFooter.className = 'flex justify-end';
@@ -2011,6 +2024,24 @@
         });
         
         card.appendChild(itemsList);
+        
+        // メモを表示
+        if (workout.memo && workout.memo.trim()) {
+          const memoDiv = document.createElement('div');
+          memoDiv.className = 'p-3 rounded-lg border border-dashed';
+          memoDiv.style.cssText = 'border-color: rgba(212, 175, 55, 0.3); background-color: rgba(245, 237, 214, 0.1);';
+          const memoLabel = document.createElement('p');
+          memoLabel.className = 'text-xs font-light mb-1';
+          memoLabel.style.color = 'var(--color-gold)';
+          memoLabel.textContent = 'メモ';
+          const memoText = document.createElement('p');
+          memoText.className = 'text-sm font-light sumi-text whitespace-pre-wrap';
+          memoText.textContent = workout.memo;
+          memoDiv.appendChild(memoLabel);
+          memoDiv.appendChild(memoText);
+          card.appendChild(memoDiv);
+        }
+        
         list.appendChild(card);
       });
       
@@ -2107,6 +2138,7 @@
       const workout = state.history[historyIndex];
       state.day = {
         date: workout.date,
+        memo: workout.memo || '',
         items: JSON.parse(JSON.stringify(workout.items)) // deep copy
       };
       
@@ -2124,6 +2156,7 @@
         // 編集モード：履歴を更新
         const workout = {
           date: state.day.date,
+          memo: state.day.memo || '',
           items: JSON.parse(JSON.stringify(state.day.items)), // deep copy
           completedAt: state.history[uiState.editingHistoryIndex].completedAt,
           updatedAt: new Date().toISOString()
@@ -2137,6 +2170,7 @@
         // 新しい日のデータを初期化
         state.day = {
           date: new Date().toISOString().slice(0, 10),
+          memo: '',
           items: []
         };
         
@@ -2146,6 +2180,7 @@
         // 通常モード：今日のトレーニングをhistoryに追加
         const workout = {
           date: state.day.date,
+          memo: state.day.memo || '',
           items: JSON.parse(JSON.stringify(state.day.items)), // deep copy
           completedAt: new Date().toISOString()
         };
@@ -2155,6 +2190,7 @@
         // 新しい日のデータを初期化
         state.day = {
           date: new Date().toISOString().slice(0, 10),
+          memo: '',
           items: []
         };
         
