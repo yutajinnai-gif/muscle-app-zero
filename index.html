@@ -317,47 +317,151 @@
       const container = document.querySelector('[data-route="#/dashboard"]');
       container.innerHTML = '';
 
+      // ナビゲーションボタン
       const navRow = document.createElement('div');
       navRow.className = 'grid grid-cols-1 sm:grid-cols-3 gap-4';
       const buttons = [
-        { label: '今日のトレーニング', handler: () => navigate('#/today'), classes: 'bg-indigo-500 text-white' },
-        { label: '履歴', handler: () => alert('履歴は後日実装予定です。'), classes: 'bg-white text-slate-700' },
-        { label: '設定', handler: () => alert('設定は後日実装予定です。'), classes: 'bg-white text-slate-700' }
+        { label: '今日のトレーニング', handler: () => navigate('#/today'), icon: '📝' },
+        { label: '履歴', handler: () => navigate('#/history'), icon: '📖' },
+        { label: '設定', handler: () => alert('設定は後日実装予定です。'), icon: '⚙️' }
       ];
       buttons.forEach(btn => {
         const button = document.createElement('button');
         button.type = 'button';
-        button.className = `ios-card w-full px-6 py-4 text-lg font-semibold transition active:scale-[0.99] min-h-[44px] ${btn.classes}`;
-        button.textContent = btn.label;
+        button.className = 'ios-card bg-white w-full px-6 py-5 text-base font-light transition active:scale-[0.99] min-h-[44px] sumi-text hover:gold-accent border border-neutral-100';
+        button.innerHTML = `
+          <div class="flex flex-col items-center gap-2">
+            <span class="text-2xl">${btn.icon}</span>
+            <span>${btn.label}</span>
+          </div>
+        `;
         button.addEventListener('click', btn.handler);
         navRow.appendChild(button);
       });
       container.appendChild(navRow);
 
+      // 統計情報カード
+      const stats = computeDashboardStats();
       const statsCard = document.createElement('section');
-      statsCard.className = 'section-card bg-white p-6 space-y-4';
-      const todayStats = computeTodayStats();
+      statsCard.className = 'section-card bg-white p-6 space-y-5';
       statsCard.innerHTML = `
-        <div class="flex items-center justify-between">
-          <h2 class="text-xl font-semibold">今日の概要</h2>
-          <span class="text-xs text-slate-400">ウォームアップ除外</span>
-        </div>
-        <div class="grid grid-cols-3 gap-3 text-center">
-          <div class="ios-card bg-indigo-50 text-indigo-700 py-3 min-h-[44px] flex flex-col justify-center">
-            <p class="text-xs">作業セット</p>
-            <p class="text-2xl font-semibold">${todayStats.workSets}</p>
+        <h2 class="text-xl font-light sumi-text" style="letter-spacing: 0.05em;">統計情報</h2>
+        <div class="grid grid-cols-3 gap-4 text-center">
+          <div class="section-card gold-accent py-4 px-3 min-h-[44px] flex flex-col justify-center">
+            <p class="text-xs sumi-text-light font-light mb-1">今週</p>
+            <p class="text-3xl font-light sumi-text">${stats.thisWeek}</p>
+            <p class="text-xs sumi-text-light font-light mt-1">回</p>
           </div>
-          <div class="ios-card bg-orange-50 text-orange-700 py-3 min-h-[44px] flex flex-col justify-center">
-            <p class="text-xs">SSラウンド</p>
-            <p class="text-2xl font-semibold">${todayStats.supersetRounds}</p>
+          <div class="section-card bg-neutral-50 py-4 px-3 min-h-[44px] flex flex-col justify-center">
+            <p class="text-xs sumi-text-light font-light mb-1">総日数</p>
+            <p class="text-3xl font-light sumi-text">${stats.totalDays}</p>
+            <p class="text-xs sumi-text-light font-light mt-1">日</p>
           </div>
-          <div class="ios-card bg-emerald-50 text-emerald-700 py-3 min-h-[44px] flex flex-col justify-center">
-            <p class="text-xs">単独セット</p>
-            <p class="text-2xl font-semibold">${todayStats.soloSets}</p>
+          <div class="section-card bg-neutral-50 py-4 px-3 min-h-[44px] flex flex-col justify-center">
+            <p class="text-xs sumi-text-light font-light mb-1">最終日</p>
+            <p class="text-lg font-light sumi-text">${stats.lastDate}</p>
           </div>
         </div>
       `;
       container.appendChild(statsCard);
+
+      // 最近のトレーニング概要
+      if (state.history.length > 0) {
+        const recentSection = document.createElement('section');
+        recentSection.className = 'section-card bg-white p-6 space-y-4';
+        
+        const header = document.createElement('div');
+        header.className = 'flex items-center justify-between';
+        header.innerHTML = `
+          <h2 class="text-xl font-light sumi-text" style="letter-spacing: 0.05em;">最近のトレーニング</h2>
+          <button type="button" class="text-sm sumi-text-light hover:sumi-text transition font-light" id="view-all-history">すべて見る →</button>
+        `;
+        recentSection.appendChild(header);
+        
+        const recentWorkouts = state.history.slice(0, 3);
+        recentWorkouts.forEach((workout, index) => {
+          const workoutCard = createRecentWorkoutCard(workout);
+          recentSection.appendChild(workoutCard);
+          if (index < recentWorkouts.length - 1) {
+            const divider = document.createElement('div');
+            divider.className = 'border-t border-neutral-100';
+            recentSection.appendChild(divider);
+          }
+        });
+        
+        container.appendChild(recentSection);
+        
+        document.getElementById('view-all-history')?.addEventListener('click', () => navigate('#/history'));
+      } else {
+        // 履歴がない場合のメッセージ
+        const emptyCard = document.createElement('section');
+        emptyCard.className = 'section-card bg-white p-8 text-center';
+        emptyCard.innerHTML = `
+          <p class="text-base sumi-text-light font-light mb-4">まだトレーニング履歴がありません</p>
+          <button type="button" class="ios-card gold-accent px-6 py-3 text-base font-light sumi-text transition active:scale-[0.99] min-h-[44px]" id="start-first-workout">最初のトレーニングを始める</button>
+        `;
+        container.appendChild(emptyCard);
+        
+        document.getElementById('start-first-workout')?.addEventListener('click', () => navigate('#/today'));
+      }
+    }
+
+    function computeDashboardStats() {
+      // 今週のトレーニング回数を計算
+      const now = new Date();
+      const startOfWeek = new Date(now);
+      startOfWeek.setDate(now.getDate() - now.getDay()); // 日曜日を週の始まりとする
+      startOfWeek.setHours(0, 0, 0, 0);
+      
+      const thisWeekCount = state.history.filter(workout => {
+        const workoutDate = new Date(workout.date);
+        return workoutDate >= startOfWeek;
+      }).length;
+      
+      // 総トレーニング日数
+      const totalDays = state.history.length;
+      
+      // 最後のトレーニング日付
+      let lastDate = '-';
+      if (state.history.length > 0) {
+        const lastWorkout = state.history[0];
+        const date = new Date(lastWorkout.date);
+        lastDate = `${date.getMonth() + 1}/${date.getDate()}`;
+      }
+      
+      return {
+        thisWeek: thisWeekCount,
+        totalDays,
+        lastDate
+      };
+    }
+
+    function createRecentWorkoutCard(workout) {
+      const card = document.createElement('div');
+      card.className = 'py-3 space-y-2';
+      
+      const date = new Date(workout.date);
+      const dateStr = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+      
+      // 種目数とセット数を計算
+      const exerciseCount = workout.items.length;
+      const totalSets = workout.items.reduce((sum, item) => sum + item.sets.length, 0);
+      
+      // 部位を集計
+      const parts = [...new Set(workout.items.map(item => {
+        const part = state.master.parts.find(p => p.id === item.part);
+        return part ? part.label : item.part;
+      }))].join('、');
+      
+      card.innerHTML = `
+        <div class="flex items-center justify-between">
+          <p class="text-sm font-light sumi-text">${dateStr}</p>
+          <p class="text-xs sumi-text-light font-light">${exerciseCount}種目 · ${totalSets}セット</p>
+        </div>
+        <p class="text-xs sumi-text-light font-light">${parts}</p>
+      `;
+      
+      return card;
     }
 
     function computeTodayStats() {
