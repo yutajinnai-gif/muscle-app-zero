@@ -1607,6 +1607,26 @@
         toggles.appendChild(removeBtn);
         rowCard.appendChild(toggles);
 
+        // セットメモ入力欄（ウォームアップの下）
+        const memoInput = document.createElement('input');
+        memoInput.type = 'text';
+        memoInput.className = 'w-full px-2 py-1 text-xs rounded-lg border transition';
+        memoInput.style.borderColor = 'rgba(212, 175, 55, 0.2)';
+        memoInput.style.backgroundColor = 'rgba(245, 237, 214, 0.05)';
+        memoInput.placeholder = 'セットメモ...';
+        memoInput.value = row.memo || '';
+        memoInput.addEventListener('input', () => { row.memo = memoInput.value; });
+        memoInput.addEventListener('focus', () => {
+          memoInput.style.outline = 'none';
+          memoInput.style.borderColor = 'var(--color-gold)';
+          memoInput.style.boxShadow = '0 0 0 3px rgba(212, 175, 55, 0.1)';
+        });
+        memoInput.addEventListener('blur', () => {
+          memoInput.style.borderColor = 'rgba(212, 175, 55, 0.2)';
+          memoInput.style.boxShadow = 'none';
+        });
+        rowCard.appendChild(memoInput);
+
         const dropArea = document.createElement('div');
         dropArea.className = 'space-y-2.5';
         row.drops.forEach((drop, dropIndex) => {
