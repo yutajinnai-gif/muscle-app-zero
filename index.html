@@ -636,13 +636,22 @@
       badgeArea.className = 'flex flex-col gap-2';
       groupSetsForDisplay(item.sets).forEach(group => {
         const row = document.createElement('div');
-        row.className = 'flex items-start gap-2';
-        row.appendChild(createSetBadge(group.base, item));
+        row.className = 'flex flex-col gap-1';
+        const badgeRow = document.createElement('div');
+        badgeRow.className = 'flex items-start gap-2';
+        badgeRow.appendChild(createSetBadge(group.base, item));
         if (group.drops.length > 0) {
           const dropList = document.createElement('div');
           dropList.className = 'pl-6 flex flex-wrap gap-2';
           group.drops.forEach(drop => dropList.appendChild(createSetBadge(drop, item, true)));
-          row.appendChild(dropList);
+          badgeRow.appendChild(dropList);
+        }
+        row.appendChild(badgeRow);
+        if (group.base.memo) {
+          const memoDiv = document.createElement('div');
+          memoDiv.className = 'pl-1 text-[10px] font-light sumi-text-light';
+          memoDiv.textContent = `メモ: ${group.base.memo}`;
+          row.appendChild(memoDiv);
         }
         badgeArea.appendChild(row);
       });
@@ -731,10 +740,6 @@
       if (soloChips.length > 0) {
         const soloArea = document.createElement('div');
         soloArea.className = 'space-y-2 pt-2 border-t border-neutral-100';
-        const heading = document.createElement('p');
-        heading.className = 'text-xs font-light sumi-text-light';
-        heading.textContent = '単独セット';
-        soloArea.appendChild(heading);
         const soloList = document.createElement('div');
         soloList.className = 'space-y-2';
         soloChips.forEach(row => soloList.appendChild(row));
@@ -1265,7 +1270,8 @@
         seconds: timed ? '' : '',
         warmup: false,
         round,
-        drops: []
+        drops: [],
+        memo: ''
       };
     }
 
@@ -1431,7 +1437,7 @@
       rowCard.appendChild(grid);
 
       const toggles = document.createElement('div');
-      toggles.className = 'flex flex-wrap gap-1.5 text-sm sumi-text';
+      toggles.className = 'flex items-center justify-between gap-2 text-sm sumi-text';
       const warmupLabel = document.createElement('label');
       warmupLabel.className = 'inline-flex items-center gap-1 text-xs sumi-text-light cursor-pointer';
       const warmupInput = document.createElement('input');
@@ -1442,6 +1448,17 @@
       warmupInput.addEventListener('change', () => { row.warmup = warmupInput.checked; });
       warmupLabel.append(warmupInput, document.createTextNode('W'));
       toggles.appendChild(warmupLabel);
+      
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'text-xs font-light px-3 py-1 transition';
+      removeBtn.style.color = 'var(--color-sumi-light)';
+      removeBtn.textContent = 'このセットを削除';
+      removeBtn.addEventListener('click', () => {
+        activeItem.rows.splice(rowIndex, 1);
+        renderSet();
+      });
+      toggles.appendChild(removeBtn);
       rowCard.appendChild(toggles);
 
       // ドロップセットエリア（後で削除予定）
@@ -1517,19 +1534,32 @@
         rowCard.appendChild(addDropBtn);
       }
 
-      const rowFooter = document.createElement('div');
-      rowFooter.className = 'flex justify-end';
-      const removeBtn = document.createElement('button');
-      removeBtn.type = 'button';
-      removeBtn.className = 'text-xs font-light px-3 py-1 transition';
-      removeBtn.style.color = 'var(--color-sumi-light)';
-      removeBtn.textContent = 'このセットを削除';
-      removeBtn.addEventListener('click', () => {
-        activeItem.rows.splice(rowIndex, 1);
-        renderSet();
+      // セットメモ入力欄
+      const memoWrapper = document.createElement('div');
+      memoWrapper.className = 'space-y-1';
+      const memoLabel = document.createElement('label');
+      memoLabel.className = 'text-[10px] font-light sumi-text-light';
+      memoLabel.textContent = 'メモ';
+      memoWrapper.appendChild(memoLabel);
+      const memoInput = document.createElement('input');
+      memoInput.type = 'text';
+      memoInput.className = 'w-full px-2 py-1 text-xs rounded-lg border transition';
+      memoInput.style.borderColor = 'rgba(212, 175, 55, 0.2)';
+      memoInput.style.backgroundColor = 'rgba(245, 237, 214, 0.05)';
+      memoInput.placeholder = 'セットのメモ...';
+      memoInput.value = row.memo || '';
+      memoInput.addEventListener('input', () => { row.memo = memoInput.value; });
+      memoInput.addEventListener('focus', () => {
+        memoInput.style.outline = 'none';
+        memoInput.style.borderColor = 'var(--color-gold)';
+        memoInput.style.boxShadow = '0 0 0 3px rgba(212, 175, 55, 0.1)';
       });
-      rowFooter.appendChild(removeBtn);
-      rowCard.appendChild(rowFooter);
+      memoInput.addEventListener('blur', () => {
+        memoInput.style.borderColor = 'rgba(212, 175, 55, 0.2)';
+        memoInput.style.boxShadow = 'none';
+      });
+      memoWrapper.appendChild(memoInput);
+      rowCard.appendChild(memoWrapper);
 
       return rowCard;
     }
@@ -1538,10 +1568,12 @@
       active.rows.forEach((row, rowIndex) => {
         const rowCard = document.createElement('div');
         rowCard.className = 'bg-white rounded-xl p-2.5 space-y-2 border border-neutral-200/40 shadow-sm';
-        const title = document.createElement('div');
-        title.className = 'flex items-center justify-between text-xs sumi-text-mid font-light';
-        title.textContent = row.round != null ? `ラウンド ${row.round}` : '単独セット';
-        rowCard.appendChild(title);
+        if (row.round != null) {
+          const title = document.createElement('div');
+          title.className = 'flex items-center justify-between text-xs sumi-text-mid font-light';
+          title.textContent = `ラウンド ${row.round}`;
+          rowCard.appendChild(title);
+        }
 
         const grid = document.createElement('div');
         grid.className = 'flex gap-2 text-sm sumi-text';
@@ -1555,7 +1587,7 @@
         rowCard.appendChild(grid);
 
         const toggles = document.createElement('div');
-        toggles.className = 'flex flex-wrap gap-1.5 text-sm sumi-text';
+        toggles.className = 'flex items-center justify-between gap-2 text-sm sumi-text';
         const warmupLabel = document.createElement('label');
         warmupLabel.className = 'inline-flex items-center gap-1 text-xs sumi-text-light cursor-pointer';
         const warmupInput = document.createElement('input');
@@ -1566,6 +1598,20 @@
         warmupInput.addEventListener('change', () => { row.warmup = warmupInput.checked; });
         warmupLabel.append(warmupInput, document.createTextNode('W'));
         toggles.appendChild(warmupLabel);
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'text-xs font-light px-3 py-1 transition';
+        removeBtn.style.color = 'var(--color-sumi-light)';
+        removeBtn.textContent = 'このセットを削除';
+        removeBtn.addEventListener('click', () => {
+          active.rows.splice(rowIndex, 1);
+          if (active.rows.length === 0) {
+            active.rows.push(createBlankRow(active.timed));
+          }
+          renderSet();
+        });
+        toggles.appendChild(removeBtn);
         rowCard.appendChild(toggles);
 
         const dropArea = document.createElement('div');
@@ -1630,23 +1676,6 @@
           dropArea.appendChild(addDropBtn);
         }
         rowCard.appendChild(dropArea);
-
-        const rowFooter = document.createElement('div');
-        rowFooter.className = 'flex justify-end';
-        const removeBtn = document.createElement('button');
-        removeBtn.type = 'button';
-        removeBtn.className = 'text-xs font-light px-3 py-1 transition';
-        removeBtn.style.color = 'var(--color-sumi-light)';
-        removeBtn.textContent = 'このセットを削除';
-        removeBtn.addEventListener('click', () => {
-          active.rows.splice(rowIndex, 1);
-          if (active.rows.length === 0) {
-            active.rows.push(createBlankRow(active.timed));
-          }
-          renderSet();
-        });
-        rowFooter.appendChild(removeBtn);
-        rowCard.appendChild(rowFooter);
 
         rowsWrapper.appendChild(rowCard);
       });
