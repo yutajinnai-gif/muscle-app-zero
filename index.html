@@ -211,11 +211,22 @@
       // LocalStorageから前回の設定を読み込む
       const saved = loadLastExerciseSettings();
       if (saved) {
+        // 前のセットの部位を引き継ぐ
+        const lastItem = state.day.items[state.day.items.length - 1];
+        if (lastItem && lastItem.part) {
+          saved.selectedParts = [lastItem.part];
+        }
         return saved;
       }
+      
+      // 前のセットの部位を引き継ぐ
+      const lastItem = state.day.items[state.day.items.length - 1];
+      const selectedParts = lastItem && lastItem.part ? [lastItem.part] : [];
+      
       return {
         superset: false,
-        cards: [createExerciseCardState('A')]
+        cards: [createExerciseCardState('A')],
+        selectedParts: selectedParts
       };
     }
     
@@ -1506,6 +1517,9 @@
           <h2 class="text-xl font-light sumi-text" style="letter-spacing: 0.05em;">種目入力</h2>
           <button type="button" id="exerciseBack" class="text-sm font-light px-3 py-2 min-h-[44px] transition" style="color: var(--color-gold);">← 戻る</button>
         </div>
+        <div class="-mx-6 px-6 overflow-x-auto">
+          <div id="partFilterButtons" class="flex gap-2 pb-2"></div>
+        </div>
         <div class="flex items-center justify-between gap-3 rounded-2xl px-4 py-3 text-sm gold-accent border" style="border-color: rgba(212, 175, 55, 0.15);">
           <div class="flex items-center gap-3 sumi-text-mid">
             <input type="checkbox" id="supersetToggle" class="w-5 h-5 rounded" style="color: var(--color-gold);" ${uiState.exerciseForm.superset ? 'checked' : ''}>
@@ -1533,6 +1547,9 @@
 
       const cardsContainer = form.querySelector('#exerciseCards');
       renderExerciseCards(cardsContainer);
+      
+      // 部位選択ボタンのレンダリング
+      renderPartFilterButtons(form);
 
       // リセットボタンのイベント
       form.querySelector('#resetForm').addEventListener('click', () => {
@@ -1606,6 +1623,62 @@
       });
 
       form.querySelector('#exerciseBack').addEventListener('click', () => navigate('#/today'));
+    }
+    
+    function renderPartFilterButtons(form) {
+      const container = form.querySelector('#partFilterButtons');
+      container.innerHTML = '';
+      
+      // 選択中の部位を初期化（存在しない場合）
+      if (!uiState.exerciseForm.selectedParts) {
+        uiState.exerciseForm.selectedParts = [];
+      }
+      
+      state.master.parts.forEach(part => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'px-4 py-2 rounded-full text-sm font-light min-h-[40px] border transition whitespace-nowrap';
+        
+        const isSelected = uiState.exerciseForm.selectedParts.includes(part.id);
+        if (isSelected) {
+          button.style.cssText = 'background-color: var(--color-gold); color: white; border-color: var(--color-gold-dark); letter-spacing: 0.05em;';
+        } else {
+          button.style.cssText = 'background-color: white; color: var(--color-sumi); border-color: rgba(115, 115, 115, 0.2); letter-spacing: 0.05em;';
+        }
+        
+        button.textContent = part.label;
+        button.addEventListener('click', () => {
+          togglePartFilter(part.id);
+          renderPartFilterButtons(form);
+          
+          // 部位ドロップダウンも更新
+          if (uiState.exerciseForm.selectedParts.length === 1) {
+            // 部位が1つだけ選択されている場合、その部位をカードに設定
+            uiState.exerciseForm.cards.forEach(card => {
+              card.part = uiState.exerciseForm.selectedParts[0];
+            });
+          }
+          
+          // 種目ドロップダウンを更新
+          const cardsContainer = form.querySelector('#exerciseCards');
+          renderExerciseCards(cardsContainer);
+        });
+        
+        container.appendChild(button);
+      });
+    }
+    
+    function togglePartFilter(partId) {
+      if (!uiState.exerciseForm.selectedParts) {
+        uiState.exerciseForm.selectedParts = [];
+      }
+      
+      const index = uiState.exerciseForm.selectedParts.indexOf(partId);
+      if (index > -1) {
+        uiState.exerciseForm.selectedParts.splice(index, 1);
+      } else {
+        uiState.exerciseForm.selectedParts.push(partId);
+      }
     }
 
     function renderExerciseCards(container) {
@@ -1871,7 +1944,20 @@
     }
 
     function updateExerciseOptions(select, card) {
-      const exercises = sortForDisplay(getAllExercises(card.part));
+      // 部位フィルタリングを適用
+      let exercises;
+      if (uiState.exerciseForm.selectedParts && uiState.exerciseForm.selectedParts.length > 0) {
+        // 選択された部位の種目のみを表示
+        exercises = [];
+        uiState.exerciseForm.selectedParts.forEach(partId => {
+          exercises.push(...getAllExercises(partId));
+        });
+        exercises = sortForDisplay([...new Set(exercises)]); // 重複を削除
+      } else {
+        // 部位が選択されていない場合は全ての種目を表示
+        exercises = sortForDisplay(getAllExercises(card.part));
+      }
+      
       const actual = card.exercise && exercises.includes(card.exercise) ? card.exercise : exercises[0] || '';
       select.innerHTML = '';
       exercises.forEach(value => {
