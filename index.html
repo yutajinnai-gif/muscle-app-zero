@@ -1702,13 +1702,7 @@
               <div class="w-0.5 h-3 rounded-full" style="background-color: var(--color-gold);"></div>
               <h4 class="text-xs font-light sumi-text-mid" style="letter-spacing: 0.05em;">基本情報</h4>
             </div>
-            <div class="grid grid-cols-2 gap-2">
-              <label class="flex flex-col gap-1">
-                <span class="text-xs font-light sumi-text-mid flex items-center gap-0.5">
-                  部位<span style="color: var(--color-gold);">*</span>
-                </span>
-                <select class="w-full rounded-lg border border-neutral-200 px-2 py-1.5 text-sm min-h-[40px] sumi-text bg-white transition" style="border-color: rgba(115, 115, 115, 0.2);" data-field="part"></select>
-              </label>
+            <div class="flex flex-col gap-2">
               <label class="flex flex-col gap-1">
                 <span class="text-xs font-light sumi-text-mid flex items-center gap-0.5">
                   種目<span style="color: var(--color-gold);">*</span>
@@ -3486,12 +3480,25 @@
         section.className = 'space-y-3';
         
         const header = document.createElement('div');
-        header.className = 'flex items-center gap-2';
-        header.innerHTML = `
+        header.className = 'flex items-center justify-between gap-2';
+        
+        const headerLeft = document.createElement('div');
+        headerLeft.className = 'flex items-center gap-2';
+        headerLeft.innerHTML = `
           <span class="text-xl">${category.icon}</span>
           <h3 class="text-base font-light sumi-text" style="letter-spacing: 0.05em;">${category.label}</h3>
           <span class="text-xs font-light sumi-text-light">(${items.length}件)</span>
         `;
+        header.appendChild(headerLeft);
+        
+        const addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.className = 'px-3 py-1.5 rounded-full text-xs font-light min-h-[36px] border transition';
+        addBtn.style.cssText = 'background-color: rgba(139, 92, 246, 0.1); color: var(--color-purple); border-color: rgba(139, 92, 246, 0.3); letter-spacing: 0.05em;';
+        addBtn.textContent = '＋ 追加';
+        addBtn.addEventListener('click', () => addCustomData(category.key, category.label));
+        header.appendChild(addBtn);
+        
         section.appendChild(header);
         
         if (items.length === 0) {
@@ -3571,11 +3578,24 @@
           const partDiv = document.createElement('div');
           partDiv.className = 'space-y-2';
           
+          const partHeaderDiv = document.createElement('div');
+          partHeaderDiv.className = 'flex items-center justify-between gap-2';
+          
           const partHeader = document.createElement('h4');
           partHeader.className = 'text-sm font-light sumi-text';
           partHeader.style.letterSpacing = '0.05em';
           partHeader.textContent = `${part.label} (${exercises.length}件)`;
-          partDiv.appendChild(partHeader);
+          partHeaderDiv.appendChild(partHeader);
+          
+          const addExerciseBtn = document.createElement('button');
+          addExerciseBtn.type = 'button';
+          addExerciseBtn.className = 'px-3 py-1.5 rounded-full text-xs font-light min-h-[36px] border transition';
+          addExerciseBtn.style.cssText = 'background-color: rgba(139, 92, 246, 0.1); color: var(--color-purple); border-color: rgba(139, 92, 246, 0.3); letter-spacing: 0.05em;';
+          addExerciseBtn.textContent = '＋ 追加';
+          addExerciseBtn.addEventListener('click', () => addCustomExercise(part.id, part.label));
+          partHeaderDiv.appendChild(addExerciseBtn);
+          
+          partDiv.appendChild(partHeaderDiv);
           
           const exercisesList = document.createElement('div');
           exercisesList.className = 'space-y-2';
@@ -3656,6 +3676,44 @@
       if (!confirmed) return;
       
       state.customMaster.exercises[partId].splice(index, 1);
+      saveCustomMasterData();
+      renderCustomDataContent();
+    }
+    
+    function addCustomData(categoryKey, categoryLabel) {
+      const newName = prompt(`新しい${categoryLabel}を入力してください:`);
+      if (!newName || newName.trim() === '') return;
+      
+      if (!state.customMaster[categoryKey]) {
+        state.customMaster[categoryKey] = [];
+      }
+      
+      // 重複チェック
+      if (state.customMaster[categoryKey].includes(newName.trim())) {
+        alert('すでに登録されています');
+        return;
+      }
+      
+      state.customMaster[categoryKey].push(newName.trim());
+      saveCustomMasterData();
+      renderCustomDataContent();
+    }
+    
+    function addCustomExercise(partId, partLabel) {
+      const newName = prompt(`${partLabel}の新しい種目を入力してください:`);
+      if (!newName || newName.trim() === '') return;
+      
+      if (!state.customMaster.exercises[partId]) {
+        state.customMaster.exercises[partId] = [];
+      }
+      
+      // 重複チェック
+      if (state.customMaster.exercises[partId].includes(newName.trim())) {
+        alert('すでに登録されています');
+        return;
+      }
+      
+      state.customMaster.exercises[partId].push(newName.trim());
       saveCustomMasterData();
       renderCustomDataContent();
     }
