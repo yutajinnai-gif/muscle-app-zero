@@ -1773,18 +1773,15 @@
         `;
         container.appendChild(cardEl);
 
-        const partSelect = cardEl.querySelector('[data-field="part"]');
         const exerciseSelect = cardEl.querySelector('[data-field="exercise"]');
         const selects = [
-          { element: partSelect, field: 'part', options: state.master.parts.map(p => ({ value: p.id, label: p.label })), allowAdd: false },
           { element: cardEl.querySelector('[data-field="gear"]'), field: 'gear', options: sortForDisplay(getAllGear()).map(value => ({ value, label: value })), allowAdd: true, addType: '器具' },
           { element: cardEl.querySelector('[data-field="attachment"]'), field: 'attachment', options: sortForDisplay(getAllAttachments()).map(value => ({ value, label: value })), allowAdd: true, addType: 'アタッチメント' },
           { element: cardEl.querySelector('[data-field="angle"]'), field: 'angle', options: sortForDisplay(getAllAngles()).map(value => ({ value, label: value })), allowAdd: true, addType: '角度' },
           { element: cardEl.querySelector('[data-field="position"]'), field: 'position', options: sortForDisplay(getAllPositions()).map(value => ({ value, label: value })), allowAdd: true, addType: 'ポジション' }
         ];
-        populateSelect(partSelect, selects[0].options, card.part);
         updateExerciseOptions(exerciseSelect, card);
-        selects.slice(1).forEach(select => populateSelect(select.element, select.options, card[select.field], select.allowAdd, select.addType));
+        selects.forEach(select => populateSelect(select.element, select.options, card[select.field], select.allowAdd, select.addType));
 
         // アタッチメントフィールドの文脈依存表示
         const gearSelect = cardEl.querySelector('[data-field="gear"]');
