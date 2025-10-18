@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>BUILD_TAG=PHASE-5-20240529 | Muscle Routine</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
     /* カラーパレット: 白・墨・淡い金 */
     :root {
@@ -421,6 +422,60 @@
       `;
       container.appendChild(statsCard);
 
+      // グラフセクション（履歴がある場合のみ）
+      if (state.history.length > 0) {
+        // 部位別トレーニング頻度グラフ
+        const bodyPartChartSection = document.createElement('section');
+        bodyPartChartSection.className = 'section-card bg-white p-4 space-y-3';
+        bodyPartChartSection.innerHTML = `
+          <h2 class="text-base font-light sumi-text" style="letter-spacing: 0.05em;">部位別トレーニング頻度</h2>
+          <div style="height: 280px; position: relative;">
+            <canvas id="bodyPartChart"></canvas>
+          </div>
+        `;
+        container.appendChild(bodyPartChartSection);
+        
+        // 種目別進捗グラフ
+        const exerciseNames = getAllExerciseNames();
+        if (exerciseNames.length > 0) {
+          const progressChartSection = document.createElement('section');
+          progressChartSection.className = 'section-card bg-white p-4 space-y-3';
+          
+          const selectContainer = document.createElement('div');
+          selectContainer.className = 'flex items-center justify-between gap-3';
+          selectContainer.innerHTML = `
+            <h2 class="text-base font-light sumi-text" style="letter-spacing: 0.05em;">種目別進捗</h2>
+            <select id="exerciseSelect" class="text-sm sumi-text bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-300">
+              ${exerciseNames.map(name => `<option value="${name}">${name}</option>`).join('')}
+            </select>
+          `;
+          progressChartSection.appendChild(selectContainer);
+          
+          const chartContainer = document.createElement('div');
+          chartContainer.style.height = '240px';
+          chartContainer.style.position = 'relative';
+          chartContainer.innerHTML = '<canvas id="exerciseProgressChart"></canvas>';
+          progressChartSection.appendChild(chartContainer);
+          
+          container.appendChild(progressChartSection);
+          
+          // 初期表示
+          setTimeout(() => {
+            renderExerciseProgressChart('exerciseProgressChart', exerciseNames[0]);
+          }, 100);
+          
+          // 種目変更時のイベント
+          document.getElementById('exerciseSelect')?.addEventListener('change', (e) => {
+            renderExerciseProgressChart('exerciseProgressChart', e.target.value);
+          });
+        }
+        
+        // 部位別チャートを描画
+        setTimeout(() => {
+          renderBodyPartChart('bodyPartChart');
+        }, 100);
+      }
+
       // 最近のトレーニング概要
       if (state.history.length > 0) {
         const recentSection = document.createElement('section');
@@ -490,6 +545,230 @@
         totalDays,
         lastDate
       };
+    }
+
+    // グラフ用の統計データ処理関数
+    function computeExerciseProgressData(exerciseName) {
+      // 特定の種目の重量推移データを取得
+      const data = [];
+      
+      // 履歴を古い順にソート
+      const sortedHistory = [...state.history].reverse();
+      
+      sortedHistory.forEach(workout => {
+        workout.items.forEach(item => {
+          const fullExerciseName = buildFullExerciseName(item);
+          if (fullExerciseName === exerciseName) {
+            // この種目の最大重量を取得
+            const maxWeight = Math.max(...item.sets.map(set => parseFloat(set.weight) || 0));
+            if (maxWeight > 0) {
+              const date = new Date(workout.date);
+              data.push({
+                date: `${date.getMonth() + 1}/${date.getDate()}`,
+                weight: maxWeight
+              });
+            }
+          }
+        });
+      });
+      
+      return data;
+    }
+    
+    function computeBodyPartFrequency() {
+      // 部位別のトレーニング頻度を集計
+      const frequency = {};
+      
+      state.history.forEach(workout => {
+        workout.items.forEach(item => {
+          const part = state.master.parts.find(p => p.id === item.part);
+          const partLabel = part ? part.label : item.part;
+          frequency[partLabel] = (frequency[partLabel] || 0) + 1;
+        });
+      });
+      
+      return frequency;
+    }
+    
+    function getAllExerciseNames() {
+      // 全ての種目名を取得（重複なし）
+      const exerciseNames = new Set();
+      
+      state.history.forEach(workout => {
+        workout.items.forEach(item => {
+          const fullName = buildFullExerciseName(item);
+          exerciseNames.add(fullName);
+        });
+      });
+      
+      return Array.from(exerciseNames).sort();
+    }
+    
+    function buildFullExerciseName(item) {
+      // 種目の完全な名前を構築
+      let name = '';
+      
+      // 部位
+      const part = state.master.parts.find(p => p.id === item.part);
+      if (part) name += part.label + ' - ';
+      
+      // 種目
+      name += item.exercise;
+      
+      return name;
+    }
+
+    // グラフ描画関数
+    function renderExerciseProgressChart(canvasId, exerciseName) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      
+      const data = computeExerciseProgressData(exerciseName);
+      if (data.length === 0) return;
+      
+      const ctx = canvas.getContext('2d');
+      
+      // 既存のチャートを破棄
+      if (canvas.chart) {
+        canvas.chart.destroy();
+      }
+      
+      canvas.chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.map(d => d.date),
+          datasets: [{
+            label: '重量 (kg)',
+            data: data.map(d => d.weight),
+            borderColor: 'rgb(139, 92, 246)',
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            tension: 0.3,
+            fill: true,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: 'rgba(26, 26, 26, 0.9)',
+              titleColor: '#FFFFFF',
+              bodyColor: '#FFFFFF',
+              borderColor: 'rgb(212, 175, 55)',
+              borderWidth: 1,
+              padding: 12,
+              displayColors: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(115, 115, 115, 0.1)'
+              },
+              ticks: {
+                color: '#737373',
+                font: {
+                  size: 11
+                }
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                color: '#737373',
+                font: {
+                  size: 11
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    function renderBodyPartChart(canvasId) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      
+      const frequency = computeBodyPartFrequency();
+      const labels = Object.keys(frequency);
+      const data = Object.values(frequency);
+      
+      if (labels.length === 0) return;
+      
+      const ctx = canvas.getContext('2d');
+      
+      // 既存のチャートを破棄
+      if (canvas.chart) {
+        canvas.chart.destroy();
+      }
+      
+      const colors = [
+        'rgb(139, 92, 246)',   // 紫
+        'rgb(212, 175, 55)',   // 金
+        'rgb(251, 146, 60)',   // オレンジ
+        'rgb(59, 130, 246)',   // 青
+        'rgb(236, 72, 153)',   // ピンク
+        'rgb(34, 197, 94)',    // 緑
+        'rgb(168, 85, 247)'    // 深紫
+      ];
+      
+      canvas.chart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: colors.slice(0, labels.length),
+            borderWidth: 2,
+            borderColor: '#FFFFFF'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: '#404040',
+                font: {
+                  size: 12
+                },
+                padding: 12,
+                usePointStyle: true,
+                pointStyle: 'circle'
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(26, 26, 26, 0.9)',
+              titleColor: '#FFFFFF',
+              bodyColor: '#FFFFFF',
+              borderColor: 'rgb(212, 175, 55)',
+              borderWidth: 1,
+              padding: 12,
+              displayColors: true,
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.parsed || 0;
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = ((value / total) * 100).toFixed(1);
+                  return `${label}: ${value}回 (${percentage}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
     }
 
     function createRecentWorkoutCard(workout) {
