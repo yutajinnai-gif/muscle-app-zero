@@ -3260,6 +3260,27 @@
       
       container.appendChild(dataSection);
       
+      // カスタムデータ管理セクション
+      const customDataSection = document.createElement('section');
+      customDataSection.className = 'section-card bg-white p-4 space-y-4';
+      
+      const customDataSectionTitle = document.createElement('h2');
+      customDataSectionTitle.className = 'text-base font-light sumi-text';
+      customDataSectionTitle.style.letterSpacing = '0.05em';
+      customDataSectionTitle.textContent = 'カスタムデータ管理';
+      customDataSection.appendChild(customDataSectionTitle);
+      
+      // カスタムデータ管理ボタン
+      const manageCustomDataBtn = document.createElement('button');
+      manageCustomDataBtn.type = 'button';
+      manageCustomDataBtn.className = 'w-full ios-card bg-white px-4 py-3 text-sm font-light transition min-h-[44px] border';
+      manageCustomDataBtn.style.cssText = 'border-color: rgba(139, 92, 246, 0.3); color: var(--color-purple); letter-spacing: 0.05em;';
+      manageCustomDataBtn.textContent = '⚙️ カスタムデータを管理';
+      manageCustomDataBtn.addEventListener('click', showCustomDataManagement);
+      customDataSection.appendChild(manageCustomDataBtn);
+      
+      container.appendChild(customDataSection);
+      
       // アプリ情報セクション
       const infoSection = document.createElement('section');
       infoSection.className = 'section-card bg-white p-4 space-y-3';
@@ -3336,6 +3357,221 @@
         }
       };
       reader.readAsText(file);
+    }
+    
+    function showCustomDataManagement() {
+      const modal = document.getElementById('customDataModal');
+      if (!modal) {
+        const newModal = document.createElement('div');
+        newModal.id = 'customDataModal';
+        newModal.className = 'fixed inset-0 bg-black/30 flex items-center justify-center p-4 z-50';
+        newModal.style.display = 'none';
+        newModal.innerHTML = `
+          <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b border-neutral-200/40 px-6 py-4 flex items-center justify-between">
+              <h2 class="text-lg font-light sumi-text" style="letter-spacing: 0.05em;">カスタムデータ管理</h2>
+              <button type="button" class="text-2xl text-neutral-400 hover:text-neutral-600 transition min-h-[44px] min-w-[44px]" onclick="document.getElementById('customDataModal').style.display='none'">&times;</button>
+            </div>
+            <div id="customDataContent" class="p-6 space-y-6"></div>
+          </div>
+        `;
+        document.body.appendChild(newModal);
+      }
+      
+      renderCustomDataContent();
+      document.getElementById('customDataModal').style.display = 'flex';
+    }
+    
+    function renderCustomDataContent() {
+      const content = document.getElementById('customDataContent');
+      content.innerHTML = '';
+      
+      const categories = [
+        { key: 'gear', label: '器具', icon: '🏋️' },
+        { key: 'attachments', label: 'アタッチメント', icon: '🔗' },
+        { key: 'angles', label: '角度', icon: '📊' },
+        { key: 'positions', label: 'ポジション', icon: '🧘' }
+      ];
+      
+      categories.forEach(category => {
+        const items = state.customMaster[category.key] || [];
+        
+        const section = document.createElement('div');
+        section.className = 'space-y-3';
+        
+        const header = document.createElement('div');
+        header.className = 'flex items-center gap-2';
+        header.innerHTML = `
+          <span class="text-xl">${category.icon}</span>
+          <h3 class="text-base font-light sumi-text" style="letter-spacing: 0.05em;">${category.label}</h3>
+          <span class="text-xs font-light sumi-text-light">(${items.length}件)</span>
+        `;
+        section.appendChild(header);
+        
+        if (items.length === 0) {
+          const emptyMsg = document.createElement('p');
+          emptyMsg.className = 'text-sm font-light sumi-text-light pl-8';
+          emptyMsg.textContent = 'カスタムデータはありません';
+          section.appendChild(emptyMsg);
+        } else {
+          const list = document.createElement('div');
+          list.className = 'space-y-2 pl-8';
+          
+          items.forEach((item, index) => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'flex items-center justify-between gap-2 p-3 rounded-lg border border-neutral-200/40 bg-neutral-50/30';
+            
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'text-sm font-light sumi-text';
+            nameSpan.textContent = item;
+            itemDiv.appendChild(nameSpan);
+            
+            const buttonGroup = document.createElement('div');
+            buttonGroup.className = 'flex gap-2';
+            
+            const editBtn = document.createElement('button');
+            editBtn.type = 'button';
+            editBtn.className = 'px-3 py-1.5 rounded-full text-xs font-light min-h-[36px] border transition';
+            editBtn.style.cssText = 'background-color: rgba(245, 237, 214, 0.2); color: var(--color-gold); border-color: rgba(212, 175, 55, 0.3); letter-spacing: 0.05em;';
+            editBtn.textContent = '編集';
+            editBtn.addEventListener('click', () => editCustomData(category.key, index, item));
+            buttonGroup.appendChild(editBtn);
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.type = 'button';
+            deleteBtn.className = 'px-3 py-1.5 rounded-full text-xs font-light min-h-[36px] border transition';
+            deleteBtn.style.cssText = 'background-color: rgba(254, 226, 226, 0.5); color: #dc2626; border-color: rgba(220, 38, 38, 0.3); letter-spacing: 0.05em;';
+            deleteBtn.textContent = '削除';
+            deleteBtn.addEventListener('click', () => deleteCustomData(category.key, index, item));
+            buttonGroup.appendChild(deleteBtn);
+            
+            itemDiv.appendChild(buttonGroup);
+            list.appendChild(itemDiv);
+          });
+          
+          section.appendChild(list);
+        }
+        
+        content.appendChild(section);
+      });
+      
+      // 種目は部位ごとに表示
+      const exercisesSection = document.createElement('div');
+      exercisesSection.className = 'space-y-3';
+      
+      const exercisesHeader = document.createElement('div');
+      exercisesHeader.className = 'flex items-center gap-2';
+      const totalExercises = Object.values(state.customMaster.exercises || {}).reduce((sum, arr) => sum + arr.length, 0);
+      exercisesHeader.innerHTML = `
+        <span class="text-xl">🏋️‍♂️</span>
+        <h3 class="text-base font-light sumi-text" style="letter-spacing: 0.05em;">種目</h3>
+        <span class="text-xs font-light sumi-text-light">(${totalExercises}件)</span>
+      `;
+      exercisesSection.appendChild(exercisesHeader);
+      
+      if (totalExercises === 0) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'text-sm font-light sumi-text-light pl-8';
+        emptyMsg.textContent = 'カスタム種目はありません';
+        exercisesSection.appendChild(emptyMsg);
+      } else {
+        const partsList = document.createElement('div');
+        partsList.className = 'space-y-4 pl-8';
+        
+        state.master.parts.forEach(part => {
+          const exercises = state.customMaster.exercises[part.id] || [];
+          if (exercises.length === 0) return;
+          
+          const partDiv = document.createElement('div');
+          partDiv.className = 'space-y-2';
+          
+          const partHeader = document.createElement('h4');
+          partHeader.className = 'text-sm font-light sumi-text';
+          partHeader.style.letterSpacing = '0.05em';
+          partHeader.textContent = `${part.label} (${exercises.length}件)`;
+          partDiv.appendChild(partHeader);
+          
+          const exercisesList = document.createElement('div');
+          exercisesList.className = 'space-y-2';
+          
+          exercises.forEach((exercise, index) => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'flex items-center justify-between gap-2 p-3 rounded-lg border border-neutral-200/40 bg-neutral-50/30';
+            
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'text-sm font-light sumi-text';
+            nameSpan.textContent = exercise;
+            itemDiv.appendChild(nameSpan);
+            
+            const buttonGroup = document.createElement('div');
+            buttonGroup.className = 'flex gap-2';
+            
+            const editBtn = document.createElement('button');
+            editBtn.type = 'button';
+            editBtn.className = 'px-3 py-1.5 rounded-full text-xs font-light min-h-[36px] border transition';
+            editBtn.style.cssText = 'background-color: rgba(245, 237, 214, 0.2); color: var(--color-gold); border-color: rgba(212, 175, 55, 0.3); letter-spacing: 0.05em;';
+            editBtn.textContent = '編集';
+            editBtn.addEventListener('click', () => editCustomExercise(part.id, index, exercise));
+            buttonGroup.appendChild(editBtn);
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.type = 'button';
+            deleteBtn.className = 'px-3 py-1.5 rounded-full text-xs font-light min-h-[36px] border transition';
+            deleteBtn.style.cssText = 'background-color: rgba(254, 226, 226, 0.5); color: #dc2626; border-color: rgba(220, 38, 38, 0.3); letter-spacing: 0.05em;';
+            deleteBtn.textContent = '削除';
+            deleteBtn.addEventListener('click', () => deleteCustomExercise(part.id, index, exercise));
+            buttonGroup.appendChild(deleteBtn);
+            
+            itemDiv.appendChild(buttonGroup);
+            exercisesList.appendChild(itemDiv);
+          });
+          
+          partDiv.appendChild(exercisesList);
+          partsList.appendChild(partDiv);
+        });
+        
+        exercisesSection.appendChild(partsList);
+      }
+      
+      content.appendChild(exercisesSection);
+    }
+    
+    function editCustomData(categoryKey, index, currentName) {
+      const newName = prompt(`新しい名前を入力してください:`, currentName);
+      if (!newName || newName.trim() === '') return;
+      if (newName === currentName) return;
+      
+      state.customMaster[categoryKey][index] = newName.trim();
+      saveCustomMasterData();
+      renderCustomDataContent();
+    }
+    
+    function deleteCustomData(categoryKey, index, name) {
+      const confirmed = confirm(`「${name}」を削除しますか？`);
+      if (!confirmed) return;
+      
+      state.customMaster[categoryKey].splice(index, 1);
+      saveCustomMasterData();
+      renderCustomDataContent();
+    }
+    
+    function editCustomExercise(partId, index, currentName) {
+      const newName = prompt(`新しい種目名を入力してください:`, currentName);
+      if (!newName || newName.trim() === '') return;
+      if (newName === currentName) return;
+      
+      state.customMaster.exercises[partId][index] = newName.trim();
+      saveCustomMasterData();
+      renderCustomDataContent();
+    }
+    
+    function deleteCustomExercise(partId, index, name) {
+      const confirmed = confirm(`「${name}」を削除しますか？`);
+      if (!confirmed) return;
+      
+      state.customMaster.exercises[partId].splice(index, 1);
+      saveCustomMasterData();
+      renderCustomDataContent();
     }
     
     function clearAllData() {
