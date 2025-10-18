@@ -105,6 +105,13 @@
         angles: ['-', 'インクライン', 'デクライン', 'フラット'],
         positions: ['-', 'ワイド', 'ナロー', 'ボックス', 'リバース']
       },
+      customMaster: {
+        exercises: {},  // { chest: ['カスタム種目1', ...], ... }
+        gear: [],
+        attachments: [],
+        angles: [],
+        positions: []
+      },
       history: [],
       day: {
         date: new Date().toISOString().slice(0, 10),
@@ -1108,15 +1115,15 @@
         const partSelect = cardEl.querySelector('[data-field="part"]');
         const exerciseSelect = cardEl.querySelector('[data-field="exercise"]');
         const selects = [
-          { element: partSelect, field: 'part', options: state.master.parts.map(p => ({ value: p.id, label: p.label })) },
-          { element: cardEl.querySelector('[data-field="gear"]'), field: 'gear', options: sortForDisplay(state.master.gear).map(value => ({ value, label: value })) },
-          { element: cardEl.querySelector('[data-field="attachment"]'), field: 'attachment', options: sortForDisplay(state.master.attachments).map(value => ({ value, label: value })) },
-          { element: cardEl.querySelector('[data-field="angle"]'), field: 'angle', options: sortForDisplay(state.master.angles).map(value => ({ value, label: value })) },
-          { element: cardEl.querySelector('[data-field="position"]'), field: 'position', options: sortForDisplay(state.master.positions).map(value => ({ value, label: value })) }
+          { element: partSelect, field: 'part', options: state.master.parts.map(p => ({ value: p.id, label: p.label })), allowAdd: false },
+          { element: cardEl.querySelector('[data-field="gear"]'), field: 'gear', options: sortForDisplay(getAllGear()).map(value => ({ value, label: value })), allowAdd: true, addType: '器具' },
+          { element: cardEl.querySelector('[data-field="attachment"]'), field: 'attachment', options: sortForDisplay(getAllAttachments()).map(value => ({ value, label: value })), allowAdd: true, addType: 'アタッチメント' },
+          { element: cardEl.querySelector('[data-field="angle"]'), field: 'angle', options: sortForDisplay(getAllAngles()).map(value => ({ value, label: value })), allowAdd: true, addType: '角度' },
+          { element: cardEl.querySelector('[data-field="position"]'), field: 'position', options: sortForDisplay(getAllPositions()).map(value => ({ value, label: value })), allowAdd: true, addType: 'ポジション' }
         ];
         populateSelect(partSelect, selects[0].options, card.part);
         updateExerciseOptions(exerciseSelect, card);
-        selects.slice(1).forEach(select => populateSelect(select.element, select.options, card[select.field]));
+        selects.slice(1).forEach(select => populateSelect(select.element, select.options, card[select.field], select.allowAdd, select.addType));
 
         // アタッチメントフィールドの文脈依存表示
         const gearSelect = cardEl.querySelector('[data-field="gear"]');
@@ -1144,6 +1151,69 @@
             const target = event.target;
             const fieldName = target.getAttribute('data-field');
             if (!fieldName) return;
+            
+            // 新規追加処理
+            if (target.value === '__ADD_NEW__') {
+              let name = null;
+              let addFunction = null;
+              let typeName = '';
+              
+              if (fieldName === 'exercise') {
+                typeName = '種目';
+                showCustomModal(`新しい${typeName}を追加`, `${typeName}名を入力`, (name) => {
+                  if (name && name.trim()) {
+                    if (addCustomExercise(card.part, name.trim())) {
+                      card.exercise = name.trim();
+                      updateExerciseOptions(exerciseSelect, card);
+                    } else {
+                      target.value = card.exercise || '';
+                    }
+                  } else {
+                    target.value = card.exercise || '';
+                  }
+                });
+                return;
+              } else if (fieldName === 'gear') {
+                typeName = '器具';
+                addFunction = addCustomGear;
+              } else if (fieldName === 'attachment') {
+                typeName = 'アタッチメント';
+                addFunction = addCustomAttachment;
+              } else if (fieldName === 'angle') {
+                typeName = '角度';
+                addFunction = addCustomAngle;
+              } else if (fieldName === 'position') {
+                typeName = 'ポジション';
+                addFunction = addCustomPosition;
+              }
+              
+              if (addFunction) {
+                showCustomModal(`新しい${typeName}を追加`, `${typeName}名を入力`, (name) => {
+                  if (name && name.trim()) {
+                  if (addFunction(name.trim())) {
+                    card[fieldName] = name.trim();
+                    // ドロップダウンを再構築
+                    const select = selects.find(s => s.field === fieldName);
+                    if (select) {
+                      let newOptions;
+                      if (fieldName === 'gear') newOptions = sortForDisplay(getAllGear()).map(value => ({ value, label: value }));
+                      else if (fieldName === 'attachment') newOptions = sortForDisplay(getAllAttachments()).map(value => ({ value, label: value }));
+                      else if (fieldName === 'angle') newOptions = sortForDisplay(getAllAngles()).map(value => ({ value, label: value }));
+                      else if (fieldName === 'position') newOptions = sortForDisplay(getAllPositions()).map(value => ({ value, label: value }));
+                      populateSelect(target, newOptions, name.trim(), select.allowAdd, select.addType);
+                    }
+                  } else {
+                    target.value = card[fieldName] || '-';
+                  }
+                } else {
+                  target.value = card[fieldName] || '-';
+                }
+                });
+                return;
+              }
+            }
+            
+            // 通常の変更処理
             if (fieldName === 'part') {
               card.part = target.value;
               updateExerciseOptions(exerciseSelect, card);
@@ -1182,7 +1252,7 @@
       }
     }
 
-    function populateSelect(select, options, selected) {
+    function populateSelect(select, options, selected, allowAdd = false, addType = null) {
       select.innerHTML = '';
       options.forEach(option => {
         const opt = document.createElement('option');
@@ -1191,10 +1261,23 @@
         if (option.value === selected) opt.selected = true;
         select.appendChild(opt);
       });
+      
+      // 新規追加オプションを追加
+      if (allowAdd && addType) {
+        const separator = document.createElement('option');
+        separator.disabled = true;
+        separator.textContent = '─────────────';
+        select.appendChild(separator);
+        
+        const addNew = document.createElement('option');
+        addNew.value = '__ADD_NEW__';
+        addNew.textContent = `＋ 新しい${addType}を追加`;
+        select.appendChild(addNew);
+      }
     }
 
     function updateExerciseOptions(select, card) {
-      const exercises = sortForDisplay(state.master.exercises[card.part] || []);
+      const exercises = sortForDisplay(getAllExercises(card.part));
       const actual = card.exercise && exercises.includes(card.exercise) ? card.exercise : exercises[0] || '';
       select.innerHTML = '';
       exercises.forEach(value => {
@@ -1205,6 +1288,17 @@
         select.appendChild(opt);
       });
       card.exercise = actual;
+      
+      // 新規追加オプションを追加
+      const separator = document.createElement('option');
+      separator.disabled = true;
+      separator.textContent = '─────────────';
+      select.appendChild(separator);
+      
+      const addNew = document.createElement('option');
+      addNew.value = '__ADD_NEW__';
+      addNew.textContent = '＋ 新しい種目を追加';
+      select.appendChild(addNew);
     }
 
     function buildItemsFromExerciseForm() {
@@ -2770,13 +2864,194 @@
       }
     }
 
+    // カスタムマスターデータの保存・読み込み
+    function loadCustomMaster() {
+      try {
+        const stored = localStorage.getItem('customMaster');
+        if (stored) {
+          const custom = JSON.parse(stored);
+          state.customMaster = {
+            exercises: custom.exercises || {},
+            gear: custom.gear || [],
+            attachments: custom.attachments || [],
+            angles: custom.angles || [],
+            positions: custom.positions || []
+          };
+          console.log('Custom master data loaded');
+        }
+      } catch (e) {
+        console.error('Failed to load custom master data:', e);
+      }
+    }
+
+    function saveCustomMaster() {
+      try {
+        localStorage.setItem('customMaster', JSON.stringify(state.customMaster));
+        console.log('Custom master data saved');
+      } catch (e) {
+        console.error('Failed to save custom master data:', e);
+      }
+    }
+
+    // カスタムマスターデータの取得（既存データと統合）
+    function getAllExercises(part) {
+      const defaults = state.master.exercises[part] || [];
+      const custom = state.customMaster.exercises[part] || [];
+      return [...custom, ...defaults];
+    }
+
+    function getAllGear() {
+      const defaults = state.master.gear;
+      const custom = state.customMaster.gear;
+      return [...custom, ...defaults];
+    }
+
+    function getAllAttachments() {
+      const defaults = state.master.attachments;
+      const custom = state.customMaster.attachments;
+      return [...custom, ...defaults];
+    }
+
+    function getAllAngles() {
+      const defaults = state.master.angles;
+      const custom = state.customMaster.angles;
+      return [...custom, ...defaults];
+    }
+
+    function getAllPositions() {
+      const defaults = state.master.positions;
+      const custom = state.customMaster.positions;
+      return [...custom, ...defaults];
+    }
+
+    // カスタムマスターデータの追加
+    function addCustomExercise(part, name) {
+      if (!state.customMaster.exercises[part]) {
+        state.customMaster.exercises[part] = [];
+      }
+      const allExercises = getAllExercises(part);
+      if (allExercises.includes(name)) {
+        alert('この種目は既に存在します。');
+        return false;
+      }
+      state.customMaster.exercises[part].push(name);
+      saveCustomMaster();
+      return true;
+    }
+
+    function addCustomGear(name) {
+      const allGear = getAllGear();
+      if (allGear.includes(name)) {
+        alert('この器具は既に存在します。');
+        return false;
+      }
+      state.customMaster.gear.push(name);
+      saveCustomMaster();
+      return true;
+    }
+
+    function addCustomAttachment(name) {
+      const allAttachments = getAllAttachments();
+      if (allAttachments.includes(name)) {
+        alert('このアタッチメントは既に存在します。');
+        return false;
+      }
+      state.customMaster.attachments.push(name);
+      saveCustomMaster();
+      return true;
+    }
+
+    function addCustomAngle(name) {
+      const allAngles = getAllAngles();
+      if (allAngles.includes(name)) {
+        alert('この角度は既に存在します。');
+        return false;
+      }
+      state.customMaster.angles.push(name);
+      saveCustomMaster();
+      return true;
+    }
+
+    function addCustomPosition(name) {
+      const allPositions = getAllPositions();
+      if (allPositions.includes(name)) {
+        alert('このポジションは既に存在します。');
+        return false;
+      }
+      state.customMaster.positions.push(name);
+      saveCustomMaster();
+      return true;
+    }
+
+    // カスタムモーダル関数
+    function showCustomModal(title, placeholder, callback) {
+      const modal = document.getElementById('customModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalInput = document.getElementById('modalInput');
+      const modalError = document.getElementById('modalError');
+      
+      modalTitle.textContent = title;
+      modalInput.placeholder = placeholder;
+      modalInput.value = '';
+      modalError.textContent = '';
+      modalError.classList.add('hidden');
+      
+      modal.classList.remove('hidden');
+      modalInput.focus();
+      
+      // キャンセルボタン
+      document.getElementById('modalCancel').onclick = () => {
+        modal.classList.add('hidden');
+        callback(null);
+      };
+      
+      // 追加ボタン
+      document.getElementById('modalAdd').onclick = () => {
+        const value = modalInput.value.trim();
+        if (!value) {
+          modalError.textContent = '入力してください';
+          modalError.classList.remove('hidden');
+          return;
+        }
+        modal.classList.add('hidden');
+        callback(value);
+      };
+      
+      // Enterキーで追加
+      modalInput.onkeydown = (e) => {
+        if (e.key === 'Enter') {
+          document.getElementById('modalAdd').click();
+        } else if (e.key === 'Escape') {
+          document.getElementById('modalCancel').click();
+        }
+      };
+    }
+
     function initialize() {
       loadHistory();
+      loadCustomMaster(); // カスタムマスターデータを読み込み
       restoreDraft(); // 下書きを復元
       handleNavigation(window.location.hash || '#/dashboard');
     }
 
     initialize();
   </script>
+  
+  <!-- カスタムモーダル -->
+  <div id="customModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl p-6 m-4 max-w-sm w-full shadow-2xl">
+      <h3 id="modalTitle" class="text-lg font-bold mb-4"></h3>
+      <input id="modalInput" type="text" class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-yellow-600 focus:outline-none text-lg mb-2">
+      <p id="modalError" class="text-red-600 text-sm mb-4 hidden"></p>
+      <div class="flex gap-3">
+        <button id="modalCancel" class="flex-1 px-4 py-3 bg-gray-200 text-gray-800 rounded-xl font-semibold hover:bg-gray-300 transition">
+          キャンセル
+        </button>
+        <button id="modalAdd" class="flex-1 px-4 py-3 bg-yellow-600 text-white rounded-xl font-semibold hover:bg-yellow-700 transition">
+          追加
+        </button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
