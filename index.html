@@ -1251,22 +1251,25 @@
 
       const list = document.createElement('div');
       list.className = 'space-y-3';
-      const sortedItems = [...state.day.items].sort((a, b) => a.order - b.order);
+      const sortedItems = [...state.day.items].sort((a, b) => b.order - a.order);
       const processedGroups = new Set();
+      let exerciseNumber = 0;
       sortedItems.forEach(item => {
         if (item.mode === 'superset') {
           if (!item.groupId || processedGroups.has(item.groupId)) return;
+          exerciseNumber++;
           const groupItems = sortedItems.filter(candidate => candidate.groupId === item.groupId);
           processedGroups.add(item.groupId);
-          list.appendChild(buildSupersetCard(groupItems));
+          list.appendChild(buildSupersetCard(groupItems, exerciseNumber));
         } else {
-          list.appendChild(buildSingleCard(item));
+          exerciseNumber++;
+          list.appendChild(buildSingleCard(item, exerciseNumber));
         }
       });
       container.appendChild(list);
     }
 
-    function buildSingleCard(item) {
+    function buildSingleCard(item, exerciseNumber = null) {
       const card = document.createElement('article');
       card.className = 'section-card bg-white p-4 space-y-2';
       const partLabel = state.master.parts.find(p => p.id === item.part)?.label ?? '';
@@ -1274,8 +1277,9 @@
       // ヘッダー：種目名と部位
       const header = document.createElement('div');
       header.className = 'space-y-1';
+      const exerciseTitle = exerciseNumber ? `${exerciseNumber}種目目: ${item.exercise}` : item.exercise;
       header.innerHTML = `
-        <p class="text-base font-light sumi-text" style="letter-spacing: 0.02em;">${item.exercise}</p>
+        <p class="text-base font-light sumi-text" style="letter-spacing: 0.02em;">${exerciseTitle}</p>
         <p class="text-xs font-light sumi-text-light">${partLabel}</p>
       `;
       card.appendChild(header);
@@ -1334,7 +1338,7 @@
       return card;
     }
 
-    function buildSupersetCard(groupItems) {
+    function buildSupersetCard(groupItems, exerciseNumber = null) {
       const sorted = [...groupItems].sort((a, b) => a.order - b.order);
       const labels = ['A', 'B', 'C'];
       const title = `(SS) ${sorted.map(item => item.exercise).join(' + ')}`;
@@ -1344,8 +1348,9 @@
       // ヘッダー：種目名と部位
       const header = document.createElement('div');
       header.className = 'space-y-1';
+      const exerciseTitle = exerciseNumber ? `${exerciseNumber}種目目: ${title}` : title;
       header.innerHTML = `
-        <p class="text-base font-light sumi-text" style="letter-spacing: 0.02em;">${title}</p>
+        <p class="text-base font-light sumi-text" style="letter-spacing: 0.02em;">${exerciseTitle}</p>
         <p class="text-xs font-light sumi-text-light">${sorted.map((item, index) => `${labels[index]}. ${state.master.parts.find(p => p.id === item.part)?.label ?? ''}`).join(' / ')}</p>
       `;
       card.appendChild(header);
@@ -1510,11 +1515,26 @@
       const container = document.querySelector('[data-route="#/exercise"]');
       container.innerHTML = '';
 
+      // 現在の種目数を計算
+      const sortedItems = [...state.day.items].sort((a, b) => b.order - a.order);
+      const processedGroups = new Set();
+      let currentExerciseCount = 0;
+      sortedItems.forEach(item => {
+        if (item.mode === 'superset') {
+          if (!item.groupId || processedGroups.has(item.groupId)) return;
+          processedGroups.add(item.groupId);
+          currentExerciseCount++;
+        } else {
+          currentExerciseCount++;
+        }
+      });
+      const nextExerciseNumber = currentExerciseCount + 1;
+
       const form = document.createElement('form');
       form.className = 'section-card bg-white p-6 space-y-6';
       form.innerHTML = `
         <div class="flex items-center justify-between">
-          <h2 class="text-xl font-light sumi-text" style="letter-spacing: 0.05em;">種目入力</h2>
+          <h2 class="text-xl font-light sumi-text" style="letter-spacing: 0.05em;">${nextExerciseNumber}種目目: 種目入力</h2>
           <button type="button" id="exerciseBack" class="text-sm font-light px-3 py-2 min-h-[44px] transition" style="color: var(--color-gold);">← 戻る</button>
         </div>
         <div class="-mx-6 px-6 overflow-x-auto">
@@ -1527,17 +1547,7 @@
           </div>
           <button type="button" id="resetForm" class="text-xs sumi-text-light hover:sumi-text font-light px-2 py-1 transition">リセット</button>
         </div>
-        <div id="exercisePreview" class="hidden rounded-xl px-4 py-3 text-sm border" style="background-color: rgba(245, 237, 214, 0.3); border-color: rgba(212, 175, 55, 0.2);">
-          <div class="flex items-start gap-2">
-            <svg class="w-5 h-5 mt-0.5 flex-shrink-0" style="color: var(--color-gold);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <div class="flex-1">
-              <div class="font-light sumi-text mb-1" style="letter-spacing: 0.02em;">入力中の種目</div>
-              <div id="exercisePreviewText" class="sumi-text-mid font-light"></div>
-            </div>
-          </div>
-        </div>
+
         <div id="exerciseCards" class="flex flex-col gap-4"></div>
         <div class="flex justify-between items-center">
           <button type="submit" class="ios-card text-white px-6 py-3 font-light min-h-[44px] transition" style="background-color: var(--color-gold); letter-spacing: 0.05em;">決定</button>
@@ -1561,28 +1571,8 @@
         renderExercise();
       });
       
-      // プレビュー更新関数
-      function updateExercisePreview() {
-        const preview = form.querySelector('#exercisePreview');
-        const previewText = form.querySelector('#exercisePreviewText');
-        const cards = uiState.exerciseForm.cards;
-        
-        if (cards.length === 0) {
-          preview.classList.add('hidden');
-          return;
-        }
-        
-        const descriptions = cards.map((card, index) => {
-          const partLabel = state.master.parts.find(p => p.id === card.part)?.label || card.part;
-          const details = [card.exercise, card.gear !== '-' ? card.gear : null, card.attachment !== '-' ? card.attachment : null, card.angle !== '-' ? card.angle : null, card.position !== '-' ? card.position : null].filter(Boolean).join(' / ');
-          const prefix = uiState.exerciseForm.superset ? `${['A', 'B', 'C'][index]}: ` : '';
-          return `${prefix}${partLabel} - ${details}`;
-        });
-        
-        previewText.innerHTML = descriptions.join('<br>');
-        preview.classList.remove('hidden');
-        
-        // LocalStorageに保存
+      // LocalStorageに保存する関数
+      function saveExerciseSettings() {
         saveLastExerciseSettings(uiState.exerciseForm);
       }
 
@@ -1597,11 +1587,10 @@
           }
           renderExercise();
         }
-        updateExercisePreview();
+        saveExerciseSettings();
       });
       
-      // 初回プレビュー表示
-      updateExercisePreview();
+
 
       form.addEventListener('submit', event => {
         event.preventDefault();
@@ -3090,17 +3079,20 @@
         const itemsList = document.createElement('div');
         itemsList.className = 'space-y-2';
         
-        const sortedItems = [...workout.items].sort((a, b) => a.order - b.order);
+        const sortedItems = [...workout.items].sort((a, b) => b.order - a.order);
         const processedGroups = new Set();
+        let exerciseNumber = 0;
         
         sortedItems.forEach(item => {
           if (item.mode === 'superset') {
             if (!item.groupId || processedGroups.has(item.groupId)) return;
+            exerciseNumber++;
             const groupItems = sortedItems.filter(candidate => candidate.groupId === item.groupId);
             processedGroups.add(item.groupId);
-            itemsList.appendChild(buildHistorySuperset(groupItems));
+            itemsList.appendChild(buildHistorySuperset(groupItems, exerciseNumber));
           } else {
-            itemsList.appendChild(buildHistorySingle(item));
+            exerciseNumber++;
+            itemsList.appendChild(buildHistorySingle(item, exerciseNumber));
           }
         });
         
@@ -3129,16 +3121,17 @@
       container.appendChild(list);
     }
     
-    function buildHistorySingle(item) {
+    function buildHistorySingle(item, exerciseNumber = null) {
       const div = document.createElement('div');
       div.className = 'p-3 rounded-lg border border-neutral-200/40';
       
       const partLabel = state.master.parts.find(p => p.id === item.part)?.label ?? '';
+      const exerciseTitle = exerciseNumber ? `${exerciseNumber}種目目: ${item.exercise}` : item.exercise;
       const header = document.createElement('div');
       header.className = 'flex items-start justify-between gap-2 mb-2';
       header.innerHTML = `
         <div class="min-w-0">
-          <p class="text-sm font-light sumi-text" style="letter-spacing: 0.02em;">${item.exercise}</p>
+          <p class="text-sm font-light sumi-text" style="letter-spacing: 0.02em;">${exerciseTitle}</p>
           <p class="text-xs font-light sumi-text-light">${partLabel}</p>
         </div>
         <div class="text-xs font-light sumi-text-light text-right min-w-0 truncate">
@@ -3164,10 +3157,11 @@
       return div;
     }
     
-    function buildHistorySuperset(groupItems) {
+    function buildHistorySuperset(groupItems, exerciseNumber = null) {
       const sorted = [...groupItems].sort((a, b) => a.order - b.order);
       const labels = ['A', 'B', 'C'];
       const title = `(SS) ${sorted.map(item => item.exercise).join(' + ')}`;
+      const exerciseTitle = exerciseNumber ? `${exerciseNumber}種目目: ${title}` : title;
       
       const div = document.createElement('div');
       div.className = 'p-3 rounded-lg border border-neutral-200/40';
@@ -3176,7 +3170,7 @@
       header.className = 'flex items-start justify-between gap-2 mb-2';
       header.innerHTML = `
         <div class="min-w-0">
-          <p class="text-sm font-light sumi-text" style="letter-spacing: 0.02em;">${title}</p>
+          <p class="text-sm font-light sumi-text" style="letter-spacing: 0.02em;">${exerciseTitle}</p>
           <p class="text-xs font-light sumi-text-light">${sorted.map((item, index) => `${labels[index]}. ${state.master.parts.find(p => p.id === item.part)?.label ?? ''}`).join(' / ')}</p>
         </div>
       `;
