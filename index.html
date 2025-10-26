@@ -2524,7 +2524,7 @@
           }
         };
 
-        // 1行に統合: ウォームアップ + 入力欄 + 削除ボタン
+        // 1行に統合: ウォームアップ + ドロップセット開始 + 入力欄 + 削除ボタン
         const mainRow = document.createElement('div');
         mainRow.className = 'flex items-center gap-2 text-sm sumi-text';
         
@@ -2542,6 +2542,23 @@
         });
         warmupLabel.append(warmupInput, document.createTextNode('W'));
         mainRow.appendChild(warmupLabel);
+        
+        // ドロップセット開始チェックボックス
+        const dropStartLabel = document.createElement('label');
+        dropStartLabel.className = 'inline-flex items-center gap-1 text-xs cursor-pointer flex-shrink-0';
+        dropStartLabel.style.color = 'var(--color-gold)';
+        const dropStartInput = document.createElement('input');
+        dropStartInput.type = 'checkbox';
+        dropStartInput.className = 'w-4 h-4 rounded';
+        dropStartInput.style.accentColor = 'var(--color-gold)';
+        dropStartInput.checked = row.isDropStart || false;
+        dropStartInput.addEventListener('change', () => { 
+          row.isDropStart = dropStartInput.checked;
+          autoSaveDraft();
+          renderSet();
+        });
+        dropStartLabel.append(dropStartInput, document.createTextNode('D'));
+        mainRow.appendChild(dropStartLabel);
         
         // 入力欄（中央）
         const inputsWrapper = document.createElement('div');
@@ -2663,8 +2680,8 @@
           dropCard.appendChild(dropFooter);
           dropArea.appendChild(dropCard);
         });
-        // ドロップセットが有効な場合のみボタンを表示
-        if (active.dropset) {
+        // ドロップセットが有効またはこのセットがドロップセット開始点の場合にボタンを表示
+        if (active.dropset || row.isDropStart) {
           const addDropBtn = document.createElement('button');
           addDropBtn.type = 'button';
           addDropBtn.className = 'w-full text-xs font-light px-4 py-2 bg-white rounded-xl min-h-[36px] border transition';
@@ -3079,7 +3096,7 @@
         const itemsList = document.createElement('div');
         itemsList.className = 'space-y-2';
         
-        const sortedItems = [...workout.items].sort((a, b) => b.order - a.order);
+        const sortedItems = [...workout.items].sort((a, b) => a.order - b.order);
         const processedGroups = new Set();
         let exerciseNumber = 0;
         
