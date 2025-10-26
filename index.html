@@ -1586,8 +1586,8 @@
             uiState.exerciseForm.cards = [createExerciseCardState('A')];
           }
           renderExercise();
+          saveExerciseSettings();
         }
-        saveExerciseSettings();
       });
       
 
@@ -1648,9 +1648,18 @@
             });
           }
           
-          // 種目ドロップダウンを更新
+          // 種目ドロップダウンを更新（再レンダリングしない）
           const cardsContainer = form.querySelector('#exerciseCards');
-          renderExerciseCards(cardsContainer);
+          // 各カードの種目ドロップダウンだけを更新
+          uiState.exerciseForm.cards.forEach((card, idx) => {
+            const cardEl = cardsContainer.children[idx];
+            if (cardEl) {
+              const exerciseSelect = cardEl.querySelector('[data-field="exercise"]');
+              if (exerciseSelect) {
+                updateExerciseOptions(exerciseSelect, card);
+              }
+            }
+          });
         });
         
         container.appendChild(button);
@@ -1799,6 +1808,9 @@
             const fieldName = target.getAttribute('data-field');
             if (!fieldName) return;
             
+            // LocalStorageに保存（再レンダリングはしない）
+            saveExerciseSettings();
+            
             // 新規追加処理
             if (target.value === '__ADD_NEW__') {
               let name = null;
@@ -1860,9 +1872,10 @@
               }
             }
             
-            // 通常の変更処理
+            // 通常の変更処理（再レンダリングしない）
             if (fieldName === 'part') {
               card.part = target.value;
+              // 種目ドロップダウンのみ更新
               updateExerciseOptions(exerciseSelect, card);
             } else if (fieldName === 'exercise') {
               card.exercise = target.value;
