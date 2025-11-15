@@ -389,22 +389,6 @@
       const next = valid.includes(hash) ? hash : '#/dashboard';
       uiState.route = next;
       
-      // bodyの背景色をルートに応じて変更
-      // body背景色は常にダークテーマ
-      // const bgColors = {
-        '#/dashboard': 'bg-gray-800',
-        '#/today': 'bg-gray-800',
-        '#/exercise': 'bg-gray-800',
-        '#/set': 'bg-gray-800',
-        '#/history': 'bg-gray-800',
-        '#/settings': 'bg-gray-800'
-      };
-      
-      const body = document.body;
-      // 既存の背景色クラスを削除
-      Object.values(bgColors).forEach(cls => body.classList.remove(cls));
-      // 新しい背景色クラスを追加
-      body.classList.add(bgColors[next]);
       
       document.querySelectorAll('.route-view').forEach(section => {
         section.classList.toggle('hidden', section.getAttribute('data-route') !== next);
