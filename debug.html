@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>デバッグ - MuscleApp</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #1a1a1a;
+            color: #00ff88;
+            padding: 20px;
+            font-size: 12px;
+        }
+        .log {
+            margin-bottom: 10px;
+            padding: 5px;
+            background: rgba(0, 255, 136, 0.1);
+            border-left: 3px solid #00ff88;
+        }
+        .error {
+            color: #ff4444;
+            background: rgba(255, 68, 68, 0.1);
+            border-left-color: #ff4444;
+        }
+        .success {
+            color: #00ff88;
+        }
+        h1 {
+            color: #ff4444;
+            font-size: 16px;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 デバッグ情報</h1>
+    <div id="output"></div>
+
+    <script>
+        const output = document.getElementById('output');
+        
+        function log(message, isError = false) {
+            const div = document.createElement('div');
+            div.className = isError ? 'log error' : 'log success';
+            div.innerHTML = message;
+            output.appendChild(div);
+        }
+
+        // エラーをキャッチ
+        window.onerror = function(msg, url, line, col, error) {
+            log(`❌ エラー: ${msg}<br>ファイル: ${url}<br>行: ${line}:${col}<br>詳細: ${error}`, true);
+            return false;
+        };
+
+        log('✅ デバッグページ読み込み開始');
+        log(`📱 UserAgent: ${navigator.userAgent}`);
+        log(`🌐 URL: ${location.href}`);
+        
+        // スクリプトを順番に読み込み
+        const scripts = [
+            'js/data-models.js',
+            'js/storage.js',
+            'js/ui-components.js',
+            'js/navigation.js',
+            'js/app.js'
+        ];
+        
+        let loadedCount = 0;
+        
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                log(`⏳ 読み込み中: ${src}`);
+                const script = document.createElement('script');
+                script.src = src;
+                
+                script.onload = () => {
+                    loadedCount++;
+                    log(`✅ ${src} 読み込み成功 (${loadedCount}/${scripts.length})`);
+                    resolve();
+                };
+                
+                script.onerror = (e) => {
+                    log(`❌ ${src} 読み込み失敗: ${e}`, true);
+                    reject(e);
+                };
+                
+                document.body.appendChild(script);
+            });
+        }
+        
+        async function loadAllScripts() {
+            try {
+                for (const src of scripts) {
+                    await loadScript(src);
+                }
+                
+                log('✅ 全スクリプト読み込み完了');
+                
+                // グローバル変数をチェック
+                log('<br><strong>📦 グローバル変数チェック:</strong>');
+                log(`createWorkoutEntry: ${typeof createWorkoutEntry}`);
+                log(`StorageManager: ${typeof StorageManager}`);
+                log(`UIComponents: ${typeof UIComponents}`);
+                log(`Navigation: ${typeof Navigation}`);
+                log(`MuscleApp: ${typeof MuscleApp}`);
+                log(`storage: ${typeof storage}`);
+                log(`ui: ${typeof ui}`);
+                log(`nav: ${typeof nav}`);
+                log(`app: ${typeof app}`);
+                
+                // LocalStorageチェック
+                log('<br><strong>💾 LocalStorage チェック:</strong>');
+                try {
+                    localStorage.setItem('test', 'ok');
+                    const test = localStorage.getItem('test');
+                    localStorage.removeItem('test');
+                    log(`✅ LocalStorage 動作OK (test: ${test})`);
+                } catch (e) {
+                    log(`❌ LocalStorage エラー: ${e}`, true);
+                }
+                
+                // DOMContentLoaded
+                log('<br><strong>🎯 初期化状態:</strong>');
+                log(`document.readyState: ${document.readyState}`);
+                log(`nav インスタンス: ${nav ? 'あり' : 'なし'}`);
+                log(`app インスタンス: ${app ? 'あり' : 'なし'}`);
+                
+                if (app) {
+                    log(`app.currentWorkout: ${app.currentWorkout ? 'あり' : 'なし'}`);
+                }
+                
+            } catch (error) {
+                log(`❌ 致命的エラー: ${error}`, true);
+                log(`<pre>${error.stack}</pre>`, true);
+            }
+        }
+        
+        loadAllScripts();
+    </script>
+</body>
+</html>
