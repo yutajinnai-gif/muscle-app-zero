@@ -353,14 +353,20 @@ class MuscleApp {
   completeWorkout() {
     if (confirm('トレーニングを完了しますか？')) {
       this.syncDataFromUI();
+      
+      // デバッグ用：保存前のデータをログ出力
+      console.log('保存するワークアウト:', JSON.stringify(this.currentWorkout, null, 2));
+      
       const success = storage.completeWorkout(this.currentWorkout);
       
       if (success) {
-        alert('お疲れ様でした！🔥');
+        alert('お疲れ様でした！🔥\n\n履歴タブで確認できます。');
         // 新しいワークアウトを開始
         this.currentWorkout = createWorkoutEntry();
         storage.saveCurrentWorkout(this.currentWorkout);
         this.init();
+      } else {
+        alert('保存に失敗しました。\n\nブラウザーのコンソールを確認してください。');
       }
     }
   }

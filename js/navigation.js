@@ -51,6 +51,12 @@ class Navigation {
   createPageContainers() {
     const existingContainer = document.querySelector('.container');
     
+    // .containerが存在しない場合は何もしない（デバッグページなど）
+    if (!existingContainer) {
+      console.warn('Container element not found. Navigation may not work properly.');
+      return;
+    }
+    
     // ワークアウトページ用のコンテナを作成
     const workoutPage = document.createElement('div');
     workoutPage.id = 'workout-page';

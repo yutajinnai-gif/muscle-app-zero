@@ -58,13 +58,16 @@ class StorageManager {
       const validation = validateWorkoutEntry(workout);
       if (!validation.isValid) {
         console.error('Validation failed:', validation.errors);
+        alert('データの検証エラー: ' + validation.errors.join(', '));
         return false;
       }
       
       // 全ワークアウトに追加
       const workouts = this.getAllWorkouts();
+      console.log('保存前の履歴件数:', workouts.length);
       workouts.push(workout);
       localStorage.setItem(STORAGE_KEYS.WORKOUTS, JSON.stringify(workouts));
+      console.log('保存後の履歴件数:', workouts.length);
       
       // 現在のワークアウトをクリア
       this.clearCurrentWorkout();
@@ -72,6 +75,7 @@ class StorageManager {
       return true;
     } catch (error) {
       console.error('Failed to complete workout:', error);
+      alert('保存エラー: ' + error.message);
       return false;
     }
   }
