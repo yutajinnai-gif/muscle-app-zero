@@ -155,7 +155,7 @@ class UIComponents {
         <input type="number" value="${setData.repsAssisted || ''}" placeholder="補" 
                class="assisted-input" min="0" step="1" ${assistedColor}>
       </div>
-      <div class="rpe-badge" contenteditable="true">RPE ${setData.rpe}</div>
+      <div class="rpe-badge">RPE ${setData.rpe || '-'}</div>
       <button class="remove-btn" title="セットを削除">✕</button>
     `;
     
