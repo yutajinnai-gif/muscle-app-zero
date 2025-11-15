@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Script Load Test</title>
+</head>
+<body>
+    <h1>Script Loading Test</h1>
+    <div id="status"></div>
+    <script>
+        const status = document.getElementById('status');
+        const scripts = [
+            'js/data-models.js',
+            'js/storage.js',
+            'js/ui-components.js',
+            'js/navigation.js',
+            'js/app.js'
+        ];
+        
+        function testScript(src) {
+            return new Promise((resolve) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = () => {
+                    status.innerHTML += `✅ ${src} loaded<br>`;
+                    resolve(true);
+                };
+                script.onerror = () => {
+                    status.innerHTML += `❌ ${src} failed<br>`;
+                    resolve(false);
+                };
+                document.body.appendChild(script);
+            });
+        }
+        
+        (async () => {
+            for (const src of scripts) {
+                await testScript(src);
+            }
+            status.innerHTML += '<br>Testing globals:<br>';
+            status.innerHTML += `createWorkoutEntry: ${typeof createWorkoutEntry}<br>`;
+            status.innerHTML += `StorageManager: ${typeof StorageManager}<br>`;
+            status.innerHTML += `UIComponents: ${typeof UIComponents}<br>`;
+            status.innerHTML += `Navigation: ${typeof Navigation}<br>`;
+            status.innerHTML += `MuscleApp: ${typeof MuscleApp}<br>`;
+        })();
+    </script>
+</body>
+</html>
