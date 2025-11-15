@@ -1,0 +1,477 @@
+/**
+ * コンパクト版スタイル
+ * 筋トレアプリのメインCSS
+ */
+
+/* ========== リセット ========== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: linear-gradient(135deg, #0A0A0A 0%, #1a0a0a 100%);
+  color: #FFFFFF;
+  padding: 12px;
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ========== ヘッダー ========== */
+.header {
+  background: rgba(255, 68, 68, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-left h1 {
+  font-size: 18px;
+  margin-bottom: 3px;
+  text-shadow: 0 0 10px rgba(255, 68, 68, 0.6);
+}
+
+.header-left .date {
+  color: #FF6B35;
+  font-size: 12px;
+}
+
+.header-right {
+  text-align: right;
+}
+
+.trainer-compact {
+  font-size: 11px;
+  color: #AAA;
+  margin-bottom: 3px;
+}
+
+.trainer-compact select,
+#trainerSelect {
+  background: rgba(15, 15, 15, 0.9);
+  border: 1px solid rgba(255, 107, 53, 0.3);
+  border-radius: 4px;
+  padding: 4px 8px;
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+#trainerSelect:focus {
+  outline: none;
+  border-color: #FF6B35;
+}
+
+/* ========== クイック統計 ========== */
+.quick-stats {
+  background: rgba(26, 26, 26, 0.4);
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-around;
+  font-size: 11px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 16px;
+  font-weight: bold;
+  color: #FF6B35;
+  text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+}
+
+.stat-label {
+  color: #888;
+  margin-top: 2px;
+}
+
+/* ========== アクションボタン ========== */
+.action-buttons {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #FF6B35 0%, #FF4444 100%);
+  color: white;
+  box-shadow: 0 0 15px rgba(255, 107, 53, 0.3);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background: rgba(255, 68, 68, 0.15);
+  color: #FF6B35;
+  border: 1px solid rgba(255, 68, 68, 0.3);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 68, 68, 0.25);
+  border-color: #FF6B35;
+}
+
+/* ========== 種目グループ ========== */
+.exercise-group {
+  background: rgba(26, 26, 26, 0.6);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 8px;
+  border-left: 3px solid #FF6B35;
+}
+
+.exercise-group.superset {
+  border-left-color: #FF4444;
+  border-left-width: 4px;
+  box-shadow: 0 0 15px rgba(255, 68, 68, 0.15);
+}
+
+/* グループヘッダー */
+.group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+}
+
+.group-header > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255, 107, 53, 0.2);
+}
+
+.group-title {
+  font-size: 13px;
+  font-weight: bold;
+  color: #FF6B35;
+}
+
+.group-title.superset {
+  color: #FF4444;
+}
+
+.group-order {
+  font-size: 11px;
+  color: #888;
+}
+
+.drag-handle {
+  display: inline-block;
+  color: #555;
+  font-size: 16px;
+  cursor: move;
+  margin-right: 6px;
+  user-select: none;
+}
+
+.drag-handle:hover {
+  color: #888;
+}
+
+/* ========== 種目アイテム ========== */
+.exercise-item {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 107, 53, 0.1);
+}
+
+.exercise-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+/* 種目ヘッダー */
+.exercise-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  justify-content: space-between;
+}
+
+.exercise-label {
+  font-size: 11px;
+  color: #FF6B35;
+  padding: 2px 6px;
+  background: rgba(255, 107, 53, 0.15);
+  border-radius: 3px;
+  font-weight: bold;
+  min-width: 24px;
+  text-align: center;
+}
+
+.exercise-name-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 107, 53, 0.3);
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 4px 0;
+}
+
+.exercise-name-input:focus {
+  outline: none;
+  border-bottom-color: #FF6B35;
+}
+
+.exercise-name-input::placeholder {
+  color: #555;
+}
+
+/* 器具行 */
+.equipment-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  align-items: center;
+}
+
+.equipment-row label {
+  color: #888;
+  min-width: 40px;
+  font-size: 11px;
+}
+
+.equipment-row select {
+  flex: 1;
+  background: rgba(15, 15, 15, 0.7);
+  border: 1px solid rgba(255, 107, 53, 0.2);
+  border-radius: 4px;
+  padding: 6px 8px;
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.equipment-row select:focus {
+  outline: none;
+  border-color: #FF6B35;
+  box-shadow: 0 0 5px rgba(255, 107, 53, 0.3);
+}
+
+/* ========== セット記録 ========== */
+.sets-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.sets-label {
+  font-size: 11px;
+  color: #AAA;
+}
+
+.add-set-link {
+  font-size: 11px;
+  color: #FF6B35;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.add-set-link:hover {
+  color: #FF8844;
+}
+
+.set-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* セット行 */
+.set-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 40px 30px;
+  gap: 6px;
+  align-items: center;
+  background: rgba(15, 15, 15, 0.5);
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.set-number {
+  color: #888;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.set-input {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.set-input input {
+  width: 45px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 107, 53, 0.3);
+  color: white;
+  padding: 2px 4px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.set-input input:focus {
+  outline: none;
+  border-bottom-color: #FF6B35;
+}
+
+.set-input input.assisted-input {
+  color: #FF9800;
+  border-bottom-color: rgba(255, 152, 0, 0.3);
+}
+
+.set-input span {
+  color: #666;
+  font-size: 11px;
+}
+
+.rpe-badge {
+  background: rgba(255, 107, 53, 0.2);
+  color: #FF6B35;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  text-align: center;
+  cursor: text;
+}
+
+.rpe-badge:focus {
+  outline: 1px solid #FF6B35;
+  background: rgba(255, 107, 53, 0.3);
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  color: #FF4444;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.remove-btn:hover {
+  opacity: 1;
+}
+
+/* ========== 過去データ ========== */
+.history-compact {
+  background: rgba(255, 107, 53, 0.08);
+  border-left: 2px solid #FF6B35;
+  padding: 6px 8px;
+  margin-top: 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  color: #AAA;
+}
+
+.history-compact strong {
+  color: #FF6B35;
+  font-weight: bold;
+}
+
+/* ========== リンク ========== */
+.add-exercise-link {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #FF6B35;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.add-exercise-link:hover {
+  color: #FF8844;
+}
+
+/* ========== スクロールバー ========== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(26, 26, 26, 0.3);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 107, 53, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 107, 53, 0.5);
+}
+
+/* ========== レスポンシブ ========== */
+@media (max-width: 480px) {
+  body {
+    padding: 8px;
+  }
+  
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .header-right {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .quick-stats {
+    font-size: 10px;
+  }
+  
+  .stat-value {
+    font-size: 14px;
+  }
+}

@@ -1,0 +1,20 @@
+--- a/index.html
++++ b/index.html
+@@ -390,18 +390,8 @@
+       const next = valid.includes(hash) ? hash : '#/dashboard';
+       uiState.route = next;
+       
+-      // bodyの背景色をルートに応じて変更
+-      // body背景色は常にダークテーマ
+-      // const bgColors = {
+-        '#/dashboard': 'bg-gray-800',
+-        '#/today': 'bg-gray-800',
+-        '#/exercise': 'bg-gray-800',
+-        '#/set': 'bg-gray-800',
+-        '#/history': 'bg-gray-800',
+-        '#/settings': 'bg-gray-800'
+-      };
+-      
+-      const body = document.body;
++      // body背景色は常にダークテーマ(#0A0A0A)で固定
++      // ルートごとの背景色変更は無効化
