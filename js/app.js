@@ -375,24 +375,24 @@ class MuscleApp {
 // アプリケーションを起動
 let app;
 
-// 即座に初期化（navigation.jsの後）
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initApp);
-} else {
-  // 既にDOMが読み込まれている場合
-  initApp();
-}
-
+// より堅牢な初期化ロジック
 function initApp() {
-  // .containerが存在するか確認
+  console.log('[App Init] Attempting to initialize...');
+  console.log('[App Init] document.readyState:', document.readyState);
+  
   const container = document.querySelector('.container');
   if (!container) {
-    console.warn('Container element not found. App may not initialize properly.');
+    console.warn('[App Init] .container not found, retrying in 100ms...');
+    setTimeout(initApp, 100);
     return;
   }
   
+  console.log('[App Init] .container found, initializing MuscleApp...');
   app = new MuscleApp();
-  console.log('MuscleApp initialized:', app);
+  console.log('[App Init] ✅ MuscleApp initialized successfully:', app);
+  
+  // グローバルスコープに公開（デバッグ用）
+  window.app = app;
   
   // 定期的に統計を更新（1分ごと）
   setInterval(() => {
@@ -400,4 +400,23 @@ function initApp() {
       app.updateStats();
     }
   }, 60000);
+}
+
+// 複数のタイミングで初期化を試みる
+console.log('[App] Script loaded, document.readyState:', document.readyState);
+
+if (document.readyState === 'loading') {
+  // まだ読み込み中
+  console.log('[App] Waiting for DOMContentLoaded...');
+  document.addEventListener('DOMContentLoaded', initApp);
+} else if (document.readyState === 'interactive') {
+  // DOMは読み込まれたがリソースは未完了
+  console.log('[App] DOM is interactive, waiting for full load...');
+  window.addEventListener('load', initApp);
+  // 念のため即座にも試みる
+  setTimeout(initApp, 50);
+} else {
+  // 完全に読み込み済み
+  console.log('[App] DOM is complete, initializing immediately...');
+  initApp();
 }
