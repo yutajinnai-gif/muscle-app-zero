@@ -126,12 +126,20 @@ class Navigation {
   
   // 履歴を読み込み
   loadHistory() {
+    console.log('[Navigation] Loading history...');
     const historyList = document.getElementById('historyList');
-    if (!historyList) return;
+    console.log('[Navigation] historyList element:', historyList);
+    
+    if (!historyList) {
+      console.error('[Navigation] historyList element not found!');
+      return;
+    }
     
     const workouts = storage.getAllWorkouts();
+    console.log('[Navigation] workouts count:', workouts.length);
     
     if (workouts.length === 0) {
+      console.log('[Navigation] No workouts, showing empty message');
       historyList.innerHTML = '<div class="empty-message">まだトレーニング記録がありません</div>';
       return;
     }

@@ -59,26 +59,49 @@ class MuscleApp {
   
   // イベントリスナーを設定
   attachEventListeners() {
+    console.log('[App] Attaching event listeners...');
+    
     // スーパーセット追加ボタン
     const addSupersetBtn = document.getElementById('addSupersetBtn');
+    console.log('[App] addSupersetBtn:', addSupersetBtn);
     if (addSupersetBtn) {
-      addSupersetBtn.addEventListener('click', () => this.addSuperset());
+      addSupersetBtn.addEventListener('click', () => {
+        console.log('[App] addSupersetBtn clicked!');
+        this.addSuperset();
+      });
+      console.log('[App] addSupersetBtn listener attached');
+    } else {
+      console.error('[App] addSupersetBtn not found!');
     }
     
     // 通常種目追加ボタン
     const addNormalBtn = document.getElementById('addNormalBtn');
+    console.log('[App] addNormalBtn:', addNormalBtn);
     if (addNormalBtn) {
-      addNormalBtn.addEventListener('click', () => this.addNormalExercise());
+      addNormalBtn.addEventListener('click', () => {
+        console.log('[App] addNormalBtn clicked!');
+        this.addNormalExercise();
+      });
+      console.log('[App] addNormalBtn listener attached');
+    } else {
+      console.error('[App] addNormalBtn not found!');
     }
     
     // トレーナー選択
     const trainerSelect = document.getElementById('trainerSelect');
+    console.log('[App] trainerSelect:', trainerSelect);
     if (trainerSelect) {
       trainerSelect.addEventListener('change', (e) => {
+        console.log('[App] trainerSelect changed!');
         this.currentWorkout.trainer = e.target.value === 'self' ? null : e.target.value;
         this.saveCurrentWorkout();
       });
+      console.log('[App] trainerSelect listener attached');
+    } else {
+      console.error('[App] trainerSelect not found!');
     }
+    
+    console.log('[App] All event listeners attached');
   }
   
   // ========== ワークアウト描画 ==========
