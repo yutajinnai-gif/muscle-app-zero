@@ -220,13 +220,5 @@ class Navigation {
 }
 
 // グローバルインスタンスを作成
+// 初期化はinit.jsが行う
 let nav;
-
-// 即座に初期化（app.jsより先に）
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    nav = new Navigation();
-  });
-} else {
-  nav = new Navigation();
-}

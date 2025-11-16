@@ -376,60 +376,6 @@ class MuscleApp {
   }
 }
 
-// アプリケーションを起動
+// アプリケーションインスタンス
+// 初期化はinit.jsが行う
 let app;
-
-// より堅牢な初期化ロジック（navigation.jsの後に実行）
-function initApp() {
-  console.log('[App Init] Attempting to initialize...');
-  console.log('[App Init] document.readyState:', document.readyState);
-  console.log('[App Init] nav exists:', typeof nav !== 'undefined');
-  
-  // navigation.jsの初期化を待つ
-  if (typeof nav === 'undefined') {
-    console.warn('[App Init] Navigation not initialized yet, retrying in 50ms...');
-    setTimeout(initApp, 50);
-    return;
-  }
-  
-  // 必要な要素が存在するか確認
-  const dateElement = document.getElementById('currentDate');
-  const exerciseContainer = document.getElementById('exerciseListContainer');
-  
-  if (!dateElement || !exerciseContainer) {
-    console.warn('[App Init] Required elements not found, retrying in 50ms...');
-    console.log('[App Init] dateElement:', dateElement);
-    console.log('[App Init] exerciseContainer:', exerciseContainer);
-    setTimeout(initApp, 50);
-    return;
-  }
-  
-  console.log('[App Init] All prerequisites met, initializing MuscleApp...');
-  app = new MuscleApp();
-  console.log('[App Init] ✅ MuscleApp initialized successfully:', app);
-  
-  // グローバルスコープに公開（デバッグ用）
-  window.app = app;
-  
-  // 定期的に統計を更新（1分ごと）
-  setInterval(() => {
-    if (app) {
-      app.updateStats();
-    }
-  }, 60000);
-}
-
-// navigation.jsの後に実行されるよう初期化
-console.log('[App] Script loaded, document.readyState:', document.readyState);
-
-if (document.readyState === 'loading') {
-  console.log('[App] Waiting for DOMContentLoaded...');
-  document.addEventListener('DOMContentLoaded', () => {
-    // navigation.jsが先に実行されるよう100ms遅延
-    setTimeout(initApp, 100);
-  });
-} else {
-  console.log('[App] DOM already loaded, initializing with delay...');
-  // navigation.jsが先に実行されるよう100ms遅延
-  setTimeout(initApp, 100);
-}
