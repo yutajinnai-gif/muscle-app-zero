@@ -33,8 +33,10 @@ class MuscleApp {
   
   // UIを初期化
   initUI() {
+    console.log('[App] Initializing UI...');
     // 日付を設定
     const dateElement = document.getElementById('currentDate');
+    console.log('[App] dateElement:', dateElement);
     if (dateElement) {
       const weekday = getWeekday(this.currentWorkout.date);
       dateElement.textContent = `${this.currentWorkout.date} (${weekday}) ${this.currentWorkout.startTime}`;
@@ -82,7 +84,9 @@ class MuscleApp {
   // ========== ワークアウト描画 ==========
   
   renderWorkout() {
+    console.log('[App] Rendering workout...');
     const container = document.getElementById('exerciseListContainer');
+    console.log('[App] exerciseListContainer:', container);
     if (!container) return;
     
     // クリア
@@ -375,19 +379,32 @@ class MuscleApp {
 // アプリケーションを起動
 let app;
 
-// より堅牢な初期化ロジック
+// より堅牢な初期化ロジック（navigation.jsの後に実行）
 function initApp() {
   console.log('[App Init] Attempting to initialize...');
   console.log('[App Init] document.readyState:', document.readyState);
+  console.log('[App Init] nav exists:', typeof nav !== 'undefined');
   
-  const container = document.querySelector('.container');
-  if (!container) {
-    console.warn('[App Init] .container not found, retrying in 100ms...');
-    setTimeout(initApp, 100);
+  // navigation.jsの初期化を待つ
+  if (typeof nav === 'undefined') {
+    console.warn('[App Init] Navigation not initialized yet, retrying in 50ms...');
+    setTimeout(initApp, 50);
     return;
   }
   
-  console.log('[App Init] .container found, initializing MuscleApp...');
+  // 必要な要素が存在するか確認
+  const dateElement = document.getElementById('currentDate');
+  const exerciseContainer = document.getElementById('exerciseListContainer');
+  
+  if (!dateElement || !exerciseContainer) {
+    console.warn('[App Init] Required elements not found, retrying in 50ms...');
+    console.log('[App Init] dateElement:', dateElement);
+    console.log('[App Init] exerciseContainer:', exerciseContainer);
+    setTimeout(initApp, 50);
+    return;
+  }
+  
+  console.log('[App Init] All prerequisites met, initializing MuscleApp...');
   app = new MuscleApp();
   console.log('[App Init] ✅ MuscleApp initialized successfully:', app);
   
@@ -402,21 +419,17 @@ function initApp() {
   }, 60000);
 }
 
-// 複数のタイミングで初期化を試みる
+// navigation.jsの後に実行されるよう初期化
 console.log('[App] Script loaded, document.readyState:', document.readyState);
 
 if (document.readyState === 'loading') {
-  // まだ読み込み中
   console.log('[App] Waiting for DOMContentLoaded...');
-  document.addEventListener('DOMContentLoaded', initApp);
-} else if (document.readyState === 'interactive') {
-  // DOMは読み込まれたがリソースは未完了
-  console.log('[App] DOM is interactive, waiting for full load...');
-  window.addEventListener('load', initApp);
-  // 念のため即座にも試みる
-  setTimeout(initApp, 50);
+  document.addEventListener('DOMContentLoaded', () => {
+    // navigation.jsが先に実行されるよう100ms遅延
+    setTimeout(initApp, 100);
+  });
 } else {
-  // 完全に読み込み済み
-  console.log('[App] DOM is complete, initializing immediately...');
-  initApp();
+  console.log('[App] DOM already loaded, initializing with delay...');
+  // navigation.jsが先に実行されるよう100ms遅延
+  setTimeout(initApp, 100);
 }
