@@ -375,8 +375,24 @@ class MuscleApp {
 // アプリケーションを起動
 let app;
 
-document.addEventListener('DOMContentLoaded', () => {
+// 即座に初期化（navigation.jsの後）
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  // 既にDOMが読み込まれている場合
+  initApp();
+}
+
+function initApp() {
+  // .containerが存在するか確認
+  const container = document.querySelector('.container');
+  if (!container) {
+    console.warn('Container element not found. App may not initialize properly.');
+    return;
+  }
+  
   app = new MuscleApp();
+  console.log('MuscleApp initialized:', app);
   
   // 定期的に統計を更新（1分ごと）
   setInterval(() => {
@@ -384,4 +400,4 @@ document.addEventListener('DOMContentLoaded', () => {
       app.updateStats();
     }
   }, 60000);
-});
+}

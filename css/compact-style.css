@@ -553,13 +553,17 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-height: 200px;
 }
 
 .empty-message {
   text-align: center;
   padding: 40px 20px;
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 16px;
+  background: rgba(255, 68, 68, 0.05);
+  border-radius: 8px;
+  border: 1px dashed rgba(255, 68, 68, 0.3);
 }
 
 /* ワークアウトカード */
