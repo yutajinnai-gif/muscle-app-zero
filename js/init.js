@@ -31,10 +31,17 @@ function initializeApp() {
     if (container) {
       try {
         window.nav = new Navigation();
+        // Navigationが完全に初期化されるまで待つ
+        if (!window.nav.initialized) {
+          console.warn('[Init] Navigation created but not fully initialized, retrying...');
+          setTimeout(initializeApp, 100);
+          return;
+        }
         window.muscleAppInitFlags.navReady = true;
         console.log('[Init] ✅ Navigation initialized:', window.nav);
       } catch (error) {
         console.error('[Init] ❌ Navigation initialization failed:', error);
+        console.error('[Init] Stack:', error.stack);
         setTimeout(initializeApp, 100);
         return;
       }
@@ -54,16 +61,34 @@ function initializeApp() {
       return;
     }
     
-    // 必要な要素を確認
+    // 必要な要素を確認（より詳細なデバッグ）
     const dateElement = document.getElementById('currentDate');
     const exerciseContainer = document.getElementById('exerciseListContainer');
+    const workoutPage = document.getElementById('workout-page');
+    
+    console.log('[Init] Element check:');
+    console.log('[Init] - dateElement:', dateElement);
+    console.log('[Init] - exerciseContainer:', exerciseContainer);
+    console.log('[Init] - workoutPage:', workoutPage);
+    console.log('[Init] - document.body.innerHTML length:', document.body.innerHTML.length);
+    
+    // 要素がまだ存在しない場合でも、一定回数リトライしたら強制的に初期化
+    if (!window.muscleAppInitFlags.retryCount) {
+      window.muscleAppInitFlags.retryCount = 0;
+    }
+    window.muscleAppInitFlags.retryCount++;
     
     if (!dateElement || !exerciseContainer) {
-      console.warn('[Init] Required elements not found yet, retrying...');
-      console.log('[Init] dateElement:', dateElement);
-      console.log('[Init] exerciseContainer:', exerciseContainer);
-      setTimeout(initializeApp, 100);
-      return;
+      console.warn(`[Init] Required elements not found yet, retrying... (${window.muscleAppInitFlags.retryCount}/20)`);
+      
+      if (window.muscleAppInitFlags.retryCount >= 20) {
+        console.error('[Init] ❌ Max retry count reached. Elements still not found.');
+        console.error('[Init] This may indicate a structural problem with navigation.js');
+        // 諦めずに初期化を試みる（エラーを記録するため）
+      } else {
+        setTimeout(initializeApp, 100);
+        return;
+      }
     }
     
     try {
@@ -95,11 +120,12 @@ if (document.readyState === 'loading') {
   console.log('[Init] Waiting for DOMContentLoaded...');
   document.addEventListener('DOMContentLoaded', () => {
     console.log('[Init] DOMContentLoaded fired');
-    setTimeout(initializeApp, 50);
+    // navigation.jsがDOMを変更するのを待つため、さらに遅延
+    setTimeout(initializeApp, 200);
   });
 } else {
-  console.log('[Init] DOM already ready, initializing immediately');
-  setTimeout(initializeApp, 50);
+  console.log('[Init] DOM already ready, initializing with delay');
+  setTimeout(initializeApp, 200);
 }
 
 // エラーハンドラー

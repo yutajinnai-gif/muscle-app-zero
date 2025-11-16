@@ -10,14 +10,23 @@ class Navigation {
   }
   
   init() {
+    console.log('[Navigation] Initializing...');
+    
     // ナビゲーションバーを作成
     this.createNavBar();
+    console.log('[Navigation] NavBar created');
     
     // ページコンテナを作成
     this.createPageContainers();
+    console.log('[Navigation] Page containers created');
     
     // 初期ページを表示
     this.showPage('workout');
+    console.log('[Navigation] Initial page shown');
+    
+    // 初期化完了フラグ
+    this.initialized = true;
+    console.log('[Navigation] ✅ Initialization complete');
   }
   
   // ナビゲーションバーを作成
