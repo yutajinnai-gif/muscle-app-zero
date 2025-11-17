@@ -301,13 +301,20 @@ class UIComponents {
     
     // セット削除
     const removeBtn = rowDiv.querySelector('.remove-btn');
-    removeBtn.addEventListener('click', () => {
-      if (confirm('このセットを削除しますか？')) {
-        rowDiv.remove();
-        app.recalculateSetNumbers(rowDiv.closest('.exercise-item'));
-        app.saveCurrentWorkout();
-      }
-    });
+    if (removeBtn) {
+      removeBtn.addEventListener('click', () => {
+        if (confirm('このセットを削除しますか？')) {
+          const exerciseItem = rowDiv.closest('.exercise-item');
+          rowDiv.remove();
+          if (app && typeof app.recalculateSetNumbers === 'function') {
+            app.recalculateSetNumbers(exerciseItem);
+          }
+          if (app && typeof app.saveCurrentWorkout === 'function') {
+            app.saveCurrentWorkout();
+          }
+        }
+      });
+    }
   }
   
   // ========== 過去データ表示 ==========
