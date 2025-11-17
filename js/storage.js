@@ -266,16 +266,97 @@ class StorageManager {
     }
   }
   
+  // 全データをエクスポート
+  exportAllData() {
+    return {
+      workouts: this.getWorkoutHistory(),
+      trainers: this.getTrainers(),
+      currentWorkout: this.getCurrentWorkout(),
+      exportDate: new Date().toISOString()
+    };
+  }
+  
+  // 全データをインポート
+  importAllData(data) {
+    try {
+      if (data.workouts) {
+        localStorage.setItem(STORAGE_KEYS.WORKOUTS, JSON.stringify(data.workouts));
+      }
+      if (data.trainers) {
+        localStorage.setItem(STORAGE_KEYS.TRAINERS, JSON.stringify(data.trainers));
+      }
+      if (data.currentWorkout) {
+        localStorage.setItem(STORAGE_KEYS.CURRENT_WORKOUT, JSON.stringify(data.currentWorkout));
+      }
+      return true;
+    } catch (error) {
+      console.error('Failed to import all data:', error);
+      return false;
+    }
+  }
+  
+  // ストレージ使用量を取得（バイト数）
+  getStorageSize() {
+    let total = 0;
+    for (let key in localStorage) {
+      if (localStorage.hasOwnProperty(key)) {
+        total += localStorage[key].length + key.length;
+      }
+    }
+    return total;
+  }
+  
+  // ストレージ使用率を取得（0-100%）
+  getStorageUsagePercent() {
+    const used = this.getStorageSize();
+    const limit = 5 * 1024 * 1024; // 5MBを仮定
+    return (used / limit) * 100;
+  }
+  
+  // 容量警告をチェック
+  checkStorageWarning() {
+    const usagePercent = this.getStorageUsagePercent();
+    
+    if (usagePercent > 80) {
+      const usedKB = (this.getStorageSize() / 1024).toFixed(2);
+      const message = `ストレージ使用率: ${usagePercent.toFixed(1)}% (${usedKB} KB)\n\n古いデータを削除しますか？`;
+      
+      if (confirm(message)) {
+        this.deleteOldWorkouts(6); // 6ヶ月以上前のデータを削除
+      }
+    }
+  }
+  
+  // 古いワークアウトを削除
+  deleteOldWorkouts(monthsAgo) {
+    const workouts = this.getWorkoutHistory();
+    const cutoffDate = new Date();
+    cutoffDate.setMonth(cutoffDate.getMonth() - monthsAgo);
+    
+    const filtered = workouts.filter(workout => {
+      const workoutDate = new Date(workout.date);
+      return workoutDate >= cutoffDate;
+    });
+    
+    const deletedCount = workouts.length - filtered.length;
+    
+    if (deletedCount > 0) {
+      localStorage.setItem(STORAGE_KEYS.WORKOUTS, JSON.stringify(filtered));
+      alert(`${deletedCount}件の古いデータを削除しました。`);
+      return true;
+    } else {
+      alert('削除する古いデータがありません。');
+      return false;
+    }
+  }
+  
   // 全データをクリア（危険！）
   clearAllData() {
-    if (confirm('本当に全データを削除しますか？この操作は取り消せません。')) {
-      localStorage.removeItem(STORAGE_KEYS.WORKOUTS);
-      localStorage.removeItem(STORAGE_KEYS.CURRENT_WORKOUT);
-      // トレーナーリストはデフォルトに戻す
-      this.saveTrainers(DEFAULT_TRAINERS);
-      return true;
-    }
-    return false;
+    localStorage.removeItem(STORAGE_KEYS.WORKOUTS);
+    localStorage.removeItem(STORAGE_KEYS.CURRENT_WORKOUT);
+    // トレーナーリストはデフォルトに戻す
+    this.saveTrainers(DEFAULT_TRAINERS);
+    return true;
   }
 }
 

@@ -125,6 +125,56 @@ class MuscleApp {
       }
       container.appendChild(groupElement);
     });
+    
+    // ドラッグ&ドロップを有効化
+    this.initDragAndDrop();
+  }
+  
+  // ドラッグ&ドロップの初期化
+  initDragAndDrop() {
+    const container = document.getElementById('exerciseListContainer');
+    if (!container || typeof Sortable === 'undefined') return;
+    
+    // グループの並び替え
+    new Sortable(container, {
+      animation: 150,
+      handle: '.drag-handle',
+      ghostClass: 'sortable-ghost',
+      onEnd: () => {
+        this.syncDataFromUI();
+        this.saveCurrentWorkout();
+      }
+    });
+    
+    // 各グループ内のセットの並び替え
+    const exerciseItems = container.querySelectorAll('.exercise-item');
+    exerciseItems.forEach(item => {
+      const setsContainer = item.querySelector('.sets-container');
+      if (setsContainer) {
+        new Sortable(setsContainer, {
+          animation: 150,
+          handle: '.set-number',
+          ghostClass: 'sortable-ghost',
+          onEnd: () => {
+            this.recalculateSetNumbers(setsContainer);
+            this.syncDataFromUI();
+            this.saveCurrentWorkout();
+          }
+        });
+      }
+    });
+  }
+  
+  // セット番号を再計算
+  recalculateSetNumbers(setsContainer) {
+    const setRows = setsContainer.querySelectorAll('.set-row');
+    setRows.forEach((row, index) => {
+      const setNumberSpan = row.querySelector('.set-number');
+      if (setNumberSpan) {
+        setNumberSpan.textContent = `SET ${index + 1}`;
+        row.dataset.setNumber = index + 1;
+      }
+    });
   }
   
   // ========== グループ管理 ==========
@@ -293,11 +343,21 @@ class MuscleApp {
         const setRows = exerciseElement.querySelectorAll('.set-row');
         exercise.sets = [];
         setRows.forEach((setRow, setIndex) => {
+          // 入力値を取得してバリデーション
+          let weight = parseFloat(setRow.querySelector('.weight-input').value) || 0;
+          let repsUnassisted = parseInt(setRow.querySelector('.reps-input').value) || 0;
+          let repsAssisted = parseInt(setRow.querySelector('.assisted-input').value) || 0;
+          
+          // バリデーション: 範囲チェック
+          weight = Math.max(0, Math.min(500, weight));
+          repsUnassisted = Math.max(0, Math.min(100, repsUnassisted));
+          repsAssisted = Math.max(0, Math.min(50, repsAssisted));
+          
           const setData = {
             setNumber: setIndex + 1,
-            weight: parseFloat(setRow.querySelector('.weight-input').value) || 0,
-            repsUnassisted: parseInt(setRow.querySelector('.reps-input').value) || 0,
-            repsAssisted: parseInt(setRow.querySelector('.assisted-input').value) || 0,
+            weight: weight,
+            repsUnassisted: repsUnassisted,
+            repsAssisted: repsAssisted,
             rpe: parseInt(setRow.querySelector('.rpe-badge').textContent.replace('RPE ', '')) || 8,
             restSeconds: 90,
             notes: ''
@@ -387,6 +447,9 @@ class MuscleApp {
       const success = storage.completeWorkout(this.currentWorkout);
       
       if (success) {
+        // 容量チェック
+        storage.checkStorageWarning();
+        
         alert('お疲れ様でした！🔥\n\n履歴タブで確認できます。');
         // 新しいワークアウトを開始
         this.currentWorkout = createWorkoutEntry();

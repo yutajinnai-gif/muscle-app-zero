@@ -147,13 +147,13 @@ class UIComponents {
       <span class="set-number">SET ${setData.setNumber}</span>
       <div class="set-input">
         <input type="number" value="${setData.weight || ''}" placeholder="kg" 
-               class="weight-input" min="0" step="0.5">
+               class="weight-input" min="0.5" max="500" step="0.5">
         <span>×</span>
         <input type="number" value="${setData.repsUnassisted || ''}" placeholder="自" 
-               class="reps-input" min="0" step="1">
+               class="reps-input" min="0" max="100" step="1">
         <span>+</span>
         <input type="number" value="${setData.repsAssisted || ''}" placeholder="補" 
-               class="assisted-input" min="0" step="1" ${assistedColor}>
+               class="assisted-input" min="0" max="50" step="1" ${assistedColor}>
       </div>
       <div class="rpe-badge">RPE ${setData.rpe || '-'}</div>
       <button class="remove-btn" title="セットを削除">✕</button>
@@ -345,17 +345,41 @@ class UIComponents {
       return;
     }
     
-    // 最新のエントリ
-    const lastEntry = history[0];
+    // 過去3-5回分のデータを表示
+    const displayCount = Math.min(5, history.length);
+    const historyEntries = history.slice(0, displayCount);
     
-    // 最大セットを取得
-    const lastMaxSet = this.getMaxSet(lastEntry.sets);
-    const comparison = this.comparePerformance(exerciseData, lastEntry);
+    let historyHTML = '<div class="history-list">';
     
-    historyDiv.innerHTML = `
-      前回: ${lastMaxSet.weight}kg×${lastMaxSet.repsUnassisted}+${lastMaxSet.repsAssisted} 
-      (${formatDate(lastEntry.date)}) → <strong>${comparison}</strong>
-    `;
+    historyEntries.forEach((entry, index) => {
+      const maxSet = this.getMaxSet(entry.sets);
+      const daysAgo = this.getDaysAgo(entry.date);
+      const label = index === 0 ? '前回' : `${index + 1}回前`;
+      
+      // 前回との比較（最新のみ）
+      let comparisonText = '';
+      if (index === 0) {
+        const comparison = this.comparePerformance(exerciseData, entry);
+        comparisonText = ` → <strong>${comparison}</strong>`;
+      }
+      
+      historyHTML += `
+        <div class="history-entry ${index === 0 ? 'latest' : ''}">
+          <span class="history-label">${label}:</span>
+          <span class="history-data">${maxSet.weight}kg×${maxSet.repsUnassisted}${maxSet.repsAssisted > 0 ? '+' + maxSet.repsAssisted : ''}</span>
+          <span class="history-date">(${daysAgo})</span>${comparisonText}
+        </div>
+      `;
+    });
+    
+    // トレンド分析
+    if (historyEntries.length >= 2) {
+      const trend = this.analyzeTrend(historyEntries);
+      historyHTML += `<div class="history-trend">${trend}</div>`;
+    }
+    
+    historyHTML += '</div>';
+    historyDiv.innerHTML = historyHTML;
   }
   
   // 最大セットを取得
@@ -415,6 +439,41 @@ class UIComponents {
     }
     
     return messages.join(' ');
+  }
+  
+  // 日付から経過日数を計算
+  getDaysAgo(dateString) {
+    const date = new Date(dateString);
+    const today = new Date();
+    const diffTime = Math.abs(today - date);
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return '今日';
+    if (diffDays === 1) return '昨日';
+    if (diffDays < 7) return `${diffDays}日前`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)}週間前`;
+    return `${Math.floor(diffDays / 30)}ヶ月前`;
+  }
+  
+  // トレンド分析
+  analyzeTrend(historyEntries) {
+    if (historyEntries.length < 2) return '';
+    
+    // 最新と最古のデータを比較
+    const latest = this.getMaxSet(historyEntries[0].sets);
+    const oldest = this.getMaxSet(historyEntries[historyEntries.length - 1].sets);
+    
+    const weightDiff = latest.weight - oldest.weight;
+    const repsDiff = latest.repsUnassisted - oldest.repsUnassisted;
+    
+    // トレンド判定
+    if (weightDiff > 0 || (weightDiff === 0 && repsDiff > 0)) {
+      return '📈 順調に伸びています！';
+    } else if (weightDiff < 0 || (weightDiff === 0 && repsDiff < 0)) {
+      return '📉 前回より低下しています';
+    } else {
+      return '➡️ 横ばいです';
+    }
   }
   
   // RPE自動計算
