@@ -101,6 +101,19 @@ class MuscleApp {
       console.error('[App] trainerSelect not found!');
     }
     
+    // トレーニング完了ボタン
+    const completeBtn = document.getElementById('completeWorkoutBtn');
+    console.log('[App] completeWorkoutBtn:', completeBtn);
+    if (completeBtn) {
+      completeBtn.addEventListener('click', () => {
+        console.log('[App] completeWorkoutBtn clicked!');
+        this.completeWorkout();
+      });
+      console.log('[App] completeWorkoutBtn listener attached');
+    } else {
+      console.error('[App] completeWorkoutBtn not found!');
+    }
+    
     console.log('[App] All event listeners attached');
   }
   

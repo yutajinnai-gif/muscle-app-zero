@@ -15,8 +15,8 @@ body {
   background: linear-gradient(135deg, #0A0A0A 0%, #1a0a0a 100%);
   color: #FFFFFF;
   padding: 0;
-  padding-top: 60px;
-  padding-bottom: 12px;
+  padding-top: calc(60px + env(safe-area-inset-top));
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
   min-height: 100vh;
   font-size: 14px;
   line-height: 1.5;
@@ -40,6 +40,7 @@ body {
   justify-content: space-around;
   z-index: 1000;
   backdrop-filter: blur(10px);
+  padding-top: env(safe-area-inset-top);
 }
 
 .nav-btn {

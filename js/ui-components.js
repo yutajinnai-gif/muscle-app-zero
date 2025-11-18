@@ -246,18 +246,22 @@ class UIComponents {
     
     // セット追加
     const addSetLink = itemDiv.querySelector('.add-set-link');
-    addSetLink.addEventListener('click', (e) => {
-      app.addSet(e.target.dataset.exerciseId);
-    });
+    if (addSetLink) {
+      addSetLink.addEventListener('click', (e) => {
+        app.addSet(e.target.dataset.exerciseId);
+      });
+    }
     
     // 種目削除
     const deleteBtn = itemDiv.querySelector('.delete-exercise-btn');
-    deleteBtn.addEventListener('click', (e) => {
-      if (confirm('この種目を削除しますか？')) {
-        const exerciseId = e.target.dataset.exerciseId;
-        app.deleteExercise(exerciseId);
-      }
-    });
+    if (deleteBtn) {
+      deleteBtn.addEventListener('click', (e) => {
+        if (confirm('この種目を削除しますか？')) {
+          const exerciseId = e.target.dataset.exerciseId;
+          app.deleteExercise(exerciseId);
+        }
+      });
+    }
   }
   
   // セット行のイベントリスナーを追加
