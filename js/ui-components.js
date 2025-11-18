@@ -213,9 +213,15 @@ class UIComponents {
     const deleteGroupBtn = groupDiv.querySelector('.delete-group-btn');
     if (deleteGroupBtn) {
       deleteGroupBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const groupId = deleteGroupBtn.dataset.groupId;
         if (confirm('このグループを削除しますか？')) {
-          const groupId = e.target.dataset.groupId;
-          app.deleteGroup(groupId);
+          if (typeof app !== 'undefined' && typeof app.deleteGroup === 'function') {
+            app.deleteGroup(groupId);
+          } else {
+            console.error('app.deleteGroup is not available');
+          }
         }
       });
     }
@@ -256,9 +262,15 @@ class UIComponents {
     const deleteBtn = itemDiv.querySelector('.delete-exercise-btn');
     if (deleteBtn) {
       deleteBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const exerciseId = deleteBtn.dataset.exerciseId;
         if (confirm('この種目を削除しますか？')) {
-          const exerciseId = e.target.dataset.exerciseId;
-          app.deleteExercise(exerciseId);
+          if (typeof app !== 'undefined' && typeof app.deleteExercise === 'function') {
+            app.deleteExercise(exerciseId);
+          } else {
+            console.error('app.deleteExercise is not available');
+          }
         }
       });
     }

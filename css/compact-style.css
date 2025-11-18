@@ -15,7 +15,7 @@ body {
   background: linear-gradient(135deg, #0A0A0A 0%, #1a0a0a 100%);
   color: #FFFFFF;
   padding: 0;
-  padding-top: calc(60px + env(safe-area-inset-top));
+  padding-top: calc(70px + env(safe-area-inset-top));
   padding-bottom: calc(12px + env(safe-area-inset-bottom));
   min-height: 100vh;
   font-size: 14px;
@@ -90,7 +90,7 @@ body {
   background: rgba(255, 68, 68, 0.1);
   border-radius: 8px;
   padding: 12px;
-  margin-top: 12px;
+  margin-top: 0;
   margin-bottom: 12px;
   border: 1px solid rgba(255, 68, 68, 0.3);
   display: flex;
